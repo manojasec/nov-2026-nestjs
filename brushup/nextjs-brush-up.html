@@ -1,0 +1,1641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Next.js Brush-Up &amp; Architecture Guide</title>
+<style>
+  :root {
+    --bg: #0a0e17;
+    --panel: #111827;
+    --panel-hover: #1f2937;
+    --text: #f1f5f9;
+    --muted: #94a3b8;
+    --accent: #38bdf8;
+    --accent-dark: #0284c7;
+    --code-bg: #030712;
+    --border: #243042;
+    --ok: #34d399;
+    --err: #f87171;
+    --warn: #fbbf24;
+    --server-badge: #0284c7;
+    --client-badge: #d946ef;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+  nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 270px;
+    overflow-y: auto;
+    background: var(--panel);
+    border-right: 1px solid var(--border);
+    padding: 1.25rem 1rem;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+  nav h2 {
+    margin: 0 0 .3rem;
+    color: #fff;
+    font-size: 1.15rem;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+  }
+  nav .subtitle {
+    color: var(--muted);
+    font-size: .8rem;
+    margin-bottom: 1rem;
+    display: block;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: .6rem;
+  }
+  nav a {
+    display: block;
+    color: var(--muted);
+    text-decoration: none;
+    padding: .35rem .6rem;
+    border-radius: 6px;
+    font-size: .86rem;
+    margin-bottom: 2px;
+    transition: all .15s ease;
+  }
+  nav a:hover {
+    background: var(--panel-hover);
+    color: var(--accent);
+    transform: translateX(2px);
+  }
+  nav a.active {
+    background: rgba(56, 189, 248, 0.12);
+    color: var(--accent);
+    font-weight: 600;
+  }
+  main {
+    margin-left: 270px;
+    padding: 2.5rem 3.5rem;
+    max-width: 1040px;
+  }
+  h1 {
+    color: #fff;
+    margin-top: 0;
+    font-size: 2.3rem;
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    letter-spacing: -0.02em;
+  }
+  h1 .logo-badge {
+    background: #000;
+    border: 1px solid var(--border);
+    color: #fff;
+    padding: .2rem .7rem;
+    border-radius: 8px;
+    font-size: .9rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+  section {
+    margin-bottom: 3.5rem;
+    padding-top: .75rem;
+  }
+  h2 {
+    border-bottom: 2px solid var(--border);
+    padding-bottom: .5rem;
+    color: var(--accent);
+    font-size: 1.45rem;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+  }
+  h3 {
+    margin: 1.4rem 0 .4rem;
+    color: #f8fafc;
+    font-size: 1.12rem;
+  }
+  code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  }
+  p code, li code, td code {
+    background: var(--code-bg);
+    padding: 2px 7px;
+    border-radius: 4px;
+    color: #7dd3fc;
+    font-size: .9em;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.1rem;
+    overflow-x: auto;
+    margin: .75rem 0;
+    position: relative;
+  }
+  pre code {
+    color: #e2e8f0;
+    font-size: .88rem;
+    line-height: 1.55;
+  }
+  pre.errdemo {
+    border-left: 4px solid var(--err);
+    background: #140b0f;
+  }
+  .run {
+    background: var(--accent);
+    color: #030712;
+    border: 0;
+    padding: .35rem .9rem;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: .82rem;
+    margin-bottom: .35rem;
+    transition: filter .15s;
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+  }
+  .run:hover { filter: brightness(1.15); }
+  .run:disabled { opacity: .6; cursor: wait; }
+  .out {
+    background: #020617;
+    border-left: 3px solid var(--ok);
+    padding: .75rem 1.1rem;
+    margin: 0 0 1.25rem;
+    white-space: pre-wrap;
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+    font-size: .86rem;
+    color: var(--ok);
+    display: none;
+    border-radius: 0 6px 6px 0;
+  }
+  .out .e { color: var(--err); }
+  .tip {
+    background: rgba(14, 116, 144, 0.16);
+    border-left: 4px solid #06b6d4;
+    padding: .75rem 1.1rem;
+    border-radius: 6px;
+    margin: 1.1rem 0;
+  }
+  .warn {
+    background: rgba(180, 83, 9, 0.16);
+    border-left: 4px solid #f59e0b;
+    padding: .75rem 1.1rem;
+    border-radius: 6px;
+    margin: 1.1rem 0;
+  }
+  .note {
+    background: rgba(99, 102, 241, 0.12);
+    border-left: 4px solid #818cf8;
+    padding: .75rem 1.1rem;
+    border-radius: 6px;
+    margin: 1.1rem 0;
+  }
+  .label {
+    display: inline-block;
+    font-size: .75rem;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-right: .4rem;
+    font-weight: 600;
+  }
+  .label.bad { background: #7f1d1d; color: #fecaca; }
+  .label.server { background: #0369a1; color: #e0f2fe; }
+  .label.client { background: #86198f; color: #fae8ff; }
+  .label.next15 { background: #15803d; color: #dcfce7; }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: .85rem 0 1.5rem;
+  }
+  th, td {
+    border: 1px solid var(--border);
+    padding: .55rem .85rem;
+    text-align: left;
+    font-size: .9rem;
+  }
+  th { background: var(--panel); color: #fff; }
+  tr:nth-child(even) { background: rgba(255, 255, 255, 0.015); }
+
+  /* Interactive Simulator */
+  .simulator-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.25rem;
+    margin: 1.5rem 0;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+  }
+  .sim-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .6rem;
+    margin-bottom: 1rem;
+    align-items: center;
+  }
+  .sim-btn {
+    background: #1e293b;
+    color: #e2e8f0;
+    border: 1px solid var(--border);
+    padding: .4rem .8rem;
+    border-radius: 6px;
+    font-size: .83rem;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .sim-btn:hover, .sim-btn.active {
+    background: var(--accent);
+    color: #030712;
+    border-color: var(--accent);
+    font-weight: 600;
+  }
+  .sim-display {
+    background: #030712;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1rem;
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+    font-size: .85rem;
+    min-height: 120px;
+  }
+  .tree-node {
+    margin-left: 1.2rem;
+    position: relative;
+    padding: 3px 0;
+  }
+  .tree-node::before {
+    content: "├─ ";
+    color: var(--muted);
+  }
+
+  /* Exercise Details */
+  details {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: .8rem 1rem;
+    margin: .8rem 0;
+  }
+  summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--accent);
+    user-select: none;
+  }
+  summary:hover { text-decoration: underline; }
+
+  @media (max-width: 860px) {
+    nav { display: none; }
+    main { margin-left: 0; padding: 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <h2>▲ Next.js Guide</h2>
+  <span class="subtitle">App Router &amp; Server Components</span>
+  <a href="#intro">1. Introduction &amp; Paradigms</a>
+  <a href="#anatomy">2. Project Anatomy &amp; Setup</a>
+  <a href="#routing">3. App Router &amp; Layouts</a>
+  <a href="#dynamic">4. Dynamic Routes &amp; Params</a>
+  <a href="#rsc">5. Server vs Client Components</a>
+  <a href="#fetching">6. Data Fetching &amp; Streaming</a>
+  <a href="#actions">7. Server Actions &amp; Mutations</a>
+  <a href="#caching">8. Caching &amp; Revalidation</a>
+  <a href="#handlers">9. Route Handlers (APIs)</a>
+  <a href="#middleware">10. Middleware</a>
+  <a href="#navigation">11. Navigation &amp; Redirects</a>
+  <a href="#optimizations">12. Built-in Optimizations</a>
+  <a href="#parallel">13. Parallel &amp; Intercepting Routes</a>
+  <a href="#auth">14. Auth &amp; Security</a>
+  <a href="#suspense">15. Suspense &amp; Error Handling</a>
+  <a href="#config">16. Config &amp; Environment</a>
+  <a href="#next15">17. Next.js 15 Async APIs</a>
+  <a href="#pitfalls">18. Common Pitfalls</a>
+  <a href="#simulator">19. Interactive Simulator</a>
+  <a href="#practice">20. Practice Exercises</a>
+</nav>
+
+<main>
+<h1>
+  Next.js Brush-Up &amp; Architecture
+  <span class="logo-badge">NEXT 14 / 15</span>
+</h1>
+<p>
+  A comprehensive guide to modern <strong>Next.js (App Router, React Server Components, Server Actions, Caching, and Route Handlers)</strong>.
+  Runnable code blocks execute directly in your browser. Blocks with red left borders show common anti-patterns or compile errors.
+</p>
+<div class="tip">
+  <strong>Companion Guides:</strong>
+  <a href="javascript-brush-up.html" style="color:var(--accent); font-weight:600;">JavaScript</a> |
+  <a href="typescript-brush-up.html" style="color:var(--accent); font-weight:600;">TypeScript</a> |
+  <a href="nestjs-student-api-slider.html" style="color:var(--accent); font-weight:600;">NestJS API Slider</a>
+</div>
+
+<!-- 1. Introduction -->
+<section id="intro">
+  <h2>1. Introduction &amp; Rendering Paradigms</h2>
+  <p>
+    Next.js is a full-stack React framework that shifts heavy compute and data retrieval to the server, delivering minimal client bundles, instant page loads, and native SEO.
+  </p>
+  <table>
+    <thead>
+      <tr>
+        <th>Paradigm</th>
+        <th>Where Rendered</th>
+        <th>When Rendered</th>
+        <th>Best For</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>RSC</strong> (React Server Components)</td>
+        <td>Server only</td>
+        <td>Build or Request time</td>
+        <td>Default in App Router. Zero JS sent to browser. DB queries, markdown, heavy libs.</td>
+      </tr>
+      <tr>
+        <td><strong>SSR</strong> (Server-Side Rendering)</td>
+        <td>Server on demand</td>
+        <td>Every HTTP Request</td>
+        <td>Personalized feeds, auth dashboards, real-time dynamic data.</td>
+      </tr>
+      <tr>
+        <td><strong>SSG</strong> (Static Site Generation)</td>
+        <td>Server / Build</td>
+        <td>At <code>npm run build</code></td>
+        <td>Blogs, docs, marketing sites, e-commerce catalog pages.</td>
+      </tr>
+      <tr>
+        <td><strong>ISR</strong> (Incremental Static Revalidation)</td>
+        <td>Server background</td>
+        <td>Periodic revalidation</td>
+        <td>High-traffic pages with periodic updates (e.g. revalidate every 60s).</td>
+      </tr>
+      <tr>
+        <td><strong>CSR</strong> (Client-Side Rendering)</td>
+        <td>Browser</td>
+        <td>User interaction time</td>
+        <td>Buttons, forms with live state, modal toggles, browser APIs (canvas, audio).</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>App Router vs. Pages Router</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Feature</th>
+        <th>App Router (<code>app/</code>)</th>
+        <th>Pages Router (<code>pages/</code> legacy)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Default Component</td>
+        <td><span class="label server">Server Component</span></td>
+        <td>Client Component</td>
+      </tr>
+      <tr>
+        <td>Data Fetching</td>
+        <td>Native <code>async/await</code> in component</td>
+        <td><code>getServerSideProps</code>, <code>getStaticProps</code></td>
+      </tr>
+      <tr>
+        <td>Layouts</td>
+        <td>Nested, preserve state during transitions</td>
+        <td>Manual wrappers (re-mount on route change)</td>
+      </tr>
+      <tr>
+        <td>Data Mutations</td>
+        <td>Server Actions (<code>'use server'</code>)</td>
+        <td>API route endpoints + client fetch</td>
+      </tr>
+      <tr>
+        <td>Streaming</td>
+        <td>Native with React <code>Suspense</code> &amp; <code>loading.tsx</code></td>
+        <td>Difficult / external libraries</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- 2. Project Anatomy -->
+<section id="anatomy">
+  <h2>2. Project Anatomy &amp; Setup</h2>
+  <p>Bootstrap a production-ready Next.js project using <code>create-next-app</code>:</p>
+  <pre><code># Create new Next.js project non-interactively
+npx create-next-app@latest my-app --typescript --tailwind --eslint --app --src-dir --import-alias "@/*"
+
+cd my-app
+npm run dev           # Starts local dev server at http://localhost:3000
+npm run dev -- --turbo # Starts with lightning-fast Turbopack bundler
+npm run build         # Compiles optimized production bundle
+npm run start         # Runs production server</code></pre>
+
+  <h3>Directory Structure</h3>
+  <pre><code>my-app/
+├── src/
+│   ├── app/                    # App Router root
+│   │   ├── layout.tsx          # Root Layout (required, holds &lt;html&gt; &amp; &lt;body&gt;)
+│   │   ├── page.tsx            # Home page route ("/")
+│   │   ├── loading.tsx         # Global loading skeleton
+│   │   ├── not-found.tsx       # 404 handler
+│   │   ├── error.tsx           # Error boundary ('use client')
+│   │   ├── global-error.tsx    # Root layout error boundary
+│   │   ├── (auth)/             # Route group (doesn't affect URL)
+│   │   │   ├── login/page.tsx  # Route: /login
+│   │   │   └── register/page.tsx
+│   │   ├── dashboard/
+│   │   │   ├── layout.tsx      # Nested layout for dashboard
+│   │   │   └── page.tsx        # Route: /dashboard
+│   │   └── api/                # Route handlers (REST / Webhooks)
+│   │       └── users/route.ts  # GET/POST /api/users
+│   ├── components/             # Reusable UI components
+│   └── lib/                    # Helpers, DB client, Zod schemas
+├── public/                     # Static files (images, svgs, favicon)
+├── middleware.ts               # Edge request interceptor
+├── next.config.ts              # Next.js configuration
+└── tsconfig.json               # TypeScript config with "@/*" path alias</code></pre>
+</section>
+
+<!-- 3. Routing & Nested Layouts -->
+<section id="routing">
+  <h2>3. App Router &amp; Layouts</h2>
+  <p>
+    Next.js uses folder-based routing where the folder structure maps directly to the URL pathname.
+    Special reserved filenames define UI boundaries:
+  </p>
+
+  <h3>Root Layout (<code>app/layout.tsx</code>)</h3>
+  <p>Mandatory for the app. Must define <code>&lt;html&gt;</code> and <code>&lt;body&gt;</code> tags. It never re-renders on route transitions.</p>
+  <pre><code>// src/app/layout.tsx
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import "./globals.css";
+
+const inter = Inter({ subsets: ["latin"] });
+
+export const metadata: Metadata = {
+  title: {
+    template: "%s | Acme Corp",
+    default: "Acme Corp - NextGen Cloud",
+  },
+  description: "Enterprise high-performance cloud platform",
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    &lt;html lang="en" className={inter.className}&gt;
+      &lt;body className="bg-slate-950 text-slate-100 min-h-screen"&gt;
+        &lt;header className="border-b border-slate-800 p-4"&gt;
+          &lt;nav&gt;Shared Global Navbar&lt;/nav&gt;
+        &lt;/header&gt;
+        &lt;main&gt;{children}&lt;/main&gt;
+        &lt;footer className="p-4 text-center text-sm text-slate-500"&gt;
+          &copy; 2026 Acme Corp
+        &lt;/footer&gt;
+      &lt;/body&gt;
+    &lt;/html&gt;
+  );
+}</code></pre>
+
+  <h3>Nested Layouts</h3>
+  <p>
+    Folders can have their own <code>layout.tsx</code>. It wraps child routes and preserves its internal state during sibling navigations.
+  </p>
+  <pre><code>// src/app/dashboard/layout.tsx
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    &lt;div className="flex h-screen"&gt;
+      &lt;aside className="w-64 border-r border-slate-800 p-4"&gt;
+        &lt;h3&gt;Dashboard Menu&lt;/h3&gt;
+        {/* Navigation links here */}
+      &lt;/aside&gt;
+      &lt;section className="flex-1 p-8 overflow-y-auto"&gt;
+        {children}
+      &lt;/section&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+
+  <div class="tip">
+    <strong>Layout vs Template:</strong> <code>layout.tsx</code> persists state across page changes (form inputs retain values).
+    If you want a fresh component instance and fresh animations on every navigation, rename it to <code>template.tsx</code>!
+  </div>
+</section>
+
+<!-- 4. Dynamic Routes & Params -->
+<section id="dynamic">
+  <h2>4. Dynamic Routes &amp; URL Handling</h2>
+  <p>Dynamic route segments allow parameterized URLs.</p>
+  <table>
+    <thead>
+      <tr>
+        <th>Folder Syntax</th>
+        <th>URL Example</th>
+        <th>Extracted Params</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>app/blog/[id]/page.tsx</code></td>
+        <td><code>/blog/42</code></td>
+        <td><code>{ id: '42' }</code></td>
+      </tr>
+      <tr>
+        <td><code>app/docs/[...slug]/page.tsx</code></td>
+        <td><code>/docs/api/v2/auth</code></td>
+        <td><code>{ slug: ['api', 'v2', 'auth'] }</code></td>
+      </tr>
+      <tr>
+        <td><code>app/shop/[[...slug]]/page.tsx</code></td>
+        <td><code>/shop</code> OR <code>/shop/shoes</code></td>
+        <td><code>{ slug: undefined }</code> OR <code>{ slug: ['shoes'] }</code></td>
+      </tr>
+      <tr>
+        <td><code>app/(marketing)/about/page.tsx</code></td>
+        <td><code>/about</code></td>
+        <td><em>Route group: omitted from URL</em></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Next.js 15 Async Params &amp; Pre-rendering</h3>
+  <p>
+    <span class="label next15">Next.js 15+</span> In Next.js 15, <code>params</code> and <code>searchParams</code> are Promises that must be <code>await</code>ed.
+  </p>
+  <pre><code>// src/app/blog/[id]/page.tsx
+import { notFound } from "next/navigation";
+
+interface PageProps {
+  params: Promise&lt;{ id: string }&gt;;
+  searchParams: Promise&lt;{ filter?: string }&gt;;
+}
+
+// Generate static routes at build time (SSG for dynamic routes)
+export async function generateStaticParams() {
+  const posts = [{ id: "1" }, { id: "2" }, { id: "3" }];
+  return posts.map((post) => ({ id: post.id }));
+}
+
+export default async function BlogPostPage({ params, searchParams }: PageProps) {
+  const { id } = await params;
+  const { filter } = await searchParams;
+
+  if (Number(id) &gt; 1000) {
+    notFound(); // Triggers not-found.tsx
+  }
+
+  return (
+    &lt;article&gt;
+      &lt;h1&gt;Post #{id}&lt;/h1&gt;
+      {filter &amp;&amp; &lt;p&gt;Applied filter: {filter}&lt;/p&gt;}
+    &lt;/article&gt;
+  );
+}</code></pre>
+</section>
+
+<!-- 5. Server vs Client Components -->
+<section id="rsc">
+  <h2>5. Server Components vs. Client Components</h2>
+  <p>
+    By default in the App Router, <strong>every component is a Server Component</strong>.
+    To make a component interactive, declare <code>'use client'</code> at the very top of the file.
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Capability</th>
+        <th><span class="label server">Server Component</span></th>
+        <th><span class="label client">Client Component ('use client')</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Direct Database &amp; File System access</td>
+        <td>Yes (Prisma, Drizzle, SQL, fs)</td>
+        <td>No (Security leak!)</td>
+      </tr>
+      <tr>
+        <td>Secrets &amp; API keys without <code>NEXT_PUBLIC_</code></td>
+        <td>Yes (Safe)</td>
+        <td>No (Exposed in bundle)</td>
+      </tr>
+      <tr>
+        <td>React Hooks (<code>useState</code>, <code>useEffect</code>, <code>useReducer</code>)</td>
+        <td>No</td>
+        <td>Yes</td>
+      </tr>
+      <tr>
+        <td>Event Listeners (<code>onClick</code>, <code>onChange</code>)</td>
+        <td>No</td>
+        <td>Yes</td>
+      </tr>
+      <tr>
+        <td>Browser APIs (<code>window</code>, <code>localStorage</code>, <code>navigator</code>)</td>
+        <td>No</td>
+        <td>Yes (inside <code>useEffect</code>)</td>
+      </tr>
+      <tr>
+        <td>Bundle size impact</td>
+        <td><strong>0 KB</strong> JavaScript sent to client</td>
+        <td>Included in client bundle</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>The Component Composition Rule (The Golden Rule)</h3>
+  <p>
+    A Client Component <strong>cannot directly import</strong> a Server Component!
+    However, you can pass a Server Component as <code>children</code> or as a prop.
+  </p>
+  <pre class="errdemo"><code>// ❌ INVALID: Client component directly imports Server Component
+'use client';
+import HeavyServerDbReader from './HeavyServerDbReader'; // ERROR: Pulls server code into bundle!
+
+export default function ClientModal() {
+  return &lt;div&gt;&lt;HeavyServerDbReader /&gt;&lt;/div&gt;;
+}</code></pre>
+
+  <pre><code>// ✅ CORRECT: Pass Server Component via children
+// src/components/ClientModal.tsx
+'use client';
+import { useState } from 'react';
+
+export default function ClientModal({ children }: { children: React.ReactNode }) {
+  const [isOpen, setIsOpen] = useState(false);
+  return (
+    &lt;div&gt;
+      &lt;button onClick={() =&gt; setIsOpen(!isOpen)}&gt;Toggle Modal&lt;/button&gt;
+      {isOpen &amp;&amp; &lt;div className="modal"&gt;{children}&lt;/div&gt;}
+    &lt;/div&gt;
+  );
+}
+
+// In app/page.tsx (Server Component):
+import ClientModal from '@/components/ClientModal';
+import HeavyServerDbReader from '@/components/HeavyServerDbReader';
+
+export default function Page() {
+  return (
+    &lt;ClientModal&gt;
+      {/* HeavyServerDbReader executes on server, only rendered HTML goes into modal slot */}
+      &lt;HeavyServerDbReader /&gt;
+    &lt;/ClientModal&gt;
+  );
+}</code></pre>
+</section>
+
+<!-- 6. Data Fetching & Streaming -->
+<section id="fetching">
+  <h2>6. Data Fetching &amp; Streaming</h2>
+  <p>
+    In Server Components, simply use standard <code>async/await</code>. You do not need <code>useEffect</code> or Axios!
+  </p>
+  <pre class="runnable"><code>// Runnable Simulation of Next.js Parallel Fetching vs Waterfall
+async function fetchUser() {
+  return new Promise((res) => setTimeout(() => res({ id: 1, name: "Alice" }), 150));
+}
+async function fetchPosts() {
+  return new Promise((res) => setTimeout(() => res([{ id: 101, title: "Next.js Rocks" }]), 200));
+}
+
+// ❌ Waterfall: awaits sequentially (takes 150ms + 200ms = 350ms)
+console.time("Waterfall Fetch");
+const user1 = await fetchUser();
+const posts1 = await fetchPosts();
+console.timeEnd("Waterfall Fetch");
+console.log("Waterfall got:", user1.name, posts1[0].title);
+
+// ✅ Parallel: awaits concurrently with Promise.all (takes ~200ms)
+console.time("Parallel Fetch");
+const [user2, posts2] = await Promise.all([fetchUser(), fetchPosts()]);
+console.timeEnd("Parallel Fetch");
+console.log("Parallel got:", user2.name, posts2[0].title);</code></pre>
+
+  <h3>Next.js Extended <code>fetch</code> Cache Options</h3>
+  <pre><code>// 1. Static fetch (cached indefinitely, SSG)
+const staticData = await fetch('https://api.example.com/items', {
+  cache: 'force-cache', // Default in Next.js 14
+});
+
+// 2. Dynamic fetch on every request (no cache, SSR)
+const liveData = await fetch('https://api.example.com/stocks', {
+  cache: 'no-store', // Default in Next.js 15
+});
+
+// 3. Time-based revalidation (ISR)
+const isrData = await fetch('https://api.example.com/products', {
+  next: { revalidate: 60 }, // Revalidate every 60 seconds
+});
+
+// 4. Tag-based on-demand revalidation
+const taggedData = await fetch('https://api.example.com/cart', {
+  next: { tags: ['user-cart'] },
+});</code></pre>
+
+  <h3>Streaming with React Suspense</h3>
+  <p>
+    Stream parts of the page as soon as they become ready, preventing slow database queries from blocking the rest of the UI.
+  </p>
+  <pre><code>// src/app/dashboard/page.tsx
+import { Suspense } from 'react';
+import FastHeader from '@/components/FastHeader';
+import SlowAnalytics from '@/components/SlowAnalytics';
+import AnalyticsSkeleton from '@/components/AnalyticsSkeleton';
+
+export default function DashboardPage() {
+  return (
+    &lt;div&gt;
+      {/* FastHeader renders instantly */}
+      &lt;FastHeader /&gt;
+
+      {/* SlowAnalytics streams in once ready without delaying FastHeader */}
+      &lt;Suspense fallback={&lt;AnalyticsSkeleton /&gt;}&gt;
+        &lt;SlowAnalytics /&gt;
+      &lt;/Suspense&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+</section>
+
+<!-- 7. Server Actions -->
+<section id="actions">
+  <h2>7. Server Actions &amp; Mutations</h2>
+  <p>
+    Server Actions are asynchronous functions executed on the server. They can be invoked directly from HTML forms or client components without creating manual API endpoints.
+  </p>
+
+  <h3>Dedicated Action File (<code>actions.ts</code>)</h3>
+  <pre><code>// src/app/actions.ts
+'use server';
+
+import { revalidatePath } from 'next/cache';
+import { z } from 'zod';
+
+const TaskSchema = z.object({
+  title: z.string().min(3, "Title must be at least 3 characters"),
+});
+
+export async function createTask(prevState: any, formData: FormData) {
+  const rawTitle = formData.get('title');
+  const result = TaskSchema.safeParse({ title: rawTitle });
+
+  if (!result.success) {
+    return {
+      success: false,
+      errors: result.error.flatten().fieldErrors,
+    };
+  }
+
+  // Simulated DB insertion
+  // await db.task.create({ data: { title: result.data.title } });
+
+  // Invalidate cache for the task page
+  revalidatePath('/tasks');
+
+  return { success: true, message: `Task "${result.data.title}" added!` };
+}</code></pre>
+
+  <h3>Client Form with <code>useActionState</code> &amp; <code>useFormStatus</code></h3>
+  <pre><code>// src/components/TaskForm.tsx
+'use client';
+
+import { useActionState } from 'react';
+import { useFormStatus } from 'react-dom';
+import { createTask } from '@/app/actions';
+
+function SubmitButton() {
+  const { pending } = useFormStatus();
+  return (
+    &lt;button type="submit" disabled={pending} className="bg-sky-500 px-4 py-2 rounded font-bold"&gt;
+      {pending ? 'Saving...' : 'Add Task'}
+    &lt;/button&gt;
+  );
+}
+
+export default function TaskForm() {
+  const [state, formAction] = useActionState(createTask, null);
+
+  return (
+    &lt;form action={formAction} className="space-y-4"&gt;
+      &lt;input
+        name="title"
+        placeholder="Enter task title"
+        className="bg-slate-900 border border-slate-700 p-2 rounded"
+      /&gt;
+      {state?.errors?.title &amp;&amp; (
+        &lt;p className="text-red-400 text-sm"&gt;{state.errors.title[0]}&lt;/p&gt;
+      )}
+      &lt;SubmitButton /&gt;
+      {state?.success &amp;&amp; &lt;p className="text-emerald-400"&gt;{state.message}&lt;/p&gt;}
+    &lt;/form&gt;
+  );
+}</code></pre>
+</section>
+
+<!-- 8. Caching Architecture -->
+<section id="caching">
+  <h2>8. Caching &amp; Revalidation</h2>
+  <p>Next.js features a multi-tiered caching architecture designed for extreme performance.</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Mechanism</th>
+        <th>Where Stored</th>
+        <th>Purpose</th>
+        <th>Duration</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Request Memoization</strong></td>
+        <td>Server Memory</td>
+        <td>Deduplicates identical <code>fetch()</code> calls across the same render pass</td>
+        <td>Lifetime of a single HTTP request</td>
+      </tr>
+      <tr>
+        <td><strong>Data Cache</strong></td>
+        <td>Server Persistent Store</td>
+        <td>Stores data across distinct user requests and builds</td>
+        <td>Persistent until revalidated</td>
+      </tr>
+      <tr>
+        <td><strong>Full Route Cache</strong></td>
+        <td>Server HTML/RSC payload</td>
+        <td>Caches rendered HTML and RSC payload of static routes</td>
+        <td>Persistent until revalidation</td>
+      </tr>
+      <tr>
+        <td><strong>Router Cache</strong></td>
+        <td>Client browser memory</td>
+        <td>Stores visited RSC payloads for instant back/forward navigation</td>
+        <td>User session (seconds)</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Programmatic Cache Invalidation</h3>
+  <pre class="runnable"><code>// Demonstrating tag-based and path-based invalidation logic
+interface CacheStore {
+  [key: string]: { tag: string; value: any; timestamp: number };
+}
+
+const mockCache: CacheStore = {
+  "/products": { tag: "products", value: ["MacBook", "iPad"], timestamp: Date.now() },
+  "/products/1": { tag: "products", value: "MacBook Pro", timestamp: Date.now() },
+  "/cart": { tag: "cart", value: ["Item 1"], timestamp: Date.now() },
+};
+
+function revalidateTag(targetTag: string) {
+  let cleared = 0;
+  for (const [key, item] of Object.entries(mockCache)) {
+    if (item.tag === targetTag) {
+      delete mockCache[key];
+      cleared++;
+    }
+  }
+  return `Revalidated tag '${targetTag}': cleared ${cleared} cache entries.`;
+}
+
+console.log("Before:", Object.keys(mockCache));
+console.log(revalidateTag("products"));
+console.log("After:", Object.keys(mockCache));</code></pre>
+</section>
+
+<!-- 9. Route Handlers -->
+<section id="handlers">
+  <h2>9. Route Handlers (API Endpoints)</h2>
+  <p>
+    Defined in <code>app/api/**/route.ts</code>. Replaces traditional Express routes or Pages router API endpoints.
+  </p>
+  <pre><code>// src/app/api/users/[id]/route.ts
+import { NextRequest, NextResponse } from "next/server";
+
+interface RouteContext {
+  params: Promise&lt;{ id: string }&gt;;
+}
+
+// GET /api/users/:id
+export async function GET(request: NextRequest, context: RouteContext) {
+  const { id } = await context.params;
+  const searchParams = request.nextUrl.searchParams;
+  const detail = searchParams.get("detail");
+
+  return NextResponse.json({
+    id,
+    name: "John Doe",
+    detail: detail === "true",
+  });
+}
+
+// POST /api/users/:id
+export async function POST(request: NextRequest, context: RouteContext) {
+  const { id } = await context.params;
+  const body = await request.json();
+
+  if (!body.email) {
+    return NextResponse.json(
+      { error: "Email is required" },
+      { status: 400 }
+    );
+  }
+
+  return NextResponse.json(
+    { message: `User ${id} updated`, data: body },
+    { status: 201, headers: { "X-Processed-By": "NextJS-AppRouter" } }
+  );
+}</code></pre>
+</section>
+
+<!-- 10. Middleware -->
+<section id="middleware">
+  <h2>10. Middleware</h2>
+  <p>
+    Middleware runs <strong>before</strong> a request is completed, at the Edge.
+    It is ideal for authentication redirects, bot protection, header decoration, and A/B testing.
+  </p>
+  <pre><code>// middleware.ts (in root or src/)
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+
+export function middleware(request: NextRequest) {
+  const token = request.cookies.get('session_token')?.value;
+  const pathname = request.nextUrl.pathname;
+
+  // Protect all /dashboard routes
+  if (pathname.startsWith('/dashboard') &amp;&amp; !token) {
+    const loginUrl = new URL('/login', request.url);
+    loginUrl.searchParams.set('from', pathname);
+    return NextResponse.redirect(loginUrl);
+  }
+
+  // Inject a custom response header or pass through
+  const response = NextResponse.next();
+  response.headers.set('X-Request-Path', pathname);
+  return response;
+}
+
+// Matcher configuration restricts where middleware executes
+export const config = {
+  matcher: [
+    '/dashboard/:path*',
+    '/api/protected/:path*',
+    // Exclude static assets, favicon, _next
+    '/((?!_next/static|_next/image|favicon.ico).*)',
+  ],
+};</code></pre>
+</section>
+
+<!-- 11. Navigation & Redirects -->
+<section id="navigation">
+  <h2>11. Navigation, Redirects &amp; Linking</h2>
+  <pre><code>// 1. Declarative Navigation with &lt;Link&gt;
+import Link from 'next/link';
+
+export function Nav() {
+  return (
+    &lt;nav&gt;
+      {/* Prefetches the target route into Router Cache automatically in viewport */}
+      &lt;Link href="/dashboard" prefetch={true} className="hover:underline"&gt;
+        Dashboard
+      &lt;/Link&gt;
+    &lt;/nav&gt;
+  );
+}
+
+// 2. Programmatic Navigation in Client Components
+'use client';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+
+export function SearchBox() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const handleSearch = (term: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (term) params.set('q', term);
+    else params.delete('q');
+    router.push(`${pathname}?${params.toString()}`);
+  };
+
+  return &lt;input onChange={(e) =&gt; handleSearch(e.target.value)} /&gt;;
+}
+
+// 3. Server-side Redirect (in Server Components or Actions)
+import { redirect, permanentRedirect } from 'next/navigation';
+
+export async function logoutAction() {
+  'use server';
+  // destroy session...
+  redirect('/login'); // Throws a NEXT_REDIRECT internal error, do not catch in try/catch!
+}</code></pre>
+</section>
+
+<!-- 12. Built-in Optimizations -->
+<section id="optimizations">
+  <h2>12. Built-in Optimizations (Images, Fonts &amp; SEO)</h2>
+
+  <h3>1. <code>next/image</code> (Prevents CLS &amp; Formats WebP/AVIF)</h3>
+  <pre><code>import Image from 'next/image';
+import heroImg from '@/public/hero.jpg';
+
+export function Hero() {
+  return (
+    &lt;div className="relative w-full h-96"&gt;
+      {/* Local image: width/height &amp; blur placeholder are automatically computed */}
+      &lt;Image src={heroImg} alt="Hero Banner" placeholder="blur" priority /&gt;
+
+      {/* Remote image: requires explicit width &amp; height + next.config domain config */}
+      &lt;Image
+        src="https://images.unsplash.com/photo-1579546929518-9e396f3cc809"
+        alt="Remote Gradient"
+        width={800}
+        height={600}
+        loading="lazy"
+      /&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+
+  <h3>2. Dynamic Metadata for SEO (OpenGraph, Twitter)</h3>
+  <pre><code>import type { Metadata, ResolvingMetadata } from 'next';
+
+type Props = {
+  params: Promise&lt;{ id: string }&gt;;
+};
+
+export async function generateMetadata(
+  { params }: Props,
+  parent: ResolvingMetadata
+): Promise&lt;Metadata&gt; {
+  const { id } = await params;
+  const product = await fetch(`https://api.example.com/products/${id}`).then((res) =&gt; res.json());
+
+  return {
+    title: product.name,
+    description: product.summary,
+    openGraph: {
+      title: product.name,
+      description: product.summary,
+      images: [product.thumbnailUrl],
+    },
+  };
+}</code></pre>
+</section>
+
+<!-- 13. Advanced Routing -->
+<section id="parallel">
+  <h2>13. Advanced Routing (Parallel &amp; Intercepting Routes)</h2>
+  <p>
+    <strong>Parallel Routes</strong> (named slots <code>@slot</code>) let you render multiple sub-pages simultaneously inside the same layout (e.g. split-screen or dashboard feeds).
+  </p>
+  <pre><code>// Folder structure:
+// app/dashboard/
+//   layout.tsx
+//   @analytics/page.tsx
+//   @team/page.tsx
+
+export default function DashboardLayout({
+  children,
+  analytics,
+  team,
+}: {
+  children: React.ReactNode;
+  analytics: React.ReactNode;
+  team: React.ReactNode;
+}) {
+  return (
+    &lt;div&gt;
+      &lt;main&gt;{children}&lt;/main&gt;
+      &lt;div className="grid grid-cols-2 gap-4"&gt;
+        &lt;div&gt;{analytics}&lt;/div&gt;
+        &lt;div&gt;{team}&lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+
+  <h3>Intercepting Routes (<code>(.)</code>, <code>(..)</code>)</h3>
+  <p>
+    Allows loading a route within the current layout while intercepting the browser URL.
+    Classic use case: clicking a photo in a feed opens a <strong>modal</strong> with URL <code>/photo/123</code>; on page refresh, it renders the standalone photo page!
+  </p>
+  <pre><code>// Feed with modal photo intercept:
+// app/
+//   feed/page.tsx
+//   photo/[id]/page.tsx      &lt;-- Standalone page if loaded directly or refreshed
+//   @modal/(.)photo/[id]/page.tsx &lt;-- Intercepted modal route when clicked from feed</code></pre>
+</section>
+
+<!-- 14. Auth & Security -->
+<section id="auth">
+  <h2>14. Authentication &amp; Security Best Practices</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Security Concern</th>
+        <th>Incorrect Approach</th>
+        <th>Best Practice</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Server Secrets &amp; DB Keys</td>
+        <td>Naming <code>NEXT_PUBLIC_SECRET_KEY</code></td>
+        <td>Omit prefix: <code>SECRET_KEY</code>. Use <code>import 'server-only'</code> to guarantee it never reaches client.</td>
+      </tr>
+      <tr>
+        <td>Route Protection</td>
+        <td>Only checking auth in client <code>useEffect</code></td>
+        <td>Check session in <code>middleware.ts</code> AND verify in Server Component/Action.</td>
+      </tr>
+      <tr>
+        <td>Session Tokens</td>
+        <td>Storing tokens in <code>localStorage</code></td>
+        <td>Store in <code>HttpOnly, Secure, SameSite=Lax</code> cookies.</td>
+      </tr>
+      <tr>
+        <td>Server Action Input</td>
+        <td>Trusting <code>formData</code> blindly</td>
+        <td>Always parse with Zod or a validator schema before mutating DB.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Enforcing Server-Only Code</h3>
+  <pre><code># Install poison pill package
+npm install server-only</code></pre>
+  <pre><code>// src/lib/db.ts
+import 'server-only'; // Build fails if any Client Component tries to import this file!
+import { Pool } from 'pg';
+
+export const db = new Pool({
+  connectionString: process.env.DATABASE_URL,
+});</code></pre>
+</section>
+
+<!-- 15. Suspense & Error Handling -->
+<section id="suspense">
+  <h2>15. Suspense &amp; Error Boundaries</h2>
+  <p>Next.js provides automatic nested error boundaries via <code>error.tsx</code>.</p>
+  <pre><code>// src/app/dashboard/error.tsx
+'use client'; // Error boundaries MUST be Client Components
+
+import { useEffect } from 'react';
+
+export default function ErrorBoundary({
+  error,
+  reset,
+}: {
+  error: Error &amp; { digest?: string };
+  reset: () => void;
+}) {
+  useEffect(() => {
+    console.error('Logged to monitoring service:', error);
+  }, [error]);
+
+  return (
+    &lt;div className="p-6 bg-red-950/40 border border-red-800 rounded-lg"&gt;
+      &lt;h2 className="text-red-400 font-bold"&gt;Dashboard crashed!&lt;/h2&gt;
+      &lt;p className="text-sm text-red-200"&gt;{error.message}&lt;/p&gt;
+      &lt;button
+        onClick={() =&gt; reset()} // Re-attempts rendering the segment
+        className="mt-4 px-4 py-2 bg-red-600 rounded font-semibold text-white"
+      &gt;
+        Try Again
+      &lt;/button&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+</section>
+
+<!-- 16. Config & Environment -->
+<section id="config">
+  <h2>16. Next.js Configuration &amp; Turbopack</h2>
+  <pre><code>// next.config.ts (or next.config.mjs)
+import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
+  // Standalone output for ultra-lightweight Docker containers
+  output: "standalone",
+
+  // Allowed remote domains for next/image
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+        port: "",
+        pathname: "/**",
+      },
+    ],
+  },
+
+  // Custom HTTP Security Headers
+  async headers() {
+    return [
+      {
+        source: "/(.*)",
+        headers: [
+          { key: "X-Frame-Options", value: "DENY" },
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+        ],
+      },
+    ];
+  },
+};
+
+export default nextConfig;</code></pre>
+</section>
+
+<!-- 17. Next.js 15 Async APIs -->
+<section id="next15">
+  <h2>17. Next.js 15 Key Updates</h2>
+  <div class="note">
+    <strong>Breaking Change in Next.js 15:</strong> Runtime request APIs that rely on incoming requests (like <code>cookies()</code>, <code>headers()</code>, <code>params</code>, and <code>searchParams</code>) are now asynchronous and return a <code>Promise</code>.
+  </div>
+
+  <pre class="errdemo"><code>// ❌ Next.js 14 Style (Deprecation warning or runtime error in Next.js 15)
+import { cookies } from 'next/headers';
+
+export default function Page({ params }: { params: { id: string } }) {
+  const cookieStore = cookies(); // ERROR: cookies() must be awaited!
+  const token = cookieStore.get('token');
+  return &lt;div&gt;Post: {params.id}&lt;/div&gt;; // ERROR: params must be awaited!
+}</code></pre>
+
+  <pre><code>// ✅ Next.js 15 Style (Async await)
+import { cookies, headers } from 'next/headers';
+
+interface Props {
+  params: Promise&lt;{ id: string }&gt;;
+  searchParams: Promise&lt;{ q?: string }&gt;;
+}
+
+export default async function Page({ params, searchParams }: Props) {
+  const cookieStore = await cookies();
+  const headerStore = await headers();
+  const { id } = await params;
+  const { q } = await searchParams;
+
+  const token = cookieStore.get('token')?.value;
+  const userAgent = headerStore.get('user-agent');
+
+  return (
+    &lt;div&gt;
+      &lt;h1&gt;Item {id}&lt;/h1&gt;
+      &lt;p&gt;Search: {q}&lt;/p&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+</section>
+
+<!-- 18. Common Pitfalls -->
+<section id="pitfalls">
+  <h2>18. Common Pitfalls &amp; Solutions</h2>
+
+  <h3>Pitfall 1: Hydration Mismatch</h3>
+  <p>Occurs when HTML generated on the server differs from the initial client render (e.g. using <code>Date.now()</code>, <code>Math.random()</code>, or reading <code>window</code>).</p>
+  <pre class="errdemo"><code>// ❌ Hydration Error: Server renders UTC timestamp, browser renders user local time
+export default function Clock() {
+  return &lt;p&gt;Current time: {new Date().toLocaleTimeString()}&lt;/p&gt;;
+}</code></pre>
+  <pre><code>// ✅ Solution: Render time only after client mounts
+'use client';
+import { useState, useEffect } from 'react';
+
+export default function SafeClock() {
+  const [time, setTime] = useState&lt;string | null&gt;(null);
+
+  useEffect(() =&gt; {
+    setTime(new Date().toLocaleTimeString());
+  }, []);
+
+  return &lt;p&gt;Current time: {time ?? "Loading time..."}&lt;/p&gt;;
+}</code></pre>
+
+  <h3>Pitfall 2: Wrapping <code>redirect()</code> inside <code>try/catch</code></h3>
+  <pre class="errdemo"><code>// ❌ BUG: Next.js redirect() throws an internal NEXT_REDIRECT error
+export async function myAction() {
+  'use server';
+  try {
+    // some code
+    redirect('/done'); // Catch block catches NEXT_REDIRECT and breaks the redirect!
+  } catch (err) {
+    console.error("Failed", err);
+  }
+}</code></pre>
+  <pre><code>// ✅ Solution: Call redirect() outside the try/catch block
+export async function myAction() {
+  'use server';
+  try {
+    // some code
+  } catch (err) {
+    console.error("Failed", err);
+    return { error: "Operation failed" };
+  }
+  redirect('/done'); // Safe outside try/catch
+}</code></pre>
+</section>
+
+<!-- 19. Interactive Simulator -->
+<section id="simulator">
+  <h2>19. Interactive Next.js App Router Simulator</h2>
+  <p>
+    Test how routes resolve, which components execute on Server vs Client, and how the caching pipeline reacts.
+  </p>
+
+  <div class="simulator-card">
+    <div class="sim-controls">
+      <span style="font-size:.85rem; color:var(--muted); font-weight:600;">Simulate Route:</span>
+      <button class="sim-btn active" onclick="simulateRoute('/')">GET /</button>
+      <button class="sim-btn" onclick="simulateRoute('/dashboard')">GET /dashboard</button>
+      <button class="sim-btn" onclick="simulateRoute('/blog/42')">GET /blog/42</button>
+      <button class="sim-btn" onclick="simulateRoute('/api/health')">GET /api/health</button>
+      <button class="sim-btn" onclick="simulateAction('createPost')">⚡ Server Action (createPost)</button>
+    </div>
+
+    <div id="sim-output" class="sim-display">
+      <!-- Generated dynamically -->
+    </div>
+  </div>
+</section>
+
+<!-- 20. Practice Exercises -->
+<section id="practice">
+  <h2>20. Practice Exercises &amp; Challenges</h2>
+
+  <details>
+    <summary>Exercise 1: Convert a Waterfall Fetch into Parallel Streaming</summary>
+    <p><strong>Problem:</strong> Given a page that sequentially fetches User Profile, Recent Orders, and Product Recommendations, rewrite it using <code>Promise.all</code> and <code>&lt;Suspense&gt;</code> so that the main user profile renders immediately while recommendations stream in without blocking.</p>
+    <pre><code>// Solution:
+import { Suspense } from 'react';
+
+async function ProfileSection({ userId }: { userId: string }) {
+  const profile = await getProfile(userId);
+  return &lt;h1&gt;Welcome back, {profile.name}!&lt;/h1&gt;;
+}
+
+async function RecommendationsStream() {
+  const recs = await getRecommendations();
+  return &lt;ul&gt;{recs.map(r =&gt; &lt;li key={r.id}&gt;{r.title}&lt;/li&gt;)}&lt;/ul&gt;;
+}
+
+export default async function Page() {
+  return (
+    &lt;div&gt;
+      &lt;ProfileSection userId="123" /&gt;
+      &lt;Suspense fallback={&lt;p&gt;Loading your personalized recommendations...&lt;/p&gt;}&gt;
+        &lt;RecommendationsStream /&gt;
+      &lt;/Suspense&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+  </details>
+
+  <details>
+    <summary>Exercise 2: Type-Safe Server Action with Zod and Optimistic Updates</summary>
+    <p><strong>Problem:</strong> Build a task completion toggle that optimistically updates the checkbox in the UI before the server mutation completes, and rolls back if an error occurs.</p>
+    <pre><code>// Solution:
+'use client';
+import { useOptimistic, useTransition } from 'react';
+import { toggleTaskCompletion } from '@/app/actions';
+
+interface Task {
+  id: string;
+  title: string;
+  done: boolean;
+}
+
+export function TaskItem({ task }: { task: Task }) {
+  const [isPending, startTransition] = useTransition();
+  const [optimisticTask, setOptimisticTask] = useOptimistic(
+    task,
+    (current, update: boolean) =&gt; ({ ...current, done: update })
+  );
+
+  return (
+    &lt;label className="flex items-center gap-2"&gt;
+      &lt;input
+        type="checkbox"
+        checked={optimisticTask.done}
+        disabled={isPending}
+        onChange={() =&gt; {
+          startTransition(async () =&gt; {
+            setOptimisticTask(!optimisticTask.done);
+            await toggleTaskCompletion(task.id, !optimisticTask.done);
+          });
+        }}
+      /&gt;
+      &lt;span className={optimisticTask.done ? "line-through text-slate-500" : ""}&gt;
+        {optimisticTask.title}
+      &lt;/span&gt;
+    &lt;/label&gt;
+  );
+}</code></pre>
+  </details>
+
+  <details>
+    <summary>Exercise 3: How to pass a Server Component into a Client Component?</summary>
+    <p><strong>Answer:</strong> Pass the Server Component as <code>children</code> or as a named ReactNode prop slot from a parent Server Component. This ensures the Server Component is executed strictly on the server and only its serialized React virtual tree is passed into the client wrapper!</p>
+  </details>
+
+  <p style="color:var(--muted); margin-top:2rem;">
+    Tutorial Navigator:
+    <a href="javascript-brush-up.html" style="color:var(--accent);">javascript-brush-up.html</a> &rarr;
+    <a href="typescript-brush-up.html" style="color:var(--accent);">typescript-brush-up.html</a> &rarr;
+    <strong style="color:#fff;">nextjs-brush-up.html</strong>
+  </p>
+</main>
+
+<script>
+  // 1. Script Runner for TS / JS snippets
+  const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
+  const TS_URL = "https://cdn.jsdelivr.net/npm/typescript@5.6.3/lib/typescript.js";
+  let tsLoading = null;
+
+  function loadTs() {
+    if (window.ts) return Promise.resolve(window.ts);
+    tsLoading ??= new Promise((resolve, reject) => {
+      const s = document.createElement("script");
+      s.src = TS_URL;
+      s.onload = () => resolve(window.ts);
+      s.onerror = () => reject(new Error("Could not load TypeScript transpiler."));
+      document.head.append(s);
+    });
+    return tsLoading;
+  }
+
+  document.querySelectorAll("pre.runnable").forEach((pre) => {
+    const btn = document.createElement("button");
+    btn.className = "run";
+    btn.innerHTML = "&#9654; Run Example";
+    const out = document.createElement("div");
+    out.className = "out";
+    pre.before(btn);
+    pre.after(out);
+
+    btn.addEventListener("click", async () => {
+      out.style.display = "block";
+      out.textContent = "";
+      btn.disabled = true;
+      const timers = {};
+      const write = (cls, args) => {
+        const line = document.createElement("div");
+        if (cls) line.className = cls;
+        line.textContent = args.map(fmt).join(" ");
+        out.append(line);
+      };
+      const fakeConsole = {
+        log: (...a) => write("", a),
+        info: (...a) => write("", a),
+        warn: (...a) => write("e", a),
+        error: (...a) => write("e", a),
+        time: (l = "default") => { timers[l] = performance.now(); },
+        timeEnd: (l = "default") => write("", [`${l}: ${Math.round(performance.now() - timers[l])}ms`]),
+      };
+
+      try {
+        const ts = await loadTs();
+        const source = `async function __main() {\n${pre.textContent}\n}`;
+        const js = ts.transpileModule(source, {
+          compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext },
+        }).outputText + "\nreturn __main();";
+        await new AsyncFunction("console", js)(fakeConsole);
+      } catch (err) {
+        write("e", [`${err.name}: ${err.message}`]);
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  });
+
+  function fmt(v) {
+    if (typeof v === "string") return v;
+    if (typeof v === "bigint") return v + "n";
+    if (typeof v === "function") return `[Function ${v.name || "anonymous"}]`;
+    if (v instanceof Error) return `${v.name}: ${v.message}`;
+    try { return JSON.stringify(v, null, 2) ?? String(v); }
+    catch { return String(v); }
+  }
+
+  // 2. Interactive App Router Simulation Engine
+  const simData = {
+    "/": {
+      type: "Page Route",
+      middleware: "middleware.ts (pass through, added X-Request-Path)",
+      cache: "Full Route Cache: HIT (Rendered at build time, Static)",
+      tree: [
+        "RootLayout [Server Component - 0 KB JS]",
+        "  ├─ Header [Server Component]",
+        "  ├─ HomePage (app/page.tsx) [Server Component - 0 KB JS]",
+        "  │   ├─ HeroBanner [Server Component]",
+        "  │   └─ InteractiveNewsletter [Client Component - 'use client' - 4.2 KB JS]",
+        "  └─ Footer [Server Component]"
+      ],
+      payload: "RSC Payload: { 'hero': 'Acme', 'date': 'static' }",
+    },
+    "/dashboard": {
+      type: "Dynamic Page Route (Authenticated)",
+      middleware: "middleware.ts (Checked session cookie -> Valid)",
+      cache: "Dynamic Server-Side Rendered (SSR) on request",
+      tree: [
+        "RootLayout [Server Component]",
+        "  └─ DashboardLayout (app/dashboard/layout.tsx) [Server Component]",
+        "      ├─ SidebarNavigation [Client Component - active tab state]",
+        "      └─ DashboardPage (app/dashboard/page.tsx) [Server Component]",
+        "          ├─ FastMetricsSummary [Server Component - rendered in 10ms]",
+        "          └─ <Suspense fallback={<Skeleton />}>",
+        "              └─ SlowLiveChart [Server Component -> Streams in at 250ms]"
+      ],
+      payload: "Streams: Chunk 0 (Layout + Skeleton) -> Chunk 1 (Resolved Chart Data)",
+    },
+    "/blog/42": {
+      type: "Dynamic Route Segment (app/blog/[id]/page.tsx)",
+      middleware: "middleware.ts (pass through)",
+      cache: "ISR (Incremental Static Revalidation) - Valid for 60s",
+      tree: [
+        "RootLayout [Server Component]",
+        "  └─ BlogPostPage (id: '42') [Server Component]",
+        "      ├─ ArticleBody [Server Component from Markdown]",
+        "      └─ LikeButton [Client Component with useOptimistic]"
+      ],
+      payload: "Rendered HTML cached to edge CDN",
+    },
+    "/api/health": {
+      type: "Route Handler (app/api/health/route.ts)",
+      middleware: "Bypasses Layouts completely",
+      cache: "NextResponse.json({ status: 'ok', uptime: 99.98 })",
+      tree: [
+        "HTTP 200 OK",
+        "Content-Type: application/json",
+        "X-Processed-By: NextJS-AppRouter"
+      ],
+      payload: '{"status":"ok","timestamp":' + Date.now() + '}',
+    }
+  };
+
+  function simulateRoute(route) {
+    document.querySelectorAll(".sim-btn").forEach(b => b.classList.remove("active"));
+    const clickedBtn = Array.from(document.querySelectorAll(".sim-btn")).find(b => b.textContent.includes(route));
+    if (clickedBtn) clickedBtn.classList.add("active");
+
+    const data = simData[route];
+    const out = document.getElementById("sim-output");
+    out.innerHTML = `
+      <div style="color:var(--accent); font-weight:bold; margin-bottom:8px;">[Simulated Request: ${route}]</div>
+      <div style="color:var(--muted);"><span style="color:#fff;">1. Middleware:</span> ${data.middleware}</div>
+      <div style="color:var(--muted);"><span style="color:#fff;">2. Cache Layer:</span> <span style="color:var(--ok);">${data.cache}</span></div>
+      <div style="margin-top:8px; color:#fff; font-weight:600;">3. Component Tree &amp; Boundaries:</div>
+      <div style="font-family:monospace; font-size:.84rem; color:#cbd5e1; margin-left:8px;">
+        ${data.tree.map(t => `<div class="tree-node">${t}</div>`).join("")}
+      </div>
+      <div style="margin-top:8px; color:var(--warn); font-size:.82rem;">${data.payload}</div>
+    `;
+  }
+
+  function simulateAction(name) {
+    document.querySelectorAll(".sim-btn").forEach(b => b.classList.remove("active"));
+    const btn = Array.from(document.querySelectorAll(".sim-btn")).find(b => b.textContent.includes(name));
+    if (btn) btn.classList.add("active");
+
+    const out = document.getElementById("sim-output");
+    out.innerHTML = `
+      <div style="color:var(--accent); font-weight:bold; margin-bottom:8px;">[Simulated Mutation: Server Action '${name}']</div>
+      <div style="color:var(--muted);"><span style="color:#fff;">1. Client Event:</span> User submits form with FormData</div>
+      <div style="color:var(--muted);"><span style="color:#fff;">2. Network Call:</span> POST / with Header <code>Next-Action: 7b89f2</code></div>
+      <div style="color:var(--muted);"><span style="color:#fff;">3. Server Execution:</span> Zod schema validation passed &rarr; Inserted row into DB</div>
+      <div style="color:var(--muted);"><span style="color:#fff;">4. Cache Invalidation:</span> Called <code>revalidatePath('/posts')</code></div>
+      <div style="color:var(--ok); margin-top:8px; font-weight:bold;">&check; Server returned fresh RSC flight data. Client UI updated without full page reload!</div>
+    `;
+  }
+
+  // Initialize simulator
+  simulateRoute("/");
+</script>
+</body>
+</html>

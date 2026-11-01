@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JavaScript Brush-Up</title>
+<style>
+  :root {
+    --bg: #0f172a; --panel: #1e293b; --text: #e2e8f0; --muted: #94a3b8;
+    --accent: #f7df1e; --code-bg: #0b1220; --border: #334155; --ok: #4ade80; --err: #f87171;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+  nav { position: fixed; top: 0; left: 0; bottom: 0; width: 250px; overflow-y: auto; background: var(--panel); border-right: 1px solid var(--border); padding: 1rem; }
+  nav h2 { margin: 0 0 .75rem; color: var(--accent); font-size: 1.1rem; }
+  nav a { display: block; color: var(--muted); text-decoration: none; padding: .25rem .5rem; border-radius: 4px; font-size: .9rem; }
+  nav a:hover { background: var(--bg); color: var(--text); }
+  main { margin-left: 250px; padding: 2rem 3rem; max-width: 1000px; }
+  h1 { color: var(--accent); margin-top: 0; }
+  section { margin-bottom: 3rem; padding-top: .5rem; }
+  h2 { border-bottom: 2px solid var(--border); padding-bottom: .4rem; color: var(--accent); }
+  h3 { margin-bottom: .3rem; }
+  p, li { color: var(--text); }
+  code { font-family: Consolas, "Courier New", monospace; }
+  p code, li code, td code { background: var(--code-bg); padding: 1px 6px; border-radius: 4px; color: #fbbf24; }
+  pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 6px; padding: 1rem; overflow-x: auto; margin: .5rem 0; }
+  pre code { color: #e2e8f0; font-size: .88rem; }
+  .run { background: var(--accent); color: #111; border: 0; padding: .3rem .8rem; border-radius: 4px; cursor: pointer; font-weight: 600; margin-bottom: .25rem; }
+  .run:hover { filter: brightness(.9); }
+  .out { background: #020617; border-left: 3px solid var(--ok); padding: .5rem 1rem; margin: 0 0 1rem; white-space: pre-wrap; font-family: Consolas, monospace; font-size: .85rem; color: var(--ok); display: none; }
+  .out .e { color: var(--err); }
+  .tip { background: #1e3a8a33; border-left: 4px solid #60a5fa; padding: .5rem 1rem; border-radius: 4px; margin: 1rem 0; }
+  .warn { background: #78350f33; border-left: 4px solid #f59e0b; padding: .5rem 1rem; border-radius: 4px; margin: 1rem 0; }
+  table { border-collapse: collapse; width: 100%; margin: .5rem 0; }
+  th, td { border: 1px solid var(--border); padding: .4rem .7rem; text-align: left; font-size: .9rem; }
+  th { background: var(--panel); }
+  #demo-box { background: var(--panel); border: 1px dashed var(--border); padding: 1rem; border-radius: 6px; }
+  #demo-box button { margin-right: .5rem; }
+  @media (max-width: 800px) { nav { display: none; } main { margin-left: 0; padding: 1rem; } }
+</style>
+</head>
+<body>
+
+<nav>
+  <h2>JS Brush-Up</h2>
+  <a href="#basics">1. Variables &amp; Scope</a>
+  <a href="#types">2. Data Types</a>
+  <a href="#operators">3. Operators &amp; Coercion</a>
+  <a href="#control">4. Control Flow</a>
+  <a href="#functions">5. Functions</a>
+  <a href="#strings">6. Strings &amp; Templates</a>
+  <a href="#arrays">7. Arrays</a>
+  <a href="#objects">8. Objects</a>
+  <a href="#destructuring">9. Destructuring, Spread &amp; Rest</a>
+  <a href="#closures">10. Closures</a>
+  <a href="#this">11. <code>this</code> Binding</a>
+  <a href="#classes">12. Prototypes &amp; Classes</a>
+  <a href="#collections">13. Map, Set &amp; Symbols</a>
+  <a href="#iterators">14. Iterators &amp; Generators</a>
+  <a href="#async">15. Async: Promises &amp; async/await</a>
+  <a href="#eventloop">16. Event Loop</a>
+  <a href="#errors">17. Error Handling</a>
+  <a href="#modules">18. Modules</a>
+  <a href="#json">19. JSON, Dates &amp; Regex</a>
+  <a href="#dom">20. DOM &amp; Events</a>
+  <a href="#fetch">21. Fetch API</a>
+  <a href="#modern">22. Modern Syntax Cheatsheet</a>
+  <a href="#pitfalls">23. Common Pitfalls</a>
+  <a href="#practice">24. Practice Exercises</a>
+</nav>
+
+<main>
+<h1>JavaScript Brush-Up</h1>
+<p>A fast refresher of core JavaScript (ES2023+). Click <strong>Run</strong> on any example to execute it in your browser; output appears below the code. You can also open DevTools (F12) for more detail.</p>
+
+<!-- 1 -->
+<section id="basics">
+<h2>1. Variables &amp; Scope</h2>
+<table>
+  <tr><th>Keyword</th><th>Scope</th><th>Reassign</th><th>Hoisting</th></tr>
+  <tr><td><code>var</code></td><td>Function</td><td>Yes</td><td>Hoisted, initialised as <code>undefined</code></td></tr>
+  <tr><td><code>let</code></td><td>Block</td><td>Yes</td><td>Hoisted, Temporal Dead Zone</td></tr>
+  <tr><td><code>const</code></td><td>Block</td><td>No (binding only)</td><td>Hoisted, Temporal Dead Zone</td></tr>
+</table>
+<pre class="runnable"><code>var a = 1;
+let b = 2;
+const c = 3;
+
+if (true) {
+  var a = 10;     // same variable (function scoped)
+  let b = 20;     // new variable (block scoped)
+  console.log("inside:", a, b);
+}
+console.log("outside:", a, b);
+
+const user = { name: "Ann" };
+user.name = "Bob";              // OK: object is mutable
+console.log(user);
+
+try { c = 4; } catch (e) { console.log(e.name + ": " + e.message); }
+
+// Temporal Dead Zone
+try { console.log(x); let x = 5; } catch (e) { console.log(e.name); }</code></pre>
+<div class="tip">Default to <code>const</code>; use <code>let</code> when you must reassign; avoid <code>var</code>.</div>
+</section>
+
+<!-- 2 -->
+<section id="types">
+<h2>2. Data Types</h2>
+<p>Primitives: <code>string</code>, <code>number</code>, <code>bigint</code>, <code>boolean</code>, <code>undefined</code>, <code>null</code>, <code>symbol</code>. Everything else is an object (arrays, functions, dates, ...). Primitives are copied by value; objects by reference.</p>
+<pre class="runnable"><code>console.log(typeof "hi", typeof 42, typeof 10n, typeof true);
+console.log(typeof undefined, typeof null, typeof Symbol());   // null is a historical quirk: "object"
+console.log(typeof [], Array.isArray([]), typeof function () {});
+
+// value vs reference
+let p1 = 5, p2 = p1; p2 = 6;
+console.log(p1, p2);
+
+const o1 = { n: 1 }, o2 = o1; o2.n = 2;
+console.log(o1.n);                    // 2 - same object
+
+// copying
+const shallow = { ...o1 };
+const deep = structuredClone({ a: { b: 1 } });
+console.log(shallow, deep);
+
+// Truthy / falsy
+const falsy = [false, 0, -0, 0n, "", null, undefined, NaN];
+console.log(falsy.map(Boolean));
+console.log(Boolean("0"), Boolean([]), Boolean({}));  // all true
+
+// Number quirks
+console.log(0.1 + 0.2, 0.1 + 0.2 === 0.3, Math.abs(0.3 - (0.1 + 0.2)) &lt; Number.EPSILON);
+console.log(Number.MAX_SAFE_INTEGER, NaN === NaN, Number.isNaN(NaN));</code></pre>
+</section>
+
+<!-- 3 -->
+<section id="operators">
+<h2>3. Operators &amp; Coercion</h2>
+<pre class="runnable"><code>// == coerces, === does not
+console.log(1 == "1", 1 === "1", null == undefined, null === undefined);
+
+// + prefers strings, other math operators prefer numbers
+console.log("5" + 3, "5" - 3, "5" * "2", +"42", +"abc");
+
+// Logical operators return operands
+console.log(0 || "default", "" ?? "default", null ?? "default");
+console.log(1 &amp;&amp; 2, 0 &amp;&amp; 2);
+
+// Optional chaining + nullish coalescing
+const cfg = { server: { port: 0 } };
+console.log(cfg.server?.port ?? 8080);     // 0 (?? only checks null/undefined)
+console.log(cfg.db?.host ?? "localhost");
+console.log(cfg.run?.());                  // undefined, no error
+
+// Logical assignment
+let count = null;
+count ??= 10;  count ||= 20;  count &amp;&amp;= 30;
+console.log(count);
+
+// Exponent, increment, bitwise
+console.log(2 ** 10, 7 % 3, 5 &amp; 3, 5 | 3, 5 ^ 3, 1 &lt;&lt; 4);</code></pre>
+<div class="warn">Prefer <code>===</code> / <code>!==</code>. Use <code>??</code> instead of <code>||</code> when <code>0</code>, <code>""</code> or <code>false</code> are valid values.</div>
+</section>
+
+<!-- 4 -->
+<section id="control">
+<h2>4. Control Flow</h2>
+<pre class="runnable"><code>// if / else, ternary
+const age = 20;
+console.log(age &gt;= 18 ? "adult" : "minor");
+
+// switch (strict equality, remember break)
+function day(n) {
+  switch (n) {
+    case 0: return "Sun";
+    case 6: return "Sat";
+    default: return "Weekday";
+  }
+}
+console.log(day(0), day(3), day(6));
+
+// loops
+for (let i = 0; i &lt; 3; i++) console.log("for", i);
+
+let n = 0;
+while (n &lt; 2) { console.log("while", n++); }
+
+do { console.log("do-while once"); } while (false);
+
+const arr = ["a", "b"];
+for (const v of arr) console.log("of", v);           // values of iterables
+for (const k in { x: 1, y: 2 }) console.log("in", k); // enumerable keys
+for (const [i, v] of arr.entries()) console.log(i, v);
+
+// labels, break, continue
+outer: for (let i = 0; i &lt; 3; i++) {
+  for (let j = 0; j &lt; 3; j++) {
+    if (j === 1) continue;
+    if (i === 2) break outer;
+    console.log("pair", i, j);
+  }
+}</code></pre>
+</section>
+
+<!-- 5 -->
+<section id="functions">
+<h2>5. Functions</h2>
+<pre class="runnable"><code>// declaration (hoisted), expression, arrow
+function add(a, b) { return a + b; }
+const mul = function (a, b) { return a * b; };
+const sub = (a, b) =&gt; a - b;
+const makeObj = (n) =&gt; ({ n });            // return object literal needs ()
+
+// default, rest, spread
+function greet(name = "World", ...rest) { return `Hello ${name} +${rest.length}`; }
+console.log(greet(), greet("JS", 1, 2, 3));
+console.log(Math.max(...[3, 9, 4]));
+
+// first-class & higher-order
+const compose = (f, g) =&gt; (x) =&gt; f(g(x));
+const inc = (x) =&gt; x + 1, dbl = (x) =&gt; x * 2;
+console.log(compose(inc, dbl)(5));            // 11
+
+// currying
+const curry = (a) =&gt; (b) =&gt; (c) =&gt; a + b + c;
+console.log(curry(1)(2)(3));
+
+// IIFE
+(function () { console.log("runs immediately"); })();
+
+// arguments object (non-arrow functions only)
+function sum() { return [...arguments].reduce((t, v) =&gt; t + v, 0); }
+console.log(sum(1, 2, 3, 4));
+
+// named params via object destructuring
+function connect({ host = "localhost", port = 80 } = {}) { return `${host}:${port}`; }
+console.log(connect(), connect({ port: 3000 }));
+
+// recursion
+const fact = (n) =&gt; (n &lt;= 1 ? 1 : n * fact(n - 1));
+console.log(fact(5));</code></pre>
+</section>
+
+<!-- 6 -->
+<section id="strings">
+<h2>6. Strings &amp; Template Literals</h2>
+<pre class="runnable"><code>const s = "  Hello, JavaScript!  ";
+console.log(s.trim().toUpperCase(), s.length);
+console.log(s.includes("Java"), s.indexOf("J"), s.trim().startsWith("Hello"));
+console.log(s.trim().slice(0, 5), s.trim().slice(-11), s.trim().substring(7, 11));
+console.log("a-b-c".split("-"), ["a", "b"].join("+"));
+console.log("ab".repeat(3), "5".padStart(3, "0"), "x".padEnd(3, "."));
+console.log("a-b-c".replaceAll("-", "_"), "Hello".at(-1), "abc".charAt(1));
+
+// template literals: interpolation, multi-line, expressions
+const name = "Ann", qty = 3;
+console.log(`${name} bought ${qty} item${qty &gt; 1 ? "s" : ""}
+(second line)`);
+
+// tagged template
+const tag = (strings, ...vals) =&gt; strings.raw.join("|") + " :: " + vals.join(",");
+console.log(tag`a${1}b${2}c`);
+
+// unicode / iteration
+console.log([..."héllo"].length, "😀".length, [..."😀"].length);</code></pre>
+</section>
+
+<!-- 7 -->
+<section id="arrays">
+<h2>7. Arrays</h2>
+<pre class="runnable"><code>const nums = [5, 1, 4, 2, 3];
+
+// transform without mutation
+console.log(nums.map((n) =&gt; n * 2));
+console.log(nums.filter((n) =&gt; n % 2));
+console.log(nums.reduce((acc, n) =&gt; acc + n, 0));
+console.log(nums.find((n) =&gt; n &gt; 3), nums.findIndex((n) =&gt; n &gt; 3), nums.findLast((n) =&gt; n &lt; 3));
+console.log(nums.some((n) =&gt; n &gt; 4), nums.every((n) =&gt; n &gt; 0), nums.includes(4));
+
+// sort mutates and sorts as strings by default!
+console.log([10, 9, 1].sort());                   // [1, 10, 9]
+console.log([10, 9, 1].sort((a, b) =&gt; a - b));    // [1, 9, 10]
+
+// non-mutating versions (ES2023)
+console.log(nums.toSorted((a, b) =&gt; a - b), nums.toReversed(), nums);
+console.log(nums.with(0, 99));
+
+// mutating methods
+const m = [1, 2, 3];
+m.push(4); m.unshift(0); m.pop(); m.shift();
+console.log(m, m.splice(1, 1), m);
+
+// slicing, flattening, building
+console.log(nums.slice(1, 3), [1, [2, [3]]].flat(Infinity));
+console.log([1, 2].flatMap((n) =&gt; [n, n * 10]));
+console.log(Array.from({ length: 4 }, (_, i) =&gt; i * i), Array(3).fill(0), [...Array(3).keys()]);
+
+// grouping &amp; chaining
+const people = [{ n: "A", age: 20 }, { n: "B", age: 30 }, { n: "C", age: 20 }];
+console.log(Object.groupBy(people, (p) =&gt; p.age));
+console.log(people.map((p) =&gt; p.n).join(", "));</code></pre>
+<div class="tip"><code>Object.groupBy</code> needs a recent browser (Chrome 117+, Firefox 119+, Safari 17.4+).</div>
+</section>
+
+<!-- 8 -->
+<section id="objects">
+<h2>8. Objects</h2>
+<pre class="runnable"><code>const key = "dyn";
+const person = {
+  name: "Ann",
+  age: 30,
+  [key + "Prop"]: true,              // computed key
+  greet() { return `Hi, ${this.name}`; },   // method shorthand
+  get initials() { return this.name[0]; },
+  set years(v) { this.age = v; },
+};
+console.log(person.greet(), person.initials, person.dynProp);
+
+console.log(Object.keys(person), Object.values({ a: 1 }), Object.entries({ a: 1, b: 2 }));
+console.log(Object.fromEntries([["x", 1], ["y", 2]]));
+console.log("name" in person, Object.hasOwn(person, "toString"));
+delete person.age;
+console.log(person.age);
+
+// merge / copy
+const merged = { ...{ a: 1, b: 2 }, ...{ b: 3, c: 4 } };
+console.log(merged, Object.assign({}, merged));
+
+// freezing and property descriptors
+const frozen = Object.freeze({ a: 1 });
+frozen.a = 2;                         // silently ignored (throws in strict mode)
+console.log(frozen.a);
+
+const obj = {};
+Object.defineProperty(obj, "id", { value: 1, enumerable: false, writable: false });
+console.log(obj.id, Object.keys(obj), Object.getOwnPropertyDescriptor(obj, "id"));
+
+// shorthand properties
+const x = 1, y = 2;
+console.log({ x, y });</code></pre>
+</section>
+
+<!-- 9 -->
+<section id="destructuring">
+<h2>9. Destructuring, Spread &amp; Rest</h2>
+<pre class="runnable"><code>// array destructuring
+const [first, , third = "def", ...others] = [1, 2, undefined, 4, 5];
+console.log(first, third, others);
+
+// swap
+let a = 1, b = 2;
+[a, b] = [b, a];
+console.log(a, b);
+
+// object destructuring: rename, default, nested, rest
+const user = { id: 1, profile: { city: "Pune", zip: "411001" }, tags: ["x", "y"] };
+const { id: userId, profile: { city }, role = "guest", ...restProps } = user;
+console.log(userId, city, role, restProps);
+
+// in function params
+const fullName = ({ first, last = "Doe" }) =&gt; `${first} ${last}`;
+console.log(fullName({ first: "Jane" }));
+
+// spread: copy / merge immutably
+const list = [1, 2, 3];
+const next = [...list, 4];
+const updated = { ...user, profile: { ...user.profile, city: "Delhi" } };
+console.log(next, updated.profile.city, user.profile.city);</code></pre>
+</section>
+
+<!-- 10 -->
+<section id="closures">
+<h2>10. Closures</h2>
+<p>A closure is a function bundled with references to the variables in its lexical scope, even after the outer function has returned.</p>
+<pre class="runnable"><code>function counter() {
+  let count = 0;                        // private state
+  return {
+    inc: () =&gt; ++count,
+    dec: () =&gt; --count,
+    get value() { return count; },
+  };
+}
+const c = counter();
+c.inc(); c.inc(); c.dec();
+console.log(c.value);
+
+// classic loop pitfall
+const fnsVar = [];
+for (var i = 0; i &lt; 3; i++) fnsVar.push(() =&gt; i);
+console.log(fnsVar.map((f) =&gt; f()));       // [3,3,3]
+
+const fnsLet = [];
+for (let j = 0; j &lt; 3; j++) fnsLet.push(() =&gt; j);
+console.log(fnsLet.map((f) =&gt; f()));       // [0,1,2]
+
+// memoize
+function memoize(fn) {
+  const cache = new Map();
+  return (n) =&gt; cache.has(n) ? cache.get(n) : (cache.set(n, fn(n)), cache.get(n));
+}
+const slowSquare = (n) =&gt; { console.log("computing", n); return n * n; };
+const fast = memoize(slowSquare);
+console.log(fast(4), fast(4));
+
+// debounce
+function debounce(fn, ms) {
+  let t;
+  return (...args) =&gt; { clearTimeout(t); t = setTimeout(() =&gt; fn(...args), ms); };
+}
+const log = debounce((m) =&gt; console.log("debounced:", m), 50);
+log("a"); log("b"); log("c");</code></pre>
+</section>
+
+<!-- 11 -->
+<section id="this">
+<h2>11. <code>this</code> Binding</h2>
+<table>
+  <tr><th>Call style</th><th><code>this</code></th></tr>
+  <tr><td><code>obj.method()</code></td><td><code>obj</code></td></tr>
+  <tr><td><code>fn()</code></td><td><code>undefined</code> (strict) / global (sloppy)</td></tr>
+  <tr><td><code>fn.call/apply/bind(x)</code></td><td><code>x</code></td></tr>
+  <tr><td><code>new Fn()</code></td><td>the new object</td></tr>
+  <tr><td>Arrow function</td><td>inherited lexically from the enclosing scope</td></tr>
+</table>
+<pre class="runnable"><code>"use strict";
+const o = {
+  name: "obj",
+  regular() { return this?.name; },
+  arrow: () =&gt; typeof this,
+  delayed() { setTimeout(() =&gt; console.log("arrow keeps this:", this.name), 10); },
+};
+console.log(o.regular());
+const detached = o.regular;
+console.log(detached());              // undefined: lost this
+console.log(detached.call({ name: "called" }));
+const bound = o.regular.bind({ name: "bound" });
+console.log(bound());
+console.log(o.arrow());
+o.delayed();
+
+function sayHi(greeting, punct) { return `${greeting}, ${this.name}${punct}`; }
+console.log(sayHi.apply({ name: "Ann" }, ["Hi", "!"]));</code></pre>
+</section>
+
+<!-- 12 -->
+<section id="classes">
+<h2>12. Prototypes &amp; Classes</h2>
+<pre class="runnable"><code>// prototypes
+function Animal(name) { this.name = name; }
+Animal.prototype.speak = function () { return `${this.name} makes a sound`; };
+const generic = new Animal("Generic");
+console.log(generic.speak(), Object.getPrototypeOf(generic) === Animal.prototype);
+
+// classes are syntax over prototypes
+class Shape {
+  static count = 0;
+  #id;                                    // private field
+  constructor(name) { this.name = name; this.#id = ++Shape.count; }
+  get id() { return this.#id; }
+  area() { return 0; }
+  toString() { return `${this.name}#${this.#id} area=${this.area().toFixed(2)}`; }
+  static create(name) { return new this(name); }
+}
+
+class Circle extends Shape {
+  constructor(r) { super("Circle"); this.r = r; }
+  area() { return Math.PI * this.r ** 2; }
+}
+
+class Square extends Shape {
+  constructor(s) { super("Square"); this.s = s; }
+  area() { return this.s ** 2; }
+}
+
+const shapes = [new Circle(2), new Square(3)];
+shapes.forEach((s) =&gt; console.log(String(s)));
+console.log(shapes[0] instanceof Shape, Shape.count, shapes[0].id);
+console.log(shapes[0].id2, Object.keys(shapes[0]));   // private fields are not enumerable
+
+// Object.create
+const proto = { hello() { return "hello from proto"; } };
+const child = Object.create(proto);
+console.log(child.hello(), Object.hasOwn(child, "hello"));
+
+// mixin
+const Serializable = (Base) =&gt; class extends Base { toJSON() { return { ...this }; } };
+class Point { constructor(x, y) { this.x = x; this.y = y; } }
+console.log(JSON.stringify(new (Serializable(Point))(1, 2)));</code></pre>
+<div class="warn">Accessing <code>obj.#id</code> outside the class body is a SyntaxError, not a runtime error.</div>
+</section>
+
+<!-- 13 -->
+<section id="collections">
+<h2>13. Map, Set, WeakMap &amp; Symbols</h2>
+<pre class="runnable"><code>// Map: any key type, insertion ordered
+const m = new Map([["a", 1]]);
+m.set({ k: 1 }, "object key").set(42, "number key");
+console.log(m.size, m.get("a"), m.has(42));
+for (const [k, v] of m) console.log(k, v);
+
+// Set: unique values
+const s = new Set([1, 2, 2, 3, 3]);
+console.log([...s], s.has(2), s.size);
+const A = new Set([1, 2, 3]), B = new Set([2, 3, 4]);
+console.log("union", [...new Set([...A, ...B])]);
+console.log("intersect", [...A].filter((x) =&gt; B.has(x)));
+console.log("diff", [...A].filter((x) =&gt; !B.has(x)));
+
+// dedupe an array
+console.log([...new Set(["a", "b", "a"])]);
+
+// WeakMap: keys are objects, garbage-collectable
+const priv = new WeakMap();
+class Acct { constructor() { priv.set(this, { balance: 100 }); } get balance() { return priv.get(this).balance; } }
+console.log(new Acct().balance);
+
+// Symbols: unique keys
+const id = Symbol("id");
+const obj = { [id]: 123, name: "x" };
+console.log(obj[id], Object.keys(obj), id.toString());
+console.log(Symbol("a") === Symbol("a"), Symbol.for("a") === Symbol.for("a"));</code></pre>
+</section>
+
+<!-- 14 -->
+<section id="iterators">
+<h2>14. Iterators &amp; Generators</h2>
+<pre class="runnable"><code>// custom iterable
+const range = {
+  from: 1, to: 4,
+  [Symbol.iterator]() {
+    let cur = this.from, end = this.to;
+    return { next: () =&gt; cur &lt;= end ? { value: cur++, done: false } : { value: undefined, done: true } };
+  },
+};
+console.log([...range]);
+
+// generators
+function* fib() {
+  let [a, b] = [0, 1];
+  while (true) { yield a; [a, b] = [b, a + b]; }
+}
+const out = [];
+for (const n of fib()) { if (n &gt; 50) break; out.push(n); }
+console.log(out);
+
+// two-way communication
+function* talk() {
+  const name = yield "Name?";
+  const color = yield `Hi ${name}, color?`;
+  return `${name} likes ${color}`;
+}
+const g = talk();
+console.log(g.next().value, g.next("Ann").value, g.next("blue"));
+
+// async generator + for await
+async function* ticker(n) { for (let i = 1; i &lt;= n; i++) { await new Promise((r) =&gt; setTimeout(r, 20)); yield i; } }
+for await (const t of ticker(3)) console.log("tick", t);</code></pre>
+</section>
+
+<!-- 15 -->
+<section id="async">
+<h2>15. Async: Callbacks, Promises &amp; async/await</h2>
+<pre class="runnable"><code>const wait = (ms, value, fail = false) =&gt;
+  new Promise((resolve, reject) =&gt; setTimeout(() =&gt; (fail ? reject(new Error(value)) : resolve(value)), ms));
+
+// promise chain
+await wait(30, "chain start")
+  .then((v) =&gt; { console.log(v); return wait(30, "second"); })
+  .then((v) =&gt; { console.log(v); throw new Error("boom"); })
+  .catch((e) =&gt; console.log("caught:", e.message))
+  .finally(() =&gt; console.log("finally"));
+
+// async / await + try/catch
+async function load() {
+  try {
+    const a = await wait(20, "A");
+    const b = await wait(20, "B", true);
+    return a + b;
+  } catch (e) {
+    return "failed: " + e.message;
+  }
+}
+console.log(await load());
+
+// sequential vs parallel
+console.time("sequential");
+await wait(100); await wait(100);
+console.timeEnd("sequential");
+
+console.time("parallel");
+await Promise.all([wait(100), wait(100)]);
+console.timeEnd("parallel");
+
+// combinators
+console.log(await Promise.all([wait(10, 1), wait(20, 2)]));
+console.log(await Promise.allSettled([wait(10, "ok"), wait(10, "bad", true)]));
+console.log(await Promise.race([wait(50, "slow"), wait(10, "fast")]));
+console.log(await Promise.any([wait(10, "fail", true), wait(30, "winner")]));
+
+// timeout helper
+const withTimeout = (p, ms) =&gt; Promise.race([p, new Promise((_, rej) =&gt; setTimeout(() =&gt; rej(new Error("timeout")), ms))]);
+try { await withTimeout(wait(200), 50); } catch (e) { console.log(e.message); }</code></pre>
+<div class="tip">This runner wraps code in an async function, so top-level <code>await</code> works in the examples.</div>
+</section>
+
+<!-- 16 -->
+<section id="eventloop">
+<h2>16. Event Loop</h2>
+<p>Order: synchronous code &rarr; microtasks (<code>Promise.then</code>, <code>queueMicrotask</code>) &rarr; macrotasks (<code>setTimeout</code>, I/O, UI events).</p>
+<pre class="runnable"><code>console.log("1 sync start");
+setTimeout(() =&gt; console.log("5 macrotask: setTimeout 0"), 0);
+Promise.resolve().then(() =&gt; console.log("3 microtask: promise"));
+queueMicrotask(() =&gt; console.log("4 microtask: queueMicrotask"));
+console.log("2 sync end");</code></pre>
+</section>
+
+<!-- 17 -->
+<section id="errors">
+<h2>17. Error Handling</h2>
+<pre class="runnable"><code>class ValidationError extends Error {
+  constructor(message, field) {
+    super(message);
+    this.name = "ValidationError";
+    this.field = field;
+  }
+}
+
+function validate(user) {
+  if (!user.email) throw new ValidationError("Email required", "email");
+  return true;
+}
+
+try {
+  validate({});
+} catch (err) {
+  if (err instanceof ValidationError) console.log(`${err.name} on ${err.field}: ${err.message}`);
+  else throw err;
+} finally {
+  console.log("cleanup runs always");
+}
+
+// error cause
+try {
+  try { JSON.parse("{bad"); }
+  catch (e) { throw new Error("Config invalid", { cause: e }); }
+} catch (e) {
+  console.log(e.message, "-&gt;", e.cause.name);
+}
+
+// built-in error types
+for (const fn of [() =&gt; null.x, () =&gt; undefinedVar, () =&gt; new Array(-1), () =&gt; decodeURI("%")]) {
+  try { fn(); } catch (e) { console.log(e.constructor.name); }
+}</code></pre>
+</section>
+
+<!-- 18 -->
+<section id="modules">
+<h2>18. Modules (ES Modules)</h2>
+<p>Use <code>&lt;script type="module"&gt;</code> in browsers or <code>"type": "module"</code> in Node's <code>package.json</code>. Modules are strict mode, have their own scope and load once.</p>
+<pre><code>// math.js
+export const PI = 3.14159;
+export function add(a, b) { return a + b; }
+export default class Calculator { /* ... */ }
+
+// app.js
+import Calculator, { PI, add as sum } from "./math.js";
+import * as math from "./math.js";
+
+// dynamic import (lazy loading)
+const { add } = await import("./math.js");
+
+// re-export
+export { add } from "./math.js";</code></pre>
+<pre><code>&lt;script type="module" src="app.js"&gt;&lt;/script&gt;
+
+// CommonJS (older Node)
+const fs = require("fs");
+module.exports = { add };</code></pre>
+</section>
+
+<!-- 19 -->
+<section id="json">
+<h2>19. JSON, Dates &amp; Regex</h2>
+<pre class="runnable"><code>// JSON
+const data = { name: "Ann", skills: ["js"], when: new Date(0), skip: undefined, fn() {} };
+const text = JSON.stringify(data, null, 2);
+console.log(text);
+console.log(JSON.parse(text, (k, v) =&gt; (k === "when" ? new Date(v) : v)));
+console.log(JSON.stringify(data, ["name"]));
+
+// Dates
+const d = new Date("2024-03-15T10:30:00Z");
+console.log(d.toISOString(), d.getTime(), d.getUTCFullYear(), d.getUTCMonth());   // month is 0-based
+console.log(d.toLocaleDateString("en-GB", { year: "numeric", month: "long", day: "numeric", timeZone: "UTC" }));
+const next = new Date(d); next.setUTCDate(next.getUTCDate() + 30);
+console.log(next.toISOString().slice(0, 10), Math.round((next - d) / 864e5), "days");
+
+// Intl
+console.log(new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR" }).format(1234567.891));
+
+// Regex
+const re = /(?&lt;year&gt;\d{4})-(?&lt;month&gt;\d{2})-(?&lt;day&gt;\d{2})/;
+const m = "Date: 2024-03-15".match(re);
+console.log(m.groups, m.index);
+console.log("a1b22c333".match(/\d+/g));
+console.log("John Smith".replace(/(\w+) (\w+)/, "$2, $1"));
+console.log([..."x1y2".matchAll(/[a-z](\d)/g)].map((r) =&gt; r[1]));
+console.log(/^[\w.+-]+@[\w-]+\.[\w.]+$/.test("me@example.com"));</code></pre>
+</section>
+
+<!-- 20 -->
+<section id="dom">
+<h2>20. DOM &amp; Events</h2>
+<div id="demo-box">
+  <input id="demo-input" placeholder="Type something..." />
+  <button id="demo-add">Add item</button>
+  <button id="demo-clear">Clear</button>
+  <ul id="demo-list"></ul>
+</div>
+<pre class="runnable"><code>const input = document.querySelector("#demo-input");
+const list = document.querySelector("#demo-list");
+
+// create + append
+function addItem(text) {
+  const li = document.createElement("li");
+  li.textContent = text;                 // safe: no HTML parsing
+  li.dataset.created = Date.now();
+  li.classList.add("item");
+  list.append(li);
+}
+
+// event handlers (replace on re-run)
+document.querySelector("#demo-add").onclick = () =&gt; {
+  if (input.value.trim()) { addItem(input.value.trim()); input.value = ""; }
+};
+document.querySelector("#demo-clear").onclick = () =&gt; list.replaceChildren();
+
+// event delegation: one listener for many children
+list.onclick = (e) =&gt; {
+  const li = e.target.closest("li");
+  if (li) li.style.textDecoration = li.style.textDecoration ? "" : "line-through";
+};
+
+addItem("Click me to toggle");
+console.log("Demo wired up - use the box above.");</code></pre>
+<pre><code>// Other essentials
+element.addEventListener("click", handler, { once: true, passive: true });
+element.removeEventListener("click", handler);
+e.preventDefault();  e.stopPropagation();
+
+document.addEventListener("DOMContentLoaded", init);
+element.classList.toggle("active");
+element.setAttribute("aria-expanded", "true");
+const rect = element.getBoundingClientRect();
+
+// observers
+new IntersectionObserver((entries) =&gt; { /* visibility */ }).observe(element);
+new MutationObserver((records) =&gt; { /* DOM changes */ }).observe(element, { childList: true });
+
+// storage
+localStorage.setItem("k", JSON.stringify({ a: 1 }));
+JSON.parse(localStorage.getItem("k"));</code></pre>
+<div class="warn">Avoid <code>innerHTML</code> with untrusted input (XSS). Use <code>textContent</code> or sanitize.</div>
+</section>
+
+<!-- 21 -->
+<section id="fetch">
+<h2>21. Fetch API</h2>
+<pre class="runnable"><code>async function getJson(url, options = {}) {
+  const res = await fetch(url, options);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);   // fetch doesn't reject on 404/500
+  return res.json();
+}
+
+try {
+  const post = await getJson("https://jsonplaceholder.typicode.com/posts/1");
+  console.log(post.title);
+
+  const created = await getJson("https://jsonplaceholder.typicode.com/posts", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ title: "hello", body: "world", userId: 1 }),
+  });
+  console.log("created id:", created.id);
+} catch (e) {
+  console.log("Request failed:", e.message);
+}
+
+// cancel with AbortController
+const ctrl = new AbortController();
+setTimeout(() =&gt; ctrl.abort(), 1);
+try { await fetch("https://jsonplaceholder.typicode.com/posts", { signal: ctrl.signal }); }
+catch (e) { console.log(e.name); }</code></pre>
+</section>
+
+<!-- 22 -->
+<section id="modern">
+<h2>22. Modern Syntax Cheatsheet</h2>
+<table>
+  <tr><th>Feature</th><th>Example</th></tr>
+  <tr><td>Optional chaining</td><td><code>a?.b?.[0]?.()</code></td></tr>
+  <tr><td>Nullish coalescing</td><td><code>x ?? "default"</code></td></tr>
+  <tr><td>Logical assignment</td><td><code>a ||= 1; b &amp;&amp;= 2; c ??= 3</code></td></tr>
+  <tr><td>Numeric separators</td><td><code>1_000_000</code></td></tr>
+  <tr><td><code>Array.at</code></td><td><code>arr.at(-1)</code></td></tr>
+  <tr><td><code>Object.hasOwn</code></td><td><code>Object.hasOwn(o, "k")</code></td></tr>
+  <tr><td><code>structuredClone</code></td><td>deep copy of plain data</td></tr>
+  <tr><td>Private fields</td><td><code>#secret</code>, <code>static #x</code></td></tr>
+  <tr><td>Top-level await</td><td>in modules: <code>await fetch(...)</code></td></tr>
+  <tr><td><code>Promise.withResolvers</code></td><td><code>const { promise, resolve } = Promise.withResolvers()</code></td></tr>
+  <tr><td>Array copying methods</td><td><code>toSorted, toReversed, toSpliced, with</code></td></tr>
+  <tr><td><code>Error cause</code></td><td><code>new Error("x", { cause })</code></td></tr>
+</table>
+<pre class="runnable"><code>console.log(1_000_000, [1, 2, 3].at(-1), structuredClone(new Map([[1, 2]])));
+const { promise, resolve } = Promise.withResolvers();
+setTimeout(() =&gt; resolve("resolved later"), 20);
+console.log(await promise);</code></pre>
+</section>
+
+<!-- 23 -->
+<section id="pitfalls">
+<h2>23. Common Pitfalls</h2>
+<pre class="runnable"><code>// 1. sort() default is lexicographic
+console.log([2, 10, 1].sort());
+
+// 2. parseInt with map
+console.log(["1", "2", "3"].map(parseInt));          // [1, NaN, NaN]
+console.log(["1", "2", "3"].map(Number));
+
+// 3. typeof null
+console.log(typeof null);
+
+// 4. array equality is by reference
+console.log([1] == [1], JSON.stringify([1]) === JSON.stringify([1]));
+
+// 5. forEach does not await
+const sleep = (ms) =&gt; new Promise((r) =&gt; setTimeout(r, ms));
+[1, 2].forEach(async (n) =&gt; { await sleep(10); });
+console.log("forEach finished immediately; use for...of or Promise.all");
+
+// 6. mutating shared defaults
+function bad(list = []) { list.push(1); return list; }
+console.log(bad(), bad());                            // fresh array each call (OK in JS)
+
+// 7. floating point money
+console.log(0.1 * 3, (0.1 * 3).toFixed(2), Math.round(0.1 * 3 * 100) / 100);
+
+// 8. NaN checks
+console.log(isNaN("abc"), Number.isNaN("abc"));
+
+// 9. shallow copy gotcha
+const orig = { nested: { v: 1 } };
+const copy = { ...orig };
+copy.nested.v = 99;
+console.log(orig.nested.v);
+
+// 10. object keys are strings
+const o = {}; o[1] = "a"; o["1"] = "b";
+console.log(o);</code></pre>
+</section>
+
+<!-- 24 -->
+<section id="practice">
+<h2>24. Practice Exercises</h2>
+<p>Edit the code and run it. Solutions are inside, try before reading.</p>
+<h3>1. Reverse a string and check for a palindrome</h3>
+<pre class="runnable"><code>const isPalindrome = (s) =&gt; {
+  const t = s.toLowerCase().replace(/[^a-z0-9]/g, "");
+  return t === [...t].reverse().join("");
+};
+console.log(isPalindrome("A man, a plan, a canal: Panama"), isPalindrome("hello"));</code></pre>
+<h3>2. Count word frequency</h3>
+<pre class="runnable"><code>const freq = (text) =&gt;
+  text.toLowerCase().match(/\w+/g).reduce((m, w) =&gt; ((m[w] = (m[w] ?? 0) + 1), m), {});
+console.log(freq("the cat and the hat and the bat"));</code></pre>
+<h3>3. Flatten without <code>flat()</code></h3>
+<pre class="runnable"><code>const flatten = (arr) =&gt; arr.reduce((a, v) =&gt; a.concat(Array.isArray(v) ? flatten(v) : v), []);
+console.log(flatten([1, [2, [3, [4]], 5]]));</code></pre>
+<h3>4. Implement <code>Promise.all</code></h3>
+<pre class="runnable"><code>const myAll = (promises) =&gt; new Promise((resolve, reject) =&gt; {
+  const results = []; let done = 0;
+  if (!promises.length) return resolve(results);
+  promises.forEach((p, i) =&gt; Promise.resolve(p).then((v) =&gt; {
+    results[i] = v;
+    if (++done === promises.length) resolve(results);
+  }, reject));
+});
+console.log(await myAll([1, Promise.resolve(2), new Promise((r) =&gt; setTimeout(r, 20, 3))]));</code></pre>
+<h3>5. Group by and sum</h3>
+<pre class="runnable"><code>const sales = [
+  { region: "N", amt: 10 }, { region: "S", amt: 5 }, { region: "N", amt: 7 },
+];
+const totals = sales.reduce((acc, { region, amt }) =&gt; ({ ...acc, [region]: (acc[region] ?? 0) + amt }), {});
+console.log(totals);</code></pre>
+<h3>6. Deep equality</h3>
+<pre class="runnable"><code>const deepEqual = (a, b) => {
+  if (a === b) return true;
+  if (typeof a !== "object" || typeof b !== "object" || !a || !b) return false;
+  const ka = Object.keys(a), kb = Object.keys(b);
+  return ka.length === kb.length && ka.every((k) => deepEqual(a[k], b[k]));
+};
+console.log(deepEqual({ a: [1, { b: 2 }] }, { a: [1, { b: 2 }] }), deepEqual({ a: 1 }, { a: 2 }));</code></pre>
+</section>
+
+<p style="color:var(--muted)">Next: see <a href="typescript-brush-up.html" style="color:var(--accent)">typescript-brush-up.html</a> &amp; <a href="nextjs-brush-up.html" style="color:var(--accent)">nextjs-brush-up.html</a>.</p>
+</main>
+
+<script>
+  const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
+
+  document.querySelectorAll("pre.runnable").forEach((pre) => {
+    const btn = document.createElement("button");
+    btn.className = "run";
+    btn.textContent = "Run";
+    const out = document.createElement("div");
+    out.className = "out";
+    pre.before(btn);
+    pre.after(out);
+
+    btn.addEventListener("click", async () => {
+      out.style.display = "block";
+      out.textContent = "";
+      const timers = {};
+      const write = (cls, args) => {
+        const line = document.createElement("div");
+        if (cls) line.className = cls;
+        line.textContent = args.map(fmt).join(" ");
+        out.append(line);
+      };
+      const fakeConsole = {
+        log: (...a) => write("", a),
+        info: (...a) => write("", a),
+        warn: (...a) => write("e", a),
+        error: (...a) => write("e", a),
+        time: (l = "default") => { timers[l] = performance.now(); },
+        timeEnd: (l = "default") => write("", [`${l}: ${Math.round(performance.now() - timers[l])}ms`]),
+      };
+      try {
+        await new AsyncFunction("console", pre.textContent)(fakeConsole);
+      } catch (e) {
+        write("e", [`${e.name}: ${e.message}`]);
+      }
+    });
+  });
+
+  function fmt(v) {
+    if (typeof v === "string") return v;
+    if (typeof v === "bigint") return v + "n";
+    if (typeof v === "function") return `[Function ${v.name || "anonymous"}]`;
+    if (typeof v === "symbol") return v.toString();
+    if (v instanceof Error) return `${v.name}: ${v.message}`;
+    if (v instanceof Map) return `Map(${v.size}) ` + fmt([...v]);
+    if (v instanceof Set) return `Set(${v.size}) ` + fmt([...v]);
+    try { return JSON.stringify(v, (k, x) => (typeof x === "bigint" ? x + "n" : x === undefined ? "undefined" : x), 0) ?? String(v); }
+    catch { return String(v); }
+  }
+</script>
+</body>
+</html>

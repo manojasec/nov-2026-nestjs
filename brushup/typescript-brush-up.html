@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TypeScript Brush-Up</title>
+<style>
+  :root {
+    --bg: #0f172a; --panel: #1e293b; --text: #e2e8f0; --muted: #94a3b8;
+    --accent: #3b9eff; --code-bg: #0b1220; --border: #334155; --ok: #4ade80; --err: #f87171;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+  nav { position: fixed; top: 0; left: 0; bottom: 0; width: 250px; overflow-y: auto; background: var(--panel); border-right: 1px solid var(--border); padding: 1rem; }
+  nav h2 { margin: 0 0 .75rem; color: var(--accent); font-size: 1.1rem; }
+  nav a { display: block; color: var(--muted); text-decoration: none; padding: .25rem .5rem; border-radius: 4px; font-size: .9rem; }
+  nav a:hover { background: var(--bg); color: var(--text); }
+  main { margin-left: 250px; padding: 2rem 3rem; max-width: 1000px; }
+  h1 { color: var(--accent); margin-top: 0; }
+  section { margin-bottom: 3rem; padding-top: .5rem; }
+  h2 { border-bottom: 2px solid var(--border); padding-bottom: .4rem; color: var(--accent); }
+  h3 { margin-bottom: .3rem; }
+  code { font-family: Consolas, "Courier New", monospace; }
+  p code, li code, td code { background: var(--code-bg); padding: 1px 6px; border-radius: 4px; color: #fbbf24; }
+  pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 6px; padding: 1rem; overflow-x: auto; margin: .5rem 0; }
+  pre code { color: #e2e8f0; font-size: .88rem; }
+  pre.errdemo { border-left: 4px solid var(--err); }
+  .run { background: var(--accent); color: #fff; border: 0; padding: .3rem .8rem; border-radius: 4px; cursor: pointer; font-weight: 600; margin-bottom: .25rem; }
+  .run:hover { filter: brightness(.9); }
+  .run:disabled { opacity: .6; cursor: wait; }
+  .out { background: #020617; border-left: 3px solid var(--ok); padding: .5rem 1rem; margin: 0 0 1rem; white-space: pre-wrap; font-family: Consolas, monospace; font-size: .85rem; color: var(--ok); display: none; }
+  .out .e { color: var(--err); }
+  .tip { background: #1e3a8a33; border-left: 4px solid #60a5fa; padding: .5rem 1rem; border-radius: 4px; margin: 1rem 0; }
+  .warn { background: #78350f33; border-left: 4px solid #f59e0b; padding: .5rem 1rem; border-radius: 4px; margin: 1rem 0; }
+  .label { display: inline-block; font-size: .75rem; padding: 1px 8px; border-radius: 10px; margin-right: .4rem; }
+  .label.bad { background: #7f1d1d; color: #fecaca; }
+  table { border-collapse: collapse; width: 100%; margin: .5rem 0; }
+  th, td { border: 1px solid var(--border); padding: .4rem .7rem; text-align: left; font-size: .9rem; }
+  th { background: var(--panel); }
+  @media (max-width: 800px) { nav { display: none; } main { margin-left: 0; padding: 1rem; } }
+</style>
+</head>
+<body>
+
+<nav>
+  <h2>TS Brush-Up</h2>
+  <a href="#intro">1. Setup &amp; Compiler</a>
+  <a href="#basic">2. Basic Types &amp; Inference</a>
+  <a href="#special">3. any, unknown, never, void</a>
+  <a href="#arrays">4. Arrays, Tuples &amp; Enums</a>
+  <a href="#functions">5. Functions</a>
+  <a href="#objects">6. Objects, Interfaces &amp; Aliases</a>
+  <a href="#unions">7. Unions, Intersections &amp; Literals</a>
+  <a href="#narrowing">8. Narrowing &amp; Type Guards</a>
+  <a href="#generics">9. Generics</a>
+  <a href="#classes">10. Classes</a>
+  <a href="#utility">11. Utility Types</a>
+  <a href="#advanced">12. keyof, typeof, Mapped &amp; Conditional</a>
+  <a href="#assertions">13. Assertions, const &amp; satisfies</a>
+  <a href="#modules">14. Modules &amp; Declarations</a>
+  <a href="#async">15. Async &amp; Promises</a>
+  <a href="#errors">16. Error Handling</a>
+  <a href="#dom">17. DOM &amp; Browser Types</a>
+  <a href="#tsconfig">18. tsconfig Essentials</a>
+  <a href="#pitfalls">19. Common Pitfalls</a>
+  <a href="#practice">20. Practice Exercises</a>
+</nav>
+
+<main>
+<h1>TypeScript Brush-Up</h1>
+<p>TypeScript is JavaScript plus a static type system. Types are erased at compile time, so there is zero runtime cost. Click <strong>Run</strong> to transpile and execute an example in your browser (the compiler is downloaded from a CDN on first click). Blocks with a red left border show code that <em>fails to compile</em>; they are not runnable.</p>
+<div class="tip">The in-browser runner only transpiles (strips types). Use <code>tsc</code> or your editor to see real type errors.</div>
+
+<!-- 1 -->
+<section id="intro">
+<h2>1. Setup &amp; Compiler</h2>
+<pre><code># install
+npm init -y
+npm install --save-dev typescript
+npx tsc --init                 # creates tsconfig.json
+
+# compile
+npx tsc                        # uses tsconfig.json
+npx tsc file.ts                # single file
+npx tsc --noEmit               # type check only
+npx tsc --watch                # recompile on change
+
+# run directly
+npx tsx file.ts                # or ts-node, or Node 22.6+: node --experimental-strip-types file.ts</code></pre>
+</section>
+
+<!-- 2 -->
+<section id="basic">
+<h2>2. Basic Types &amp; Inference</h2>
+<pre class="runnable"><code>let title: string = "TS";
+let count: number = 42;           // int and float are both number
+let big: bigint = 100n;
+let done: boolean = false;
+let nothing: null = null;
+let notSet: undefined = undefined;
+let id: symbol = Symbol("id");
+
+// inference: annotations are usually unnecessary
+let inferred = "hello";           // string
+const literal = "hello";          // type is the literal "hello"
+const nums = [1, 2, 3];           // number[]
+const user = { name: "Ann", age: 30 };   // { name: string; age: number }
+
+// contextual typing
+[1, 2, 3].forEach((n) =&gt; console.log(n.toFixed(1)));   // n inferred as number
+
+console.log(title, count, big, done, nothing, notSet, id.toString());
+console.log(typeof inferred, typeof literal, nums, user);</code></pre>
+<pre class="errdemo"><code>let n: number = "five";           // <span class="label bad">error</span> Type 'string' is not assignable to type 'number'
+let s = "a"; s = 5;               // <span class="label bad">error</span> inferred as string
+user.email;                       // <span class="label bad">error</span> Property 'email' does not exist</code></pre>
+</section>
+
+<!-- 3 -->
+<section id="special">
+<h2>3. <code>any</code>, <code>unknown</code>, <code>never</code>, <code>void</code></h2>
+<table>
+  <tr><th>Type</th><th>Meaning</th></tr>
+  <tr><td><code>any</code></td><td>Opt out of type checking. Avoid.</td></tr>
+  <tr><td><code>unknown</code></td><td>Type-safe <code>any</code>: must narrow before use.</td></tr>
+  <tr><td><code>void</code></td><td>Function returns nothing useful.</td></tr>
+  <tr><td><code>never</code></td><td>Value that never occurs (throws, infinite loop, exhausted union).</td></tr>
+  <tr><td><code>object</code></td><td>Any non-primitive.</td></tr>
+</table>
+<pre class="runnable"><code>function process(input: unknown): string {
+  if (typeof input === "string") return input.toUpperCase();
+  if (typeof input === "number") return input.toFixed(2);
+  if (Array.isArray(input)) return `array(${input.length})`;
+  return "unknown";
+}
+console.log(process("hi"), process(3.14159), process([1, 2]), process({}));
+
+function fail(message: string): never {
+  throw new Error(message);
+}
+function log(msg: string): void {
+  console.log(msg);
+}
+log("void function");
+try { fail("never returns"); } catch (e) { console.log((e as Error).message); }
+
+const parsed: unknown = JSON.parse('{"a":1}');
+if (typeof parsed === "object" &amp;&amp; parsed !== null &amp;&amp; "a" in parsed) {
+  console.log("has a:", (parsed as { a: number }).a);
+}</code></pre>
+<pre class="errdemo"><code>let u: unknown = "text";
+u.toUpperCase();                  // <span class="label bad">error</span> 'u' is of type 'unknown'
+let n: number = u;                // <span class="label bad">error</span></code></pre>
+</section>
+
+<!-- 4 -->
+<section id="arrays">
+<h2>4. Arrays, Tuples &amp; Enums</h2>
+<pre class="runnable"><code>const a: number[] = [1, 2, 3];
+const b: Array&lt;string&gt; = ["x", "y"];
+const ro: readonly number[] = [1, 2];       // no push/pop
+const matrix: number[][] = [[1, 2], [3, 4]];
+
+// tuples: fixed length, positional types
+let pair: [string, number] = ["age", 30];
+const named: [name: string, active?: boolean] = ["Ann"];
+const [label, value] = pair;
+console.log(label, value, named, a, b, ro, matrix);
+
+function minMax(nums: number[]): [min: number, max: number] {
+  return [Math.min(...nums), Math.max(...nums)];
+}
+const [min, max] = minMax([4, 1, 9]);
+console.log(min, max);
+
+// numeric enum (reverse mapping at runtime)
+enum Direction { Up, Down, Left = 10, Right }
+console.log(Direction.Up, Direction.Left, Direction.Right, Direction[0]);
+
+// string enum
+enum Status { Active = "ACTIVE", Inactive = "INACTIVE" }
+console.log(Status.Active);
+
+// const enum vs union of literals (often preferred: zero runtime code)
+type Role = "admin" | "user" | "guest";
+const r: Role = "admin";
+console.log(r);</code></pre>
+<pre class="errdemo"><code>ro.push(3);                       // <span class="label bad">error</span> 'push' does not exist on readonly number[]
+pair = ["age", 30, true];         // <span class="label bad">error</span> source has 3 elements, target allows 2
+const bad: Role = "owner";        // <span class="label bad">error</span></code></pre>
+</section>
+
+<!-- 5 -->
+<section id="functions">
+<h2>5. Functions</h2>
+<pre class="runnable"><code>// parameter + return types
+function add(a: number, b: number): number { return a + b; }
+const mul = (a: number, b: number): number =&gt; a * b;
+
+// optional, default, rest
+function greet(name: string, greeting = "Hello", punct?: string, ...tags: string[]): string {
+  return `${greeting}, ${name}${punct ?? "!"} [${tags.join(",")}]`;
+}
+console.log(greet("Ann"), greet("Bob", "Hi", "?", "a", "b"));
+
+// function types
+type BinaryOp = (a: number, b: number) =&gt; number;
+const ops: Record&lt;string, BinaryOp&gt; = { add, mul };
+console.log(ops.add(2, 3), ops.mul(2, 3));
+
+// callbacks
+function apply&lt;T, R&gt;(items: T[], fn: (item: T, index: number) =&gt; R): R[] {
+  return items.map(fn);
+}
+console.log(apply([1, 2, 3], (n) =&gt; n * 2), apply(["a", "b"], (s, i) =&gt; s + i));
+
+// overloads
+function pad(value: string): string;
+function pad(value: number): string;
+function pad(value: string | number): string {
+  return typeof value === "number" ? String(value).padStart(3, "0") : value.padEnd(3, "_");
+}
+console.log(pad(7), pad("a"));
+
+// `this` parameter (erased at compile time)
+function showName(this: { name: string }) { return this.name; }
+console.log(showName.call({ name: "bound" }));
+
+// destructured params
+function connect({ host, port = 80 }: { host: string; port?: number }): string {
+  return `${host}:${port}`;
+}
+console.log(connect({ host: "localhost" }));</code></pre>
+<pre class="errdemo"><code>add(1);                           // <span class="label bad">error</span> Expected 2 arguments, but got 1
+add(1, "2");                      // <span class="label bad">error</span> string not assignable to number
+pad(true);                        // <span class="label bad">error</span> No overload matches this call</code></pre>
+</section>
+
+<!-- 6 -->
+<section id="objects">
+<h2>6. Objects, Interfaces &amp; Type Aliases</h2>
+<pre class="runnable"><code>interface User {
+  readonly id: number;              // cannot be reassigned
+  name: string;
+  email?: string;                   // optional
+  greet(): string;
+}
+
+interface Admin extends User {
+  permissions: string[];
+}
+
+const admin: Admin = {
+  id: 1,
+  name: "Ann",
+  permissions: ["all"],
+  greet() { return `Hi, ${this.name}`; },
+};
+console.log(admin.greet(), admin.permissions);
+
+// type alias
+type Point = { x: number; y: number };
+type ID = string | number;
+type Callback = (err: Error | null, data?: string) =&gt; void;
+
+// index signature
+interface Dictionary { [key: string]: number }
+const scores: Dictionary = { math: 90, art: 85 };
+scores.music = 70;
+console.log(scores);
+
+// declaration merging (interfaces only)
+interface Window2 { a: number }
+interface Window2 { b: number }
+const w: Window2 = { a: 1, b: 2 };
+console.log(w);
+
+// structural typing: shape matters, not name
+const p = { x: 1, y: 2, z: 3 };
+const pt: Point = p;               // OK: extra property allowed (not a fresh literal)
+console.log(pt);</code></pre>
+<pre class="errdemo"><code>admin.id = 2;                                       // <span class="label bad">error</span> read-only
+const pt2: Point = { x: 1, y: 2, z: 3 };            // <span class="label bad">error</span> excess property check on fresh literals
+const u: User = { id: 1, name: "A" };               // <span class="label bad">error</span> missing greet</code></pre>
+<table>
+  <tr><th>Feature</th><th><code>interface</code></th><th><code>type</code></th></tr>
+  <tr><td>Object shapes</td><td>Yes</td><td>Yes</td></tr>
+  <tr><td>Extends</td><td><code>extends</code></td><td><code>&amp;</code> intersection</td></tr>
+  <tr><td>Declaration merging</td><td>Yes</td><td>No</td></tr>
+  <tr><td>Unions, tuples, primitives, mapped/conditional</td><td>No</td><td>Yes</td></tr>
+  <tr><td>Class <code>implements</code></td><td>Yes</td><td>Yes (object types)</td></tr>
+</table>
+</section>
+
+<!-- 7 -->
+<section id="unions">
+<h2>7. Unions, Intersections &amp; Literal Types</h2>
+<pre class="runnable"><code>type Id = string | number;
+function show(id: Id) {
+  return typeof id === "string" ? id.toUpperCase() : id.toFixed(0);
+}
+console.log(show("abc"), show(42.7));
+
+// literal types
+type Direction = "north" | "south" | "east" | "west";
+type Dice = 1 | 2 | 3 | 4 | 5 | 6;
+function move(d: Direction, steps: Dice) { return `${steps} ${d}`; }
+console.log(move("north", 3));
+
+// intersection: combine types
+type Named = { name: string };
+type Aged = { age: number };
+type Person = Named &amp; Aged;
+const p: Person = { name: "Ann", age: 30 };
+console.log(p);
+
+// template literal types
+type Event = `on${Capitalize&lt;"click" | "hover"&gt;}`;     // "onClick" | "onHover"
+const ev: Event = "onClick";
+console.log(ev);
+
+// nullable
+function len(s: string | null | undefined): number {
+  return s?.length ?? 0;
+}
+console.log(len("abc"), len(null));</code></pre>
+<pre class="errdemo"><code>move("up", 3);                    // <span class="label bad">error</span> '"up"' not assignable to Direction
+move("north", 7);                 // <span class="label bad">error</span></code></pre>
+</section>
+
+<!-- 8 -->
+<section id="narrowing">
+<h2>8. Narrowing &amp; Type Guards</h2>
+<pre class="runnable"><code>// typeof, instanceof, in, equality, truthiness
+function describe(x: string | number | Date | string[] | null): string {
+  if (x === null) return "null";
+  if (typeof x === "string") return `string:${x.length}`;
+  if (typeof x === "number") return `number:${x.toFixed(1)}`;
+  if (x instanceof Date) return `date:${x.getUTCFullYear()}`;
+  return `array:${x.length}`;
+}
+console.log(describe("hi"), describe(1), describe(new Date(0)), describe(["a"]), describe(null));
+
+// custom type guard
+interface Cat { meow(): void }
+interface Dog { bark(): void }
+function isCat(pet: Cat | Dog): pet is Cat {
+  return (pet as Cat).meow !== undefined;
+}
+const pet: Cat | Dog = { meow() { console.log("meow"); } };
+if (isCat(pet)) pet.meow();
+
+// discriminated union + exhaustive check
+type Shape =
+  | { kind: "circle"; radius: number }
+  | { kind: "rect"; w: number; h: number }
+  | { kind: "square"; size: number };
+
+function area(s: Shape): number {
+  switch (s.kind) {
+    case "circle": return Math.PI * s.radius ** 2;
+    case "rect": return s.w * s.h;
+    case "square": return s.size ** 2;
+    default: {
+      const _exhaustive: never = s;      // compile error if a case is missing
+      return _exhaustive;
+    }
+  }
+}
+console.log(area({ kind: "circle", radius: 1 }).toFixed(2), area({ kind: "rect", w: 2, h: 3 }));
+
+// assertion function
+function assertString(v: unknown): asserts v is string {
+  if (typeof v !== "string") throw new TypeError("not a string");
+}
+const val: unknown = "ok";
+assertString(val);
+console.log(val.toUpperCase());</code></pre>
+</section>
+
+<!-- 9 -->
+<section id="generics">
+<h2>9. Generics</h2>
+<pre class="runnable"><code>function identity&lt;T&gt;(value: T): T { return value; }
+console.log(identity&lt;string&gt;("a"), identity(42));       // T inferred
+
+// constraints
+function longest&lt;T extends { length: number }&gt;(a: T, b: T): T {
+  return a.length &gt;= b.length ? a : b;
+}
+console.log(longest("abc", "de"), longest([1, 2], [1]));
+
+// keyof constraint
+function pluck&lt;T, K extends keyof T&gt;(items: T[], key: K): T[K][] {
+  return items.map((i) =&gt; i[key]);
+}
+console.log(pluck([{ id: 1, n: "a" }, { id: 2, n: "b" }], "n"));
+
+// generic interfaces &amp; classes
+interface Box&lt;T&gt; { value: T }
+class Stack&lt;T&gt; {
+  private items: T[] = [];
+  push(item: T): void { this.items.push(item); }
+  pop(): T | undefined { return this.items.pop(); }
+  peek(): T | undefined { return this.items[this.items.length - 1]; }
+  get size(): number { return this.items.length; }
+}
+const s = new Stack&lt;number&gt;();
+s.push(1); s.push(2);
+console.log(s.pop(), s.peek(), s.size);
+
+// default type parameter
+type ApiResponse&lt;T = unknown&gt; = { ok: boolean; data: T };
+const res: ApiResponse&lt;string[]&gt; = { ok: true, data: ["a"] };
+console.log(res);
+
+// generic factory
+function create&lt;T&gt;(Ctor: new () =&gt; T): T { return new Ctor(); }
+class Foo { hello = "foo"; }
+console.log(create(Foo).hello);
+
+// Result type
+type Result&lt;T, E = Error&gt; = { ok: true; value: T } | { ok: false; error: E };
+function safeParse(json: string): Result&lt;unknown&gt; {
+  try { return { ok: true, value: JSON.parse(json) }; }
+  catch (e) { return { ok: false, error: e as Error }; }
+}
+const r = safeParse("{bad");
+console.log(r.ok ? r.value : r.error.name);</code></pre>
+<pre class="errdemo"><code>longest(1, 2);                    // <span class="label bad">error</span> number has no 'length'
+pluck([{ id: 1 }], "name");       // <span class="label bad">error</span> "name" not in keyof</code></pre>
+</section>
+
+<!-- 10 -->
+<section id="classes">
+<h2>10. Classes</h2>
+<pre class="runnable"><code>interface Printable { print(): string }
+
+abstract class Shape implements Printable {
+  static count = 0;
+  protected readonly id: number;
+
+  // parameter properties: declare + assign in one go
+  constructor(public readonly name: string, private color: string = "black") {
+    this.id = ++Shape.count;
+  }
+  abstract area(): number;
+  print(): string { return `${this.name}#${this.id} (${this.color}) area=${this.area().toFixed(2)}`; }
+}
+
+class Circle extends Shape {
+  constructor(private radius: number) { super("Circle", "red"); }
+  area(): number { return Math.PI * this.radius ** 2; }
+}
+
+class Rect extends Shape {
+  constructor(private w: number, private h: number) { super("Rect"); }
+  area(): number { return this.w * this.h; }
+  override print(): string { return "[Rect] " + super.print(); }
+}
+
+const shapes: Shape[] = [new Circle(2), new Rect(2, 3)];
+shapes.forEach((s) =&gt; console.log(s.print()));
+console.log(Shape.count);
+
+// JS private fields (#) are enforced at runtime too
+class Account {
+  #balance = 0;
+  deposit(n: number): this { this.#balance += n; return this; }
+  get balance(): number { return this.#balance; }
+}
+console.log(new Account().deposit(10).deposit(5).balance);
+
+// accessors and index signatures in classes
+class Temp {
+  constructor(private _c: number) {}
+  get f(): number { return this._c * 9 / 5 + 32; }
+  set f(v: number) { this._c = (v - 32) * 5 / 9; }
+}
+const t = new Temp(100);
+console.log(t.f);</code></pre>
+<pre class="errdemo"><code>new Shape("x");                   // <span class="label bad">error</span> cannot instantiate abstract class
+new Circle(1).radius;             // <span class="label bad">error</span> 'radius' is private
+new Circle(1).name = "x";         // <span class="label bad">error</span> read-only</code></pre>
+<table>
+  <tr><th>Modifier</th><th>Accessible from</th></tr>
+  <tr><td><code>public</code> (default)</td><td>Everywhere</td></tr>
+  <tr><td><code>protected</code></td><td>Class and subclasses</td></tr>
+  <tr><td><code>private</code></td><td>Class only (compile time)</td></tr>
+  <tr><td><code>#field</code></td><td>Class only (compile and runtime)</td></tr>
+  <tr><td><code>readonly</code></td><td>Assign in constructor only</td></tr>
+</table>
+</section>
+
+<!-- 11 -->
+<section id="utility">
+<h2>11. Utility Types</h2>
+<pre class="runnable"><code>interface Todo { id: number; title: string; done: boolean; tags: string[] }
+
+type A = Partial&lt;Todo&gt;;                          // all optional
+type B = Required&lt;Partial&lt;Todo&gt;&gt;;                // all required
+type C = Readonly&lt;Todo&gt;;                         // all readonly
+type D = Pick&lt;Todo, "id" | "title"&gt;;             // subset
+type E = Omit&lt;Todo, "tags"&gt;;                     // everything except
+type F = Record&lt;"a" | "b", number&gt;;              // { a: number; b: number }
+type G = Exclude&lt;"a" | "b" | "c", "a"&gt;;          // "b" | "c"
+type H = Extract&lt;"a" | "b" | "c", "a" | "c"&gt;;    // "a" | "c"
+type I = NonNullable&lt;string | null | undefined&gt;; // string
+
+function makeTodo(): Todo { return { id: 1, title: "x", done: false, tags: [] }; }
+type J = ReturnType&lt;typeof makeTodo&gt;;            // Todo
+type K = Parameters&lt;(a: number, b: string) =&gt; void&gt;;   // [number, string]
+type L = Awaited&lt;Promise&lt;Promise&lt;number&gt;&gt;&gt;;      // number
+
+// practical use
+function updateTodo(todo: Todo, changes: Partial&lt;Todo&gt;): Todo {
+  return { ...todo, ...changes };
+}
+const t1 = makeTodo();
+console.log(updateTodo(t1, { done: true }));
+
+const preview: Pick&lt;Todo, "id" | "title"&gt; = { id: 2, title: "preview" };
+const frozen: Readonly&lt;Todo&gt; = Object.freeze(makeTodo());
+const lookup: Record&lt;string, Todo&gt; = { first: t1 };
+console.log(preview, frozen.title, Object.keys(lookup));</code></pre>
+</section>
+
+<!-- 12 -->
+<section id="advanced">
+<h2>12. <code>keyof</code>, <code>typeof</code>, Mapped &amp; Conditional Types</h2>
+<pre class="runnable"><code>const config = { host: "localhost", port: 8080, debug: true };
+
+type Config = typeof config;                       // { host: string; port: number; debug: boolean }
+type ConfigKey = keyof Config;                     // "host" | "port" | "debug"
+type PortType = Config["port"];                    // number  (indexed access)
+
+// mapped types
+type Nullable&lt;T&gt; = { [K in keyof T]: T[K] | null };
+type Getters&lt;T&gt; = { [K in keyof T as `get${Capitalize&lt;string &amp; K&gt;}`]: () =&gt; T[K] };
+type MutableAll&lt;T&gt; = { -readonly [K in keyof T]-?: T[K] };
+
+type CfgGetters = Getters&lt;Config&gt;;     // { getHost: () =&gt; string; getPort: ...; getDebug: ... }
+
+// conditional types
+type IsString&lt;T&gt; = T extends string ? "yes" : "no";
+type T1 = IsString&lt;"a"&gt;;       // "yes"
+type T2 = IsString&lt;1&gt;;         // "no"
+
+// distributes over unions
+type ToArray&lt;T&gt; = T extends unknown ? T[] : never;
+type T3 = ToArray&lt;string | number&gt;;        // string[] | number[]
+
+// infer
+type ElementOf&lt;T&gt; = T extends (infer U)[] ? U : never;
+type UnwrapPromise&lt;T&gt; = T extends Promise&lt;infer U&gt; ? U : T;
+type T4 = ElementOf&lt;boolean[]&gt;;            // boolean
+type T5 = UnwrapPromise&lt;Promise&lt;string&gt;&gt;;  // string
+
+// runtime usage of keyof
+function getProp&lt;T, K extends keyof T&gt;(obj: T, key: K): T[K] { return obj[key]; }
+console.log(getProp(config, "port"));
+
+// recursive type
+type Json = string | number | boolean | null | Json[] | { [k: string]: Json };
+const j: Json = { a: [1, "b", { c: null }] };
+type DeepReadonly&lt;T&gt; = { readonly [K in keyof T]: T[K] extends object ? DeepReadonly&lt;T[K]&gt; : T[K] };
+const dr: DeepReadonly&lt;{ a: { b: number } }&gt; = { a: { b: 1 } };
+console.log(j, dr);</code></pre>
+</section>
+
+<!-- 13 -->
+<section id="assertions">
+<h2>13. Assertions, <code>as const</code> &amp; <code>satisfies</code></h2>
+<pre class="runnable"><code>// type assertion: you override the compiler (no runtime check!)
+const el = { value: "42" } as { value: string };
+const n = Number(el.value);
+
+// as const: deep readonly + literal types
+const COLORS = ["red", "green", "blue"] as const;
+type Color = typeof COLORS[number];              // "red" | "green" | "blue"
+const ROUTES = { home: "/", about: "/about" } as const;
+type Route = typeof ROUTES[keyof typeof ROUTES]; // "/" | "/about"
+console.log(COLORS, ROUTES.home, n);
+
+// satisfies: validate a value against a type without widening it
+type Palette = Record&lt;string, string | [number, number, number]&gt;;
+const palette = {
+  red: [255, 0, 0],
+  green: "#00ff00",
+} satisfies Palette;
+console.log(palette.red.map((c) =&gt; c / 255), palette.green.toUpperCase());  // precise types kept
+
+// non-null assertion (!) - use sparingly
+const maybe: string | undefined = "hi";
+console.log(maybe!.length);
+
+// definite assignment
+class Svc { ready!: boolean; init() { this.ready = true; } }
+
+// unique symbol / branded types
+type UserId = number &amp; { readonly __brand: "UserId" };
+const asUserId = (n: number) =&gt; n as UserId;
+function getUser(id: UserId) { return `user ${id}`; }
+console.log(getUser(asUserId(5)));</code></pre>
+<pre class="errdemo"><code>getUser(5);                       // <span class="label bad">error</span> number is not assignable to UserId (brand missing)
+const x = "a" as number;          // <span class="label bad">error</span> types do not sufficiently overlap</code></pre>
+</section>
+
+<!-- 14 -->
+<section id="modules">
+<h2>14. Modules &amp; Declaration Files</h2>
+<pre><code>// user.ts
+export interface User { id: number; name: string }
+export type Role = "admin" | "user";
+export function makeUser(name: string): User { return { id: 1, name }; }
+export default class UserService { /* ... */ }
+
+// app.ts
+import UserService, { makeUser, type User } from "./user";   // `type` import is erased
+import type { Role } from "./user";
+export * from "./user";
+export * as userApi from "./user";
+
+// declaration files (.d.ts): types only, no implementation
+// global.d.ts
+declare const __APP_VERSION__: string;
+declare module "*.svg" { const url: string; export default url; }
+
+// augment existing types
+declare global {
+  interface Window { appConfig: { apiUrl: string } }
+}
+export {};
+
+// third-party types
+// npm i -D @types/node @types/express
+// ambient module for an untyped package:
+declare module "untyped-lib";
+
+// namespaces (legacy; prefer ES modules)
+namespace Utils { export const pi = 3.14; }</code></pre>
+</section>
+
+<!-- 15 -->
+<section id="async">
+<h2>15. Async &amp; Promises</h2>
+<pre class="runnable"><code>interface Post { id: number; title: string }
+
+const sleep = (ms: number): Promise&lt;void&gt; =&gt; new Promise((r) =&gt; setTimeout(r, ms));
+
+async function fetchPost(id: number): Promise&lt;Post&gt; {
+  await sleep(20);
+  if (id &lt; 0) throw new RangeError("bad id");
+  return { id, title: `Post ${id}` };
+}
+
+const post = await fetchPost(1);
+console.log(post.title);
+
+// Promise.all keeps tuple types
+const [p1, p2, count] = await Promise.all([fetchPost(1), fetchPost(2), Promise.resolve(10)]);
+console.log(p1.title, p2.title, count + 1);
+
+// typed error handling
+try {
+  await fetchPost(-1);
+} catch (e: unknown) {
+  if (e instanceof RangeError) console.log("RangeError:", e.message);
+}
+
+// generic retry helper
+async function retry&lt;T&gt;(fn: () =&gt; Promise&lt;T&gt;, attempts = 3): Promise&lt;T&gt; {
+  let lastErr: unknown;
+  for (let i = 0; i &lt; attempts; i++) {
+    try { return await fn(); } catch (e) { lastErr = e; console.log("retrying", i + 1); }
+  }
+  throw lastErr;
+}
+let calls = 0;
+console.log(await retry(async () =&gt; { if (++calls &lt; 3) throw new Error("flaky"); return "ok after " + calls; }));
+
+// typed fetch wrapper
+async function getJson&lt;T&gt;(url: string): Promise&lt;T&gt; {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return (await res.json()) as T;       // assertion: runtime shape is NOT verified
+}
+const remote = await getJson&lt;Post&gt;("https://jsonplaceholder.typicode.com/posts/1");
+console.log(remote.title);</code></pre>
+<div class="warn">Generic <code>res.json() as T</code> is trust, not validation. For untrusted data use a runtime validator such as Zod or a custom type guard.</div>
+</section>
+
+<!-- 16 -->
+<section id="errors">
+<h2>16. Error Handling</h2>
+<pre class="runnable"><code>// With useUnknownInCatchVariables (part of strict), `e` is unknown
+function toMessage(e: unknown): string {
+  if (e instanceof Error) return e.message;
+  if (typeof e === "string") return e;
+  return JSON.stringify(e);
+}
+
+class HttpError extends Error {
+  constructor(public readonly status: number, message: string) {
+    super(message);
+    this.name = "HttpError";
+  }
+}
+
+for (const thrower of [() =&gt; { throw new HttpError(404, "Not found"); }, () =&gt; { throw "text"; }, () =&gt; { throw { code: 1 }; }]) {
+  try { thrower(); }
+  catch (e) {
+    if (e instanceof HttpError) console.log("HTTP", e.status, e.message);
+    else console.log("other:", toMessage(e));
+  }
+}
+
+// Result pattern: make failures part of the type
+type Ok&lt;T&gt; = { ok: true; value: T };
+type Err&lt;E&gt; = { ok: false; error: E };
+type Result&lt;T, E&gt; = Ok&lt;T&gt; | Err&lt;E&gt;;
+
+function divide(a: number, b: number): Result&lt;number, "div-by-zero"&gt; {
+  return b === 0 ? { ok: false, error: "div-by-zero" } : { ok: true, value: a / b };
+}
+const r = divide(4, 0);
+if (r.ok) console.log(r.value); else console.log("error:", r.error);</code></pre>
+</section>
+
+<!-- 17 -->
+<section id="dom">
+<h2>17. DOM &amp; Browser Types</h2>
+<pre><code>// querySelector returns Element | null; narrow it
+const input = document.querySelector&lt;HTMLInputElement&gt;("#name");
+if (input) console.log(input.value);
+
+const btn = document.getElementById("save") as HTMLButtonElement | null;
+btn?.addEventListener("click", (e: MouseEvent) =&gt; {
+  e.preventDefault();
+  console.log(e.clientX, (e.currentTarget as HTMLButtonElement).disabled);
+});
+
+// typed custom events
+interface AppEvents { login: CustomEvent&lt;{ user: string }&gt; }
+declare global { interface WindowEventMap extends AppEvents {} }
+window.addEventListener("login", (e) =&gt; console.log(e.detail.user));
+
+// form handling
+form.addEventListener("submit", (e: SubmitEvent) =&gt; {
+  const data = new FormData(e.target as HTMLFormElement);
+  const name = data.get("name");              // FormDataEntryValue | null
+  if (typeof name === "string") { /* ... */ }
+});
+
+// requires "lib": ["DOM", "DOM.Iterable", "ES2022"] in tsconfig</code></pre>
+</section>
+
+<!-- 18 -->
+<section id="tsconfig">
+<h2>18. tsconfig Essentials</h2>
+<pre><code>{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",       // or "NodeNext" for Node
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "outDir": "dist",
+    "rootDir": "src",
+
+    "strict": true,                      // enables all below
+    //   noImplicitAny, strictNullChecks, strictFunctionTypes,
+    //   strictBindCallApply, strictPropertyInitialization,
+    //   noImplicitThis, useUnknownInCatchVariables, alwaysStrict
+
+    "noUncheckedIndexedAccess": true,    // arr[i] becomes T | undefined
+    "noImplicitOverride": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "exactOptionalPropertyTypes": true,
+    "noFallthroughCasesInSwitch": true,
+
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "skipLibCheck": true,
+    "declaration": true,
+    "sourceMap": true
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
+}</code></pre>
+</section>
+
+<!-- 19 -->
+<section id="pitfalls">
+<h2>19. Common Pitfalls</h2>
+<pre class="runnable"><code>// 1. Types are erased: no runtime checks
+function parseAge(raw: unknown): number {
+  return raw as number;                        // lies if raw is a string
+}
+console.log(typeof parseAge("12"));            // "string" at runtime!
+
+// 2. Object.keys returns string[]
+const o = { a: 1, b: 2 };
+const keys = Object.keys(o) as (keyof typeof o)[];
+console.log(keys.map((k) =&gt; o[k]));
+
+// 3. Structural typing allows extra props via variables
+interface Pt { x: number }
+const withExtra = { x: 1, y: 2 };
+const pt: Pt = withExtra;                      // OK
+console.log(pt);
+
+// 4. enums emit runtime code; const objects + unions are lighter
+const Level = { Low: 1, High: 2 } as const;
+type Level = typeof Level[keyof typeof Level];
+const lv: Level = Level.High;
+console.log(lv);
+
+// 5. Array index access isn't undefined-checked unless noUncheckedIndexedAccess
+const arr: string[] = [];
+console.log(arr[0]?.toUpperCase());
+
+// 6. `private` is compile-time only; use #private for real privacy
+class A { private secret = 1; }
+console.log((new A() as any).secret);
+
+// 7. Prefer unknown over any, interface for objects, readonly where possible
+// 8. Don't use `Function`, `Object`, `{}` as types - use specific signatures or Record</code></pre>
+</section>
+
+<!-- 20 -->
+<section id="practice">
+<h2>20. Practice Exercises</h2>
+<h3>1. Typed event emitter</h3>
+<pre class="runnable"><code>type Handler&lt;T&gt; = (payload: T) =&gt; void;
+
+class Emitter&lt;Events extends Record&lt;string, unknown&gt;&gt; {
+  private handlers: { [K in keyof Events]?: Handler&lt;Events[K]&gt;[] } = {};
+
+  on&lt;K extends keyof Events&gt;(event: K, fn: Handler&lt;Events[K]&gt;): void {
+    (this.handlers[event] ??= []).push(fn);
+  }
+  emit&lt;K extends keyof Events&gt;(event: K, payload: Events[K]): void {
+    this.handlers[event]?.forEach((fn) =&gt; fn(payload));
+  }
+}
+
+const bus = new Emitter&lt;{ login: { user: string }; logout: void }&gt;();
+bus.on("login", ({ user }) =&gt; console.log("welcome", user));
+bus.emit("login", { user: "Ann" });</code></pre>
+
+<h3>2. Typed <code>groupBy</code></h3>
+<pre class="runnable"><code>function groupBy&lt;T, K extends PropertyKey&gt;(items: readonly T[], keyFn: (item: T) =&gt; K): Record&lt;K, T[]&gt; {
+  const out = {} as Record&lt;K, T[]&gt;;
+  for (const item of items) {
+    (out[keyFn(item)] ??= []).push(item);
+  }
+  return out;
+}
+const people = [{ n: "A", age: 20 }, { n: "B", age: 30 }, { n: "C", age: 20 }];
+console.log(groupBy(people, (p) =&gt; p.age));</code></pre>
+
+<h3>3. Deep partial</h3>
+<pre class="runnable"><code>type DeepPartial&lt;T&gt; = T extends object ? { [K in keyof T]?: DeepPartial&lt;T[K]&gt; } : T;
+
+interface Settings { ui: { theme: string; font: { size: number; family: string } }; lang: string }
+
+function merge&lt;T&gt;(base: T, patch: DeepPartial&lt;T&gt;): T {
+  const out: any = { ...base };
+  for (const [k, v] of Object.entries(patch as object)) {
+    out[k] = v &amp;&amp; typeof v === "object" ? merge((base as any)[k], v) : v;
+  }
+  return out;
+}
+const base: Settings = { ui: { theme: "dark", font: { size: 12, family: "Arial" } }, lang: "en" };
+console.log(merge(base, { ui: { font: { size: 14 } } }));</code></pre>
+
+<h3>4. State machine with discriminated unions</h3>
+<pre class="runnable"><code>type State =
+  | { status: "idle" }
+  | { status: "loading" }
+  | { status: "success"; data: string[] }
+  | { status: "error"; message: string };
+
+type Action =
+  | { type: "fetch" }
+  | { type: "resolve"; data: string[] }
+  | { type: "reject"; message: string };
+
+function reducer(state: State, action: Action): State {
+  switch (action.type) {
+    case "fetch": return { status: "loading" };
+    case "resolve": return { status: "success", data: action.data };
+    case "reject": return { status: "error", message: action.message };
+  }
+}
+
+let s: State = { status: "idle" };
+for (const a of [{ type: "fetch" }, { type: "resolve", data: ["x"] }] as Action[]) {
+  s = reducer(s, a);
+  console.log(s);
+}</code></pre>
+
+<h3>5. Make this fail on purpose</h3>
+<pre class="errdemo"><code>// Which lines produce errors with "strict": true?
+function first&lt;T&gt;(arr: T[]) { return arr[0]; }
+const n: number = first(["a"]);         // error: string not assignable to number
+let maybe: string | undefined;
+maybe.length;                           // error: possibly undefined
+function f(x) { return x; }             // error: implicit any
+class C { name: string; }               // error: not initialised in constructor</code></pre>
+</section>
+
+<p style="color:var(--muted)">Previous: <a href="javascript-brush-up.html" style="color:var(--accent)">javascript-brush-up.html</a> | Next: <a href="nestjs-student-api-slider.html" style="color:var(--accent)">nestjs-student-api-slider.html</a> &amp; <a href="nextjs-brush-up.html" style="color:var(--accent)">nextjs-brush-up.html</a></p>
+</main>
+
+<script>
+  const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
+  const TS_URL = "https://cdn.jsdelivr.net/npm/typescript@5.6.3/lib/typescript.js";
+  let tsLoading = null;
+
+  function loadTs() {
+    if (window.ts) return Promise.resolve(window.ts);
+    tsLoading ??= new Promise((resolve, reject) => {
+      const s = document.createElement("script");
+      s.src = TS_URL;
+      s.onload = () => resolve(window.ts);
+      s.onerror = () => reject(new Error("Could not load the TypeScript compiler (check network)."));
+      document.head.append(s);
+    });
+    return tsLoading;
+  }
+
+  document.querySelectorAll("pre.runnable").forEach((pre) => {
+    const btn = document.createElement("button");
+    btn.className = "run";
+    btn.textContent = "Run";
+    const out = document.createElement("div");
+    out.className = "out";
+    pre.before(btn);
+    pre.after(out);
+
+    btn.addEventListener("click", async () => {
+      out.style.display = "block";
+      out.textContent = "";
+      btn.disabled = true;
+      const timers = {};
+      const write = (cls, args) => {
+        const line = document.createElement("div");
+        if (cls) line.className = cls;
+        line.textContent = args.map(fmt).join(" ");
+        out.append(line);
+      };
+      const fakeConsole = {
+        log: (...a) => write("", a),
+        info: (...a) => write("", a),
+        warn: (...a) => write("e", a),
+        error: (...a) => write("e", a),
+        time: (l = "default") => { timers[l] = performance.now(); },
+        timeEnd: (l = "default") => write("", [`${l}: ${Math.round(performance.now() - timers[l])}ms`]),
+      };
+      try {
+        const ts = await loadTs();
+        // Wrap so top-level await and block-scoped declarations behave like a script body.
+        const source = `async function __main() {\n${pre.textContent}\n}`;
+        const js = ts.transpileModule(source, {
+          compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext, isolatedModules: true },
+        }).outputText + "\nreturn __main();";
+        await new AsyncFunction("console", js)(fakeConsole);
+      } catch (e) {
+        write("e", [`${e.name}: ${e.message}`]);
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  });
+
+  function fmt(v) {
+    if (typeof v === "string") return v;
+    if (typeof v === "bigint") return v + "n";
+    if (typeof v === "function") return `[Function ${v.name || "anonymous"}]`;
+    if (typeof v === "symbol") return v.toString();
+    if (v instanceof Error) return `${v.name}: ${v.message}`;
+    if (v instanceof Map) return `Map(${v.size}) ` + fmt([...v]);
+    if (v instanceof Set) return `Set(${v.size}) ` + fmt([...v]);
+    try { return JSON.stringify(v, (k, x) => (typeof x === "bigint" ? x + "n" : x === undefined ? "undefined" : x), 0) ?? String(v); }
+    catch { return String(v); }
+  }
+</script>
+</body>
+</html>
