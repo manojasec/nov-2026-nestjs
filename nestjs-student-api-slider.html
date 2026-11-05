@@ -1,948 +1,1714 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NestJS API Architecture &amp; Student Registration Slider</title>
-<style>
-  :root {
-    --bg: #090d16;
-    --panel: #111827;
-    --panel-card: #162032;
-    --panel-hover: #1f2d45;
-    --text: #f1f5f9;
-    --muted: #94a3b8;
-    --accent: #e0234e;          /* NestJS Signature Red/Crimson */
-    --accent-light: #ff4d6d;
-    --accent-glow: rgba(224, 35, 78, 0.25);
-    --cyan: #38bdf8;
-    --border: #243044;
-    --border-light: #334155;
-    --code-bg: #030712;
-    --ok: #10b981;
-    --err: #ef4444;
-    --warn: #f59e0b;
-    --admin-badge: #8b5cf6;
-    --teacher-badge: #3b82f6;
-    --student-badge: #10b981;
-  }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NestJS API Architecture &amp; Student Registration Masterclass</title>
+  <style>
+    :root {
+      --bg: #090d16;
+      --panel: #111827;
+      --panel-card: #162032;
+      --panel-hover: #1f2d45;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --accent: #e0234e;
+      /* NestJS Signature Red/Crimson */
+      --accent-light: #ff4d6d;
+      --accent-glow: rgba(224, 35, 78, 0.25);
+      --cyan: #38bdf8;
+      --border: #243044;
+      --border-light: #334155;
+      --code-bg: #030712;
+      --ok: #10b981;
+      --err: #ef4444;
+      --warn: #f59e0b;
+      --admin-badge: #8b5cf6;
+      --teacher-badge: #3b82f6;
+      --student-badge: #10b981;
+    }
 
-  * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    line-height: 1.6;
-    overflow-x: hidden;
-  }
+    * {
+      box-sizing: border-box;
+    }
 
-  /* TOP HEADER / APP BAR */
-  header.top-bar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 56px;
-    background: rgba(17, 24, 39, 0.95);
-    backdrop-filter: blur(8px);
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 1.25rem;
-    z-index: 1000;
-  }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
 
-  .brand {
-    display: flex;
-    align-items: center;
-    gap: .65rem;
-    font-weight: 700;
-    font-size: 1.05rem;
-    color: #fff;
-    text-decoration: none;
-  }
+    /* TOP HEADER / APP BAR */
+    header.top-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 56px;
+      background: rgba(17, 24, 39, 0.95);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1.25rem;
+      z-index: 1000;
+    }
 
-  .nest-logo {
-    width: 28px;
-    height: 28px;
-    background: linear-gradient(135deg, #e0234e, #ff4d6d);
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: .95rem;
-    font-weight: 900;
-    color: #fff;
-    box-shadow: 0 0 12px var(--accent-glow);
-  }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: .65rem;
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: #fff;
+      text-decoration: none;
+    }
 
-  .nav-controls {
-    display: flex;
-    align-items: center;
-    gap: .75rem;
-  }
+    .nest-logo {
+      width: 28px;
+      height: 28px;
+      background: linear-gradient(135deg, #e0234e, #ff4d6d);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .95rem;
+      font-weight: 900;
+      color: #fff;
+      box-shadow: 0 0 12px var(--accent-glow);
+    }
 
-  .btn {
-    background: #1e293b;
-    color: var(--text);
-    border: 1px solid var(--border);
-    padding: .35rem .8rem;
-    border-radius: 6px;
-    font-size: .82rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all .15s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: .35rem;
-    user-select: none;
-  }
+    .nav-controls {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+    }
 
-  .btn:hover {
-    background: var(--panel-hover);
-    border-color: var(--muted);
-    color: #fff;
-  }
+    .btn {
+      background: #1e293b;
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: .35rem .8rem;
+      border-radius: 6px;
+      font-size: .82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: .35rem;
+      user-select: none;
+    }
 
-  .btn-accent {
-    background: var(--accent);
-    color: #fff;
-    border-color: var(--accent-light);
-  }
+    .btn:hover {
+      background: var(--panel-hover);
+      border-color: var(--muted);
+      color: #fff;
+    }
 
-  .btn-accent:hover {
-    background: var(--accent-light);
-    box-shadow: 0 0 12px var(--accent-glow);
-  }
+    .btn-accent {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent-light);
+    }
 
-  /* PROGRESS BAR */
-  .progress-container {
-    position: fixed;
-    top: 56px;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: rgba(255, 255, 255, 0.05);
-    z-index: 999;
-  }
-  .progress-bar {
-    height: 100%;
-    width: 0%;
-    background: linear-gradient(90deg, var(--accent), var(--cyan));
-    transition: width .25s ease;
-  }
+    .btn-accent:hover {
+      background: var(--accent-light);
+      box-shadow: 0 0 12px var(--accent-glow);
+    }
 
-  /* SLIDER VIEW CONTAINER */
-  #slider-mode {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    padding-top: 60px;
-  }
+    /* PROGRESS BAR */
+    .progress-container {
+      position: fixed;
+      top: 56px;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: rgba(255, 255, 255, 0.05);
+      z-index: 999;
+    }
 
-  .slides-viewport {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 1.5rem;
-    position: relative;
-    max-width: 1200px;
-    margin: 0 auto;
-    width: 100%;
-  }
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent), var(--cyan));
+      transition: width .25s ease;
+    }
 
-  .slide {
-    display: none;
-    width: 100%;
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 2.2rem;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-    animation: fadeIn .3s ease forwards;
-  }
+    /* SLIDER VIEW CONTAINER */
+    #slider-mode {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      padding-top: 60px;
+    }
 
-  .slide.active {
-    display: block;
-  }
+    .slides-viewport {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      position: relative;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+    }
 
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
+    .slide {
+      display: none;
+      width: 100%;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2.2rem;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+      animation: fadeIn .3s ease forwards;
+    }
 
-  .slide-header {
-    border-bottom: 1px solid var(--border);
-    padding-bottom: .85rem;
-    margin-bottom: 1.4rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    flex-wrap: wrap;
-    gap: .5rem;
-  }
+    .slide.active {
+      display: block;
+    }
 
-  .slide-header h2 {
-    margin: 0;
-    color: #fff;
-    font-size: 1.6rem;
-    display: flex;
-    align-items: center;
-    gap: .65rem;
-    letter-spacing: -0.01em;
-  }
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
 
-  .slide-step-badge {
-    background: rgba(224, 35, 78, 0.15);
-    color: var(--accent-light);
-    border: 1px solid var(--accent);
-    padding: 2px 10px;
-    border-radius: 12px;
-    font-size: .8rem;
-    font-weight: 700;
-    text-transform: uppercase;
-  }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
 
-  .slide-num {
-    font-size: .85rem;
-    color: var(--muted);
-    font-family: ui-monospace, monospace;
-  }
+    .slide-header {
+      border-bottom: 1px solid var(--border);
+      padding-bottom: .85rem;
+      margin-bottom: 1.4rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: .5rem;
+    }
 
-  /* SLIDER FOOTER BAR */
-  .slider-footer {
-    position: sticky;
-    bottom: 0;
-    background: rgba(17, 24, 39, 0.95);
-    backdrop-filter: blur(8px);
-    border-top: 1px solid var(--border);
-    padding: .75rem 1.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    z-index: 990;
-  }
+    .slide-header h2 {
+      margin: 0;
+      color: #fff;
+      font-size: 1.6rem;
+      display: flex;
+      align-items: center;
+      gap: .65rem;
+      letter-spacing: -0.01em;
+    }
 
-  .slider-footer .controls-left,
-  .slider-footer .controls-right {
-    display: flex;
-    align-items: center;
-    gap: .5rem;
-  }
+    .slide-step-badge {
+      background: rgba(224, 35, 78, 0.15);
+      color: var(--accent-light);
+      border: 1px solid var(--accent);
+      padding: 2px 10px;
+      border-radius: 12px;
+      font-size: .8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
 
-  .slide-dots {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    overflow-x: auto;
-    max-width: 450px;
-    padding: 4px;
-  }
+    .slide-num {
+      font-size: .85rem;
+      color: var(--muted);
+      font-family: ui-monospace, monospace;
+    }
 
-  .dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: #334155;
-    cursor: pointer;
-    transition: all .2s;
-  }
-  .dot:hover { background: var(--muted); }
-  .dot.active {
-    background: var(--accent);
-    transform: scale(1.3);
-    box-shadow: 0 0 8px var(--accent-glow);
-  }
+    /* SLIDER FOOTER BAR */
+    .slider-footer {
+      position: sticky;
+      bottom: 0;
+      background: rgba(17, 24, 39, 0.95);
+      backdrop-filter: blur(8px);
+      border-top: 1px solid var(--border);
+      padding: .75rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 990;
+    }
 
-  /* CODE BLOCKS */
-  pre {
-    background: var(--code-bg);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 1.1rem;
-    overflow-x: auto;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-    font-size: .87rem;
-    line-height: 1.55;
-    color: #e2e8f0;
-    position: relative;
-    margin: .8rem 0;
-  }
+    .slider-footer .controls-left,
+    .slider-footer .controls-right {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
 
-  code {
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  }
+    .slide-dots {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      overflow-x: auto;
+      max-width: 550px;
+      padding: 4px;
+    }
 
-  p code, li code, td code {
-    background: var(--code-bg);
-    padding: 2px 6px;
-    border-radius: 4px;
-    color: #f472b6;
-    font-size: .9em;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-  }
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #334155;
+      cursor: pointer;
+      transition: all .2s;
+      flex-shrink: 0;
+    }
 
-  .highlight-file {
-    position: absolute;
-    top: 8px;
-    right: 12px;
-    font-size: .75rem;
-    color: var(--muted);
-    font-family: ui-monospace, monospace;
-    background: #1e293b;
-    padding: 2px 8px;
-    border-radius: 4px;
-    border: 1px solid var(--border);
-  }
+    .dot:hover {
+      background: var(--muted);
+    }
 
-  /* GRID CARDS & TABS */
-  .grid-2 {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.25rem;
-    align-items: start;
-  }
+    .dot.active {
+      background: var(--accent);
+      transform: scale(1.3);
+      box-shadow: 0 0 8px var(--accent-glow);
+    }
 
-  .grid-3 {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
-  }
+    /* CODE BLOCKS */
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.1rem;
+      overflow-x: auto;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: .85rem;
+      line-height: 1.55;
+      color: #e2e8f0;
+      position: relative;
+      margin: .8rem 0;
+    }
 
-  @media (max-width: 900px) {
-    .grid-2, .grid-3 { grid-template-columns: 1fr; }
-    .slides-viewport { padding: 1rem; }
-    .slide { padding: 1.25rem; }
-  }
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
 
-  .card {
-    background: var(--panel-card);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 1.15rem;
-  }
+    p code,
+    li code,
+    td code {
+      background: var(--code-bg);
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #f472b6;
+      font-size: .9em;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
 
-  .card h3 {
-    margin-top: 0;
-    color: #fff;
-    font-size: 1.1rem;
-    display: flex;
-    align-items: center;
-    gap: .5rem;
-  }
+    .highlight-file {
+      position: absolute;
+      top: 8px;
+      right: 12px;
+      font-size: .75rem;
+      color: var(--muted);
+      font-family: ui-monospace, monospace;
+      background: #1e293b;
+      padding: 2px 8px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+    }
 
-  /* CALLOUT BOXES */
-  .callout {
-    padding: .85rem 1.1rem;
-    border-radius: 8px;
-    margin: .9rem 0;
-    font-size: .92rem;
-  }
-  .callout-info {
-    background: rgba(56, 189, 248, 0.1);
-    border-left: 4px solid var(--cyan);
-    color: #e0f2fe;
-  }
-  .callout-warn {
-    background: rgba(245, 158, 11, 0.1);
-    border-left: 4px solid var(--warn);
-    color: #fef3c7;
-  }
-  .callout-nest {
-    background: rgba(224, 35, 78, 0.1);
-    border-left: 4px solid var(--accent);
-    color: #ffe4e6;
-  }
+    /* GRID CARDS & TABS */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+      align-items: start;
+    }
 
-  /* ROLES BADGES */
-  .role-badge {
-    display: inline-block;
-    padding: 3px 10px;
-    border-radius: 12px;
-    font-size: .78rem;
-    font-weight: 700;
-    letter-spacing: .03em;
-  }
-  .role-admin { background: rgba(139, 92, 246, 0.2); color: #c4b5fd; border: 1px solid #8b5cf6; }
-  .role-teacher { background: rgba(59, 130, 246, 0.2); color: #93c5fd; border: 1px solid #3b82f6; }
-  .role-student { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border: 1px solid #10b981; }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
 
-  /* LIFECYCLE FLOW STEPS */
-  .flow-row {
-    display: flex;
-    align-items: center;
-    gap: .5rem;
-    overflow-x: auto;
-    padding: .75rem 0;
-  }
-  .flow-node {
-    background: var(--panel-card);
-    border: 1px solid var(--border);
-    padding: .6rem .9rem;
-    border-radius: 8px;
-    font-size: .83rem;
-    font-weight: 600;
-    text-align: center;
-    white-space: nowrap;
-  }
-  .flow-node.active-node {
-    border-color: var(--accent);
-    background: rgba(224, 35, 78, 0.15);
-    color: #fff;
-    box-shadow: 0 0 10px var(--accent-glow);
-  }
-  .flow-arrow {
-    color: var(--muted);
-    font-weight: bold;
-    font-size: .95rem;
-  }
+    @media (max-width: 900px) {
 
-  /* SIMULATOR CARD */
-  .sim-box {
-    background: #030712;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 1.25rem;
-  }
+      .grid-2,
+      .grid-3 {
+        grid-template-columns: 1fr;
+      }
 
-  .sim-inputs {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: .75rem;
-    margin-bottom: 1rem;
-  }
+      .slides-viewport {
+        padding: 1rem;
+      }
 
-  .sim-group label {
-    display: block;
-    font-size: .78rem;
-    color: var(--muted);
-    font-weight: 600;
-    margin-bottom: 4px;
-    text-transform: uppercase;
-  }
+      .slide {
+        padding: 1.25rem;
+      }
+    }
 
-  .sim-group input, .sim-group select {
-    width: 100%;
-    background: #111827;
-    border: 1px solid var(--border);
-    color: #fff;
-    padding: .45rem .65rem;
-    border-radius: 6px;
-    font-size: .86rem;
-    outline: none;
-  }
+    .card {
+      background: var(--panel-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.15rem;
+    }
 
-  .sim-group input:focus, .sim-group select:focus {
-    border-color: var(--accent);
-  }
+    .card h3 {
+      margin-top: 0;
+      color: #fff;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
 
-  .sim-log-terminal {
-    background: #020617;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: .85rem;
-    font-family: ui-monospace, Menlo, Consolas, monospace;
-    font-size: .84rem;
-    min-height: 160px;
-    max-height: 250px;
-    overflow-y: auto;
-  }
+    /* CALLOUT BOXES */
+    .callout {
+      padding: .85rem 1.1rem;
+      border-radius: 8px;
+      margin: .9rem 0;
+      font-size: .92rem;
+    }
 
-  /* DOCUMENT / SCROLL MODE (TOGGLED) */
-  #scroll-mode {
-    display: none;
-    max-width: 1000px;
-    margin: 80px auto 40px;
-    padding: 0 1.5rem;
-  }
+    .callout-info {
+      background: rgba(56, 189, 248, 0.1);
+      border-left: 4px solid var(--cyan);
+      color: #e0f2fe;
+    }
 
-  #scroll-mode .doc-section {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 2rem;
-    margin-bottom: 2rem;
-  }
+    .callout-warn {
+      background: rgba(245, 158, 11, 0.1);
+      border-left: 4px solid var(--warn);
+      color: #fef3c7;
+    }
 
-  /* DRAWER TOC */
-  .toc-drawer {
-    position: fixed;
-    top: 59px;
-    left: -320px;
-    width: 300px;
-    bottom: 0;
-    background: var(--panel);
-    border-right: 1px solid var(--border);
-    z-index: 1050;
-    transition: left .25s ease;
-    padding: 1.25rem 1rem;
-    overflow-y: auto;
-  }
+    .callout-nest {
+      background: rgba(224, 35, 78, 0.1);
+      border-left: 4px solid var(--accent);
+      color: #ffe4e6;
+    }
 
-  .toc-drawer.open {
-    left: 0;
-    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.6);
-  }
+    /* ROLES BADGES */
+    .role-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: .78rem;
+      font-weight: 700;
+      letter-spacing: .03em;
+    }
 
-  .toc-item {
-    display: block;
-    padding: .45rem .65rem;
-    color: var(--muted);
-    text-decoration: none;
-    font-size: .86rem;
-    border-radius: 6px;
-    cursor: pointer;
-    margin-bottom: 2px;
-    transition: all .15s;
-  }
+    .role-admin {
+      background: rgba(139, 92, 246, 0.2);
+      color: #c4b5fd;
+      border: 1px solid #8b5cf6;
+    }
 
-  .toc-item:hover, .toc-item.active {
-    background: rgba(224, 35, 78, 0.12);
-    color: var(--accent-light);
-    font-weight: 600;
-  }
+    .role-teacher {
+      background: rgba(59, 130, 246, 0.2);
+      color: #93c5fd;
+      border: 1px solid #3b82f6;
+    }
 
-  .drawer-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.6);
-    z-index: 1040;
-    display: none;
-  }
-  .drawer-overlay.open { display: block; }
-</style>
+    .role-student {
+      background: rgba(16, 185, 129, 0.2);
+      color: #6ee7b7;
+      border: 1px solid #10b981;
+    }
+
+    /* LIFECYCLE FLOW STEPS */
+    .flow-row {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      overflow-x: auto;
+      padding: .75rem 0;
+    }
+
+    .flow-node {
+      background: var(--panel-card);
+      border: 1px solid var(--border);
+      padding: .6rem .9rem;
+      border-radius: 8px;
+      font-size: .83rem;
+      font-weight: 600;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .flow-node.active-node {
+      border-color: var(--accent);
+      background: rgba(224, 35, 78, 0.15);
+      color: #fff;
+      box-shadow: 0 0 10px var(--accent-glow);
+    }
+
+    .flow-arrow {
+      color: var(--muted);
+      font-weight: bold;
+      font-size: .95rem;
+    }
+
+    /* SIMULATOR CARD */
+    .sim-box {
+      background: #030712;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+    }
+
+    .sim-inputs {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: .75rem;
+      margin-bottom: 1rem;
+    }
+
+    .sim-group label {
+      display: block;
+      font-size: .78rem;
+      color: var(--muted);
+      font-weight: 600;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+    }
+
+    .sim-group input,
+    .sim-group select {
+      width: 100%;
+      background: #111827;
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: .45rem .65rem;
+      border-radius: 6px;
+      font-size: .86rem;
+      outline: none;
+    }
+
+    .sim-group input:focus,
+    .sim-group select:focus {
+      border-color: var(--accent);
+    }
+
+    .sim-log-terminal {
+      background: #020617;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: .85rem;
+      font-family: ui-monospace, Menlo, Consolas, monospace;
+      font-size: .84rem;
+      min-height: 180px;
+      max-height: 280px;
+      overflow-y: auto;
+    }
+
+    /* DOCUMENT / SCROLL MODE (TOGGLED) */
+    #scroll-mode {
+      display: none;
+      max-width: 1000px;
+      margin: 80px auto 40px;
+      padding: 0 1.5rem;
+    }
+
+    #scroll-mode .doc-section {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    /* DRAWER TOC */
+    .toc-drawer {
+      position: fixed;
+      top: 59px;
+      left: -340px;
+      width: 320px;
+      bottom: 0;
+      background: var(--panel);
+      border-right: 1px solid var(--border);
+      z-index: 1050;
+      transition: left .25s ease;
+      padding: 1.25rem 1rem;
+      overflow-y: auto;
+    }
+
+    .toc-drawer.open {
+      left: 0;
+      box-shadow: 10px 0 30px rgba(0, 0, 0, 0.6);
+    }
+
+    .toc-item {
+      display: block;
+      padding: .45rem .65rem;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: .84rem;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-bottom: 2px;
+      transition: all .15s;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .toc-item:hover,
+    .toc-item.active {
+      background: rgba(224, 35, 78, 0.12);
+      color: var(--accent-light);
+      font-weight: 600;
+    }
+
+    .drawer-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 1040;
+      display: none;
+    }
+
+    .drawer-overlay.open {
+      display: block;
+    }
+  </style>
 </head>
+
 <body>
 
-<!-- TOP HEADER -->
-<header class="top-bar">
-  <a href="#" class="brand">
-    <div class="nest-logo">N</div>
-    <span>NestJS API Masterclass</span>
-  </a>
-
-  <div class="nav-controls">
-    <button class="btn" id="btn-toc" onclick="toggleDrawer()">
-      &#9776; Contents
-    </button>
-    <button class="btn" id="btn-toggle-view" onclick="toggleViewMode()">
-      &#128196; Reader View
-    </button>
-    <a href="typescript-brush-up.html" class="btn" style="text-decoration:none;">
-      &larr; TypeScript
+  <!-- TOP HEADER -->
+  <header class="top-bar">
+    <a href="#" class="brand">
+      <div class="nest-logo">N</div>
+      <span>NestJS API Masterclass</span>
     </a>
-    <a href="nextjs-brush-up.html" class="btn" style="text-decoration:none;">
-      Next.js &rarr;
-    </a>
+
+    <div class="nav-controls">
+      <button class="btn" id="btn-toc" onclick="toggleDrawer()">
+        &#9776; Contents
+      </button>
+      <button class="btn" id="btn-toggle-view" onclick="toggleViewMode()">
+        &#128196; Reader View
+      </button>
+      <a href="typescript-brush-up.html" class="btn" style="text-decoration:none;">
+        &larr; TypeScript
+      </a>
+      <a href="nextjs-brush-up.html" class="btn" style="text-decoration:none;">
+        Next.js &rarr;
+      </a>
+    </div>
+  </header>
+
+  <!-- PROGRESS BAR -->
+  <div class="progress-container">
+    <div class="progress-bar" id="progress-bar"></div>
   </div>
-</header>
 
-<!-- PROGRESS BAR -->
-<div class="progress-container">
-  <div class="progress-bar" id="progress-bar"></div>
-</div>
-
-<!-- SLIDE DRAWER TOC -->
-<div class="drawer-overlay" id="drawer-overlay" onclick="toggleDrawer()"></div>
-<div class="toc-drawer" id="toc-drawer">
-  <div style="font-weight:700; color:#fff; margin-bottom:.8rem; font-size:.95rem;">
-    Slide Directory (13 Slides)
+  <!-- SLIDE DRAWER TOC -->
+  <div class="drawer-overlay" id="drawer-overlay" onclick="toggleDrawer()"></div>
+  <div class="toc-drawer" id="toc-drawer">
+    <div style="font-weight:700; color:#fff; margin-bottom:.8rem; font-size:.95rem;">
+      Slide Directory (24 Slides)
+    </div>
+    <div id="toc-list"></div>
   </div>
-  <div id="toc-list"></div>
-</div>
 
-<!-- ========================================== -->
-<!-- SLIDESHOW MODE (Default Interactive Deck) -->
-<!-- ========================================== -->
-<div id="slider-mode">
-  <div class="slides-viewport">
+  <!-- ========================================== -->
+  <!-- SLIDESHOW MODE (Default Interactive Deck) -->
+  <!-- ========================================== -->
+  <div id="slider-mode">
+    <div class="slides-viewport">
 
-    <!-- SLIDE 1: Title & Course Roadmap -->
-    <div class="slide active" data-title="1. Introduction & SMS Scope">
-      <div class="slide-header">
-        <h2>
-          <span>Building REST APIs with NestJS</span>
-        </h2>
-        <span class="slide-step-badge">Case Study: Student Management</span>
-      </div>
-      <p style="font-size:1.05rem; color:#e2e8f0;">
-        Welcome! In this module, you will learn how to design, architect, and code an enterprise-grade <strong>Student Management System (SMS) API</strong> from scratch using <strong>NestJS</strong> and <strong>TypeScript</strong>.
-      </p>
-
-      <div class="grid-3" style="margin-top:1.5rem;">
-        <div class="card">
-          <h3 style="color:var(--accent-light);">&#9881; NestJS Architecture</h3>
-          <p style="font-size:.88rem; color:var(--muted);">
-            Modular architecture inspired by Angular, built on Express/Fastify. Strong reliance on Dependency Injection, TypeScript decorators, and clean domain separation.
-          </p>
+      <!-- SLIDE 1: Introduction & Course Roadmap -->
+      <div class="slide active" data-title="1. Introduction & Roadmap">
+        <div class="slide-header">
+          <h2>
+            <span>Building Production REST APIs with NestJS</span>
+          </h2>
+          <span class="slide-step-badge">Case Study: Student Management API</span>
         </div>
-        <div class="card">
-          <h3 style="color:var(--cyan);">&#128101; Multi-Role Domain</h3>
-          <p style="font-size:.88rem; color:var(--muted);">
-            Covers 3 distinct user roles:
-            <br>&bull; <span class="role-badge role-admin">ADMIN</span> (Registers &amp; manages all)
-            <br>&bull; <span class="role-badge role-teacher">TEACHER</span> (Grades &amp; attendance)
-            <br>&bull; <span class="role-badge role-student">STUDENT</span> (Views profile &amp; courses)
-          </p>
-        </div>
-        <div class="card">
-          <h3 style="color:var(--ok);">&#128273; Step-by-Step Registration</h3>
-          <p style="font-size:.88rem; color:var(--muted);">
-            Follow a 5-stage implementation pipeline: DTOs &rarr; Controller &rarr; Service &amp; Bcrypt &rarr; Role Guards &rarr; Exception Filters &amp; Responses.
-          </p>
-        </div>
-      </div>
+        <p style="font-size:1.05rem; color:#e2e8f0; margin-bottom:1rem;">
+          Welcome to this complete, cookbook-style masterclass on architecting, implementing, and securing a
+          battle-tested
+          <strong>Student Management System (SMS) REST API</strong> using <strong>NestJS</strong>,
+          <strong>TypeScript</strong>, and <strong>PostgreSQL</strong>.
+        </p>
 
-      <div class="callout callout-info" style="margin-top:1.5rem;">
-        <strong>Interactive Deck Tip:</strong> Use your <code>&larr;</code> and <code>&rarr;</code> arrow keys or the Next/Previous buttons below to navigate through each step!
-      </div>
-    </div>
+        <div class="grid-3">
+          <div class="card">
+            <h3 style="color:var(--accent-light);">&#9881; NestJS Architecture</h3>
+            <p style="font-size:.88rem; color:var(--muted); line-height:1.6;">
+              A structured, enterprise Node.js framework inspired by Angular. Combines Object-Oriented Programming
+              (OOP), Functional Reactive Programming (FRP), and pure TypeScript with robust Dependency Injection.
+            </p>
+            <div style="margin-top:.5rem; font-size:.8rem; color:var(--cyan);">
+              &bull; Modules &bull; Controllers &bull; Services &bull; DTOs
+            </div>
+          </div>
 
-    <!-- SLIDE 2: NestJS Pillars & Request Lifecycle -->
-    <div class="slide" data-title="2. NestJS Pillars & Lifecycle">
-      <div class="slide-header">
-        <h2>NestJS Core Pillars &amp; Request Lifecycle</h2>
-        <span class="slide-step-badge">Architecture</span>
-      </div>
-      <p>Every HTTP request in NestJS traverses a strictly organized, predictable pipeline:</p>
+          <div class="card">
+            <h3 style="color:var(--cyan);">&#128101; Multi-Role Domain (RBAC)</h3>
+            <p style="font-size:.88rem; color:var(--muted); line-height:1.6;">
+              Enforces strict Role-Based Access Control across three educational personas:
+              <br>&bull; <span class="role-badge role-admin">ADMIN</span> (Registrar / Dean: registers &amp; manages
+              student records)
+              <br>&bull; <span class="role-badge role-teacher">TEACHER</span> (Faculty: manages grades &amp; courses)
+              <br>&bull; <span class="role-badge role-student">STUDENT</span> (Learner: views profile &amp; enrollment)
+            </p>
+          </div>
 
-      <div class="flow-row">
-        <div class="flow-node">Client Request</div>
-        <div class="flow-arrow">&rarr;</div>
-        <div class="flow-node active-node">1. Middleware</div>
-        <div class="flow-arrow">&rarr;</div>
-        <div class="flow-node active-node">2. Guards (RBAC)</div>
-        <div class="flow-arrow">&rarr;</div>
-        <div class="flow-node active-node">3. Interceptors (Pre)</div>
-        <div class="flow-arrow">&rarr;</div>
-        <div class="flow-node active-node">4. Pipes (Validation)</div>
-        <div class="flow-arrow">&rarr;</div>
-        <div class="flow-node active-node">5. Controller</div>
-        <div class="flow-arrow">&rarr;</div>
-        <div class="flow-node active-node">6. Service (Logic)</div>
-        <div class="flow-arrow">&rarr;</div>
-        <div class="flow-node">7. Response / Filter</div>
-      </div>
-
-      <div class="grid-2" style="margin-top:1.2rem;">
-        <div class="card">
-          <h3 style="color:var(--accent-light);">The 3 Foundational Building Blocks</h3>
-          <ul style="font-size:.88rem; color:var(--muted); padding-left:1.2rem;">
-            <li><strong>Modules (<code>@Module()</code>)</strong>: Encapsulates related controllers and providers into self-contained units.</li>
-            <li><strong>Controllers (<code>@Controller()</code>)</strong>: Routes incoming HTTP requests (GET, POST, PUT, DELETE) and maps inputs.</li>
-            <li><strong>Providers / Services (<code>@Injectable()</code>)</strong>: Contains business logic, database queries, and external API calls. Injected via constructor DI.</li>
-          </ul>
-        </div>
-        <div class="card">
-          <h3 style="color:var(--cyan);">Why This Architecture Wins</h3>
-          <ul style="font-size:.88rem; color:var(--muted); padding-left:1.2rem;">
-            <li><strong>Zero Spaghetti Code:</strong> Clear separation between HTTP routing and business calculation.</li>
-            <li><strong>Testability:</strong> Services are injected as dependencies, making unit testing and mocking trivial.</li>
-            <li><strong>Production Standard:</strong> Enterprise standard for scalable Node.js microservices and REST backends.</li>
-          </ul>
-        </div>
-      </div>
-
-      <div style="margin-top:1.2rem; text-align:center;">
-        <img src="nestjsarchiecture.png" alt="NestJS Architecture Diagram" style="max-width:100%; max-height:260px; object-fit:contain; border-radius:8px; border:1px solid var(--border); box-shadow:0 4px 20px rgba(0,0,0,0.4);" onerror="this.style.display='none'" />
-      </div>
-    </div>
-
-    <!-- SLIDE 3: CLI Setup & Project Structure -->
-    <div class="slide" data-title="3. Project Setup & CLI">
-      <div class="slide-header">
-        <h2>Project Setup &amp; CLI Scaffolding</h2>
-        <span class="slide-step-badge">Quick Start</span>
-      </div>
-      <p>Scaffold a clean NestJS project in seconds using the official CLI:</p>
-
-      <pre><code># 1. Install NestJS CLI globally
-npm install -g @nestjs/cli
-
-# 2. Generate new student management backend
-nest new student-management-api --package-manager npm
-
-# 3. Generate our domain modules, controllers, and services with one command:
-cd student-management-api
-nest g resource students --no-spec
-nest g resource auth --no-spec
-
-# 4. Install essential packages for validation and password hashing
-npm install class-validator class-transformer bcrypt
-npm install -D @types/bcrypt</code></pre>
-
-      <div class="card" style="margin-top:1rem;">
-        <h3 style="color:#fff;">Clean Folder Layout (<code>src/</code>)</h3>
-        <pre style="margin:0;"><code>src/
-├── app.module.ts              # Root module importing feature modules
-├── main.ts                    # Bootstrap entry file (sets up global pipes &amp; Swagger)
-├── auth/                      # Authentication &amp; JWT Guards
-│   ├── auth.module.ts
-│   ├── auth.service.ts
-│   └── guards/roles.guard.ts
-└── students/                  # Student Feature Module
-    ├── students.module.ts     # Declares controller &amp; exports service
-    ├── students.controller.ts # Route: POST /students/register
-    ├── students.service.ts    # DB logic, duplication checks, hashing
-    ├── dto/
-    │   └── create-student.dto.ts # Validation schemas
-    └── entities/
-        └── student.entity.ts  # Database schema definition</code></pre>
-      </div>
-    </div>
-
-    <!-- SLIDE 4: Models & Role Enum -->
-    <div class="slide" data-title="4. Models & Role Definition">
-      <div class="slide-header">
-        <h2>Data Models &amp; User Roles</h2>
-        <span class="slide-step-badge">Domain Entities</span>
-      </div>
-      <p>
-        In an educational management system, users share basic identity credentials (email, hashed password, role) while students possess specialized academic records.
-      </p>
-
-      <div class="grid-2">
-        <div>
-          <pre><span class="highlight-file">src/common/enums/role.enum.ts</span><code>// src/common/enums/role.enum.ts
-export enum Role {
-  ADMIN = 'ADMIN',       // Dean, Registrar
-  TEACHER = 'TEACHER',   // Professors
-  STUDENT = 'STUDENT',   // Enrolled Learners
-}</code></pre>
-
-          <pre><span class="highlight-file">src/users/entities/user.entity.ts</span><code>// Base User Entity
-export class User {
-  id: string;
-  email: string;
-  passwordHash: string;
-  role: Role;
-  createdAt: Date;
-}</code></pre>
+          <div class="card">
+            <h3 style="color:var(--ok);">&#128737;&#65039; Production Hardening</h3>
+            <p style="font-size:.88rem; color:var(--muted); line-height:1.6;">
+              Built with production-grade engineering principles:
+              <br>&bull; Strict runtime schema validation (Joi + class-validator)
+              <br>&bull; Database migrations with TypeORM &amp; ACID transactions
+              <br>&bull; JWT auth, Throttling, Winston structured logs &amp; Docker
+            </p>
+          </div>
         </div>
 
-        <div>
-          <pre><span class="highlight-file">src/students/entities/student.entity.ts</span><code>// Student Profile Entity (1-to-1 with User)
-export class Student {
-  id: string;
-  userId: string;
-  user?: User;
+        <div class="card" style="margin-top:1.2rem;">
+          <h3 style="color:#fff;">&#128506;&#65039; Complete 24-Step Learning Roadmap</h3>
+          <div class="flow-row" style="flex-wrap:wrap; gap:.5rem;">
+            <span class="flow-node">1. Roadmap</span>
+            <span class="flow-arrow">&rarr;</span>
+            <span class="flow-node">2. Request Lifecycle</span>
+            <span class="flow-arrow">&rarr;</span>
+            <span class="flow-node">3. CLI Scaffolding</span>
+            <span class="flow-arrow">&rarr;</span>
+            <span class="flow-node">4. Config &amp; Joi</span>
+            <span class="flow-arrow">&rarr;</span>
+            <span class="flow-node">5. TypeORM Entities</span>
+            <span class="flow-arrow">&rarr;</span>
+            <span class="flow-node">6. PostgreSQL Setup</span>
+            <span class="flow-arrow">&rarr;</span>
+            <span class="flow-node">7. DTO Validation</span>
+            <span class="flow-arrow">&rarr;</span>
+            <span class="flow-node">8. REST Controllers</span>
+            <span class="flow-arrow">&rarr;</span>
+            <span class="flow-node">9. Service &amp; Bcrypt</span>
+            <span class="flow-arrow">&rarr;</span>
+            <span class="flow-node">10. Auth &amp; JWT</span>
+            <span class="flow-arrow">&rarr;</span>
+            <span class="flow-node">11. JWT Strategy</span>
+            <span class="flow-arrow">&rarr;</span>
+            <span class="flow-node">12. RBAC Guards</span>
+            <span class="flow-arrow">&rarr;</span>
+            <span class="flow-node">13. Exception Filters</span>
+            <span class="flow-arrow">&rarr;</span>
+            <span class="flow-node">14. Winston Logging</span>
+            <span class="flow-arrow">&rarr;</span>
+            <span class="flow-node">15. Throttler &amp; Security</span>
+            <span class="flow-arrow">&rarr;</span>
+            <span class="flow-node">16. Swagger Docs</span>
+            <span class="flow-arrow">&rarr;</span>
+            <span class="flow-node">17. Interceptors</span>
+            <span class="flow-arrow">&rarr;</span>
+            <span class="flow-node">18. Jest Unit Tests</span>
+            <span class="flow-arrow">&rarr;</span>
+            <span class="flow-node">19. E2E Tests</span>
+            <span class="flow-arrow">&rarr;</span>
+            <span class="flow-node">20. Docker Deployment</span>
+            <span class="flow-arrow">&rarr;</span>
+            <span class="flow-node">21. Master main.ts</span>
+            <span class="flow-arrow">&rarr;</span>
+            <span class="flow-node">22. Live Simulator</span>
+            <span class="flow-arrow">&rarr;</span>
+            <span class="flow-node">23. Anti-Patterns</span>
+            <span class="flow-arrow">&rarr;</span>
+            <span class="flow-node">24. Summary</span>
+          </div>
+        </div>
 
-  firstName: string;
-  lastName: string;
-  rollNumber: string;    // e.g. "CS-2026-042"
-  department: string;    // e.g. "Computer Science"
-  enrollmentYear: number;
-  status: 'ACTIVE' | 'GRADUATED' | 'SUSPENDED';
-}</code></pre>
+        <div class="callout callout-info" style="margin-top:1.2rem;">
+          <strong>&#128161; Interactive Deck Pro-Tip:</strong> Use keyboard <code>&larr;</code> and <code>&rarr;</code>
+          keys or the Next/Previous buttons below to navigate. Click <strong>&#9776; Contents</strong> to jump directly
+          to any slide, or toggle <strong>&#128196; Reader View</strong> to read the entire guide in a continuous
+          document!
+        </div>
+      </div>
+      <!-- SLIDE 2: NestJS Pillars & Request Lifecycle -->
+      <div class="slide" data-title="2. Pillars & Request Lifecycle">
+        <div class="slide-header">
+          <h2>NestJS Core Pillars &amp; Request Lifecycle</h2>
+          <span class="slide-step-badge">Architecture</span>
+        </div>
+        <p>
+          In raw Express, requests travel through an unconstrained chain of custom middleware. NestJS enforces a
+          deterministic,
+          strongly-typed lifecycle where each layer has a single, well-defined architectural responsibility.
+        </p>
 
-          <div class="callout callout-nest">
-            <strong>Key Security Rule:</strong> Never expose <code>passwordHash</code> in API responses. In our service layer, we will selectively project and sanitize the output object.
+        <div class="flow-row">
+          <div class="flow-node">Client Request</div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-node active-node">1. Middleware</div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-node active-node">2. Guards (Auth/RBAC)</div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-node active-node">3. Interceptors (Pre)</div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-node active-node">4. Pipes (Validation)</div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-node active-node">5. Controller Handler</div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-node active-node">6. Service (Logic/DB)</div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-node active-node">7. Interceptors (Post)</div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-node active-node">8. Exception Filter</div>
+        </div>
+
+        <div class="grid-3" style="margin-top:1.2rem;">
+          <div class="card">
+            <h3 style="color:var(--accent-light);">1. Modules (<code>@Module()</code>)</h3>
+            <p style="font-size:.87rem; color:var(--muted); line-height:1.6;">
+              Boundary containers organizing your application domain into modular graphs. Declares
+              <code>controllers</code>, <code>providers</code>, <code>imports</code>, and <code>exports</code>.
+            </p>
+          </div>
+          <div class="card">
+            <h3 style="color:var(--cyan);">2. Controllers (<code>@Controller()</code>)</h3>
+            <p style="font-size:.87rem; color:var(--muted); line-height:1.6;">
+              Routes HTTP methods (GET, POST, PATCH, DELETE) to handlers. Extracts params, query strings, and request
+              bodies. Delegates immediately to services.
+            </p>
+          </div>
+          <div class="card">
+            <h3 style="color:var(--ok);">3. Providers (<code>@Injectable()</code>)</h3>
+            <p style="font-size:.87rem; color:var(--muted); line-height:1.6;">
+              Contains business logic, database queries, password hashing, and third-party integrations. Injected
+              automatically via NestJS Inversion of Control (IoC).
+            </p>
+          </div>
+        </div>
+
+        <div class="grid-2" style="margin-top:1rem;">
+          <div class="callout callout-info" style="margin:0;">
+            <strong>&#128161; TIP: Why Guards Execute Before Pipes:</strong>
+            Guards check authentication and permissions <em>before</em> Pipes validate request bodies. If an
+            unauthenticated client sends a malicious 5MB payload, the Guard blocks it immediately with
+            <code>401 Unauthorized</code> before the server spends CPU parsing or validating the body!
+          </div>
+          <div class="callout callout-warn" style="margin:0;">
+            <strong>&#9888;&#65039; PITFALL: Fat Controllers:</strong>
+            Never put business calculations, password hashing, or database queries inside your controller methods. Keep
+            controllers ultra-thin: parse incoming parameters, invoke the service, and return the response.
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- SLIDE 5: Step 1 — DTO & Validation Pipe -->
-    <div class="slide" data-title="5. Step 1: DTO & Validation">
-      <div class="slide-header">
-        <h2>Step 1: The DTO &amp; Global Validation Pipe</h2>
-        <span class="slide-step-badge">Registration Pipeline</span>
+      <!-- SLIDE 3: Project Setup & CLI Scaffolding -->
+      <div class="slide" data-title="3. Project Setup & CLI">
+        <div class="slide-header">
+          <h2>Project Setup &amp; CLI Scaffolding</h2>
+          <span class="slide-step-badge">Quick Start</span>
+        </div>
+        <p>
+          NestJS provides an official command-line interface (CLI) to scaffold enterprise projects and generate clean,
+          standardized boilerplate in seconds.
+        </p>
+
+        <pre><span class="highlight-file">terminal</span><code># 1. Install the official NestJS CLI globally
+npm install -g @nestjs/cli
+
+# 2. Scaffold the Student Management project (select npm)
+nest new student-management-api --package-manager npm
+cd student-management-api
+
+# 3. Generate feature domain resources with modules, controllers, and services
+nest g resource students --no-spec
+nest g resource auth --no-spec
+
+# 4. Install production dependencies: config, database, security, validation, and swagger
+npm install @nestjs/config joi @nestjs/typeorm typeorm pg @nestjs/passport passport passport-jwt @nestjs/jwt bcrypt class-validator class-transformer @nestjs/swagger @nestjs/throttler helmet
+npm install -D @types/bcrypt @types/passport-jwt @types/supertest</code></pre>
+
+        <div class="grid-2" style="margin-top:1rem;">
+          <div class="card">
+            <h3 style="color:#fff;">Clean Modular Folder Structure</h3>
+            <pre style="margin:0;"><code>src/
+├── main.ts                    # Application bootstrap &amp; global pipeline
+├── app.module.ts              # Root module importing features &amp; database
+├── config/
+│   └── env.validation.ts      # Joi schema for .env validation
+├── common/                    # Shared reusable cross-cutting code
+│   ├── decorators/            # @Public(), @Roles()
+│   ├── filters/               # Centralized exception filters
+│   └── interceptors/          # Response transforms, timing, logging
+├── auth/                      # Authentication &amp; JWT module
+│   ├── auth.module.ts
+│   ├── auth.controller.ts
+│   ├── auth.service.ts
+│   ├── strategies/jwt.strategy.ts
+│   └── guards/roles.guard.ts
+└── students/                  # Student feature module
+    ├── students.module.ts
+    ├── students.controller.ts
+    ├── students.service.ts
+    ├── dto/                   # CreateStudentDto, UpdateStudentDto
+    └── entities/              # Student TypeORM entity</code></pre>
+          </div>
+
+          <div>
+            <div class="callout callout-info">
+              <strong>&#128161; TIP: Node Version Pinning (.nvmrc):</strong>
+              Add a <code>.nvmrc</code> file in your repository root with <code>20.18.0</code> (Active LTS). This
+              guarantees identical Node.js runtime environments between your team's local machines and CI/CD production
+              pipelines.
+            </div>
+
+            <div class="callout callout-warn">
+              <strong>&#9888;&#65039; PITFALL: Missing TypeScript Types:</strong>
+              Forgetting devDependencies like <code>@types/bcrypt</code> or <code>@types/passport-jwt</code> will allow
+              your code to write cleanly in VS Code but fail compilation during <code>npm run build</code> with cryptic
+              type declaration errors.
+            </div>
+
+            <div class="card" style="margin-top:.8rem;">
+              <h3 style="color:var(--cyan); font-size:1rem;">Useful package.json Scripts</h3>
+              <pre style="margin:0;"><code>"scripts": {
+  "start:dev": "nest start --watch",
+  "build": "nest build",
+  "start:prod": "node dist/main",
+  "test": "jest",
+  "test:cov": "jest --coverage",
+  "test:e2e": "jest --config ./test/jest-e2e.json"
+}</code></pre>
+            </div>
+          </div>
+        </div>
       </div>
-      <p>
-        A <strong>DTO (Data Transfer Object)</strong> defines the exact network payload contract. Using <code>class-validator</code> decorators, incoming data is checked before it ever touches your controller.
-      </p>
 
-      <pre><span class="highlight-file">src/students/dto/create-student.dto.ts</span><code>import { IsEmail, IsNotEmpty, IsString, MinLength, IsNumber, Min, Max } from 'class-validator';
+      <!-- SLIDE 4: Environment Configuration with @nestjs/config -->
+      <div class="slide" data-title="4. Config & Joi Validation">
+        <div class="slide-header">
+          <h2>Environment Configuration &amp; Joi Validation</h2>
+          <span class="slide-step-badge">Configuration</span>
+        </div>
+        <p>
+          Production applications must never hardcode configuration or database credentials. NestJS provides
+          <code>@nestjs/config</code> which integrates with <strong>Joi</strong> to validate environment variables at
+          startup and fail fast if anything is missing.
+        </p>
 
-export class CreateStudentDto {
-  @IsEmail({}, { message: 'Must be a valid educational or personal email' })
+        <div class="grid-2">
+          <div>
+            <pre><span class="highlight-file">.env.example</span><code># Application Port &amp; Environment
+PORT=3000
+NODE_ENV=development
+
+# PostgreSQL Database Credentials
+DB_HOST=localhost
+DB_PORT=5432
+DB_USERNAME=postgres
+DB_PASSWORD=secretpostgrespassword
+DB_DATABASE=sms_university_db
+
+# Security &amp; JWT Secrets
+JWT_SECRET=super_secret_jwt_signing_key_min_32_characters!
+JWT_EXPIRES_IN=1h
+BCRYPT_SALT_ROUNDS=10
+
+# Rate Limiting
+THROTTLE_TTL=60000
+THROTTLE_LIMIT=100</code></pre>
+
+            <div class="callout callout-warn">
+              <strong>&#9888;&#65039; PITFALL: Unvalidated process.env:</strong>
+              Accessing <code>process.env.DB_PASSWORD</code> directly in application code is dangerous. If the variable
+              is missing or misspelled, your code fails silently or crashes in the middle of a user request!
+            </div>
+          </div>
+
+          <div>
+            <pre><span class="highlight-file">src/config/env.validation.ts</span><code>import * as Joi from 'joi';
+
+// Strict Joi schema: application will refuse to start if validation fails
+export const envValidationSchema = Joi.object({
+  PORT: Joi.number().default(3000),
+  NODE_ENV: Joi.string().valid('development', 'production', 'test').default('development'),
+  DB_HOST: Joi.string().required(),
+  DB_PORT: Joi.number().default(5432),
+  DB_USERNAME: Joi.string().required(),
+  DB_PASSWORD: Joi.string().required(),
+  DB_DATABASE: Joi.string().required(),
+  JWT_SECRET: Joi.string().min(32).required(),
+  JWT_EXPIRES_IN: Joi.string().default('1h'),
+  BCRYPT_SALT_ROUNDS: Joi.number().min(10).max(14).default(10),
+  THROTTLE_TTL: Joi.number().default(60000),
+  THROTTLE_LIMIT: Joi.number().default(100),
+});</code></pre>
+
+            <pre><span class="highlight-file">src/app.module.ts</span><code>import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { envValidationSchema } from './config/env.validation';
+
+@Module({
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,               // Available everywhere without re-importing
+      validationSchema: envValidationSchema,
+      validationOptions: { abortEarly: true }, // Fails immediately on first error
+    }),
+  ],
+})
+export class AppModule {}</code></pre>
+          </div>
+        </div>
+
+        <div class="callout callout-info" style="margin-top:1rem;">
+          <strong>&#128161; TIP: Injecting ConfigService:</strong>
+          Inject <code>ConfigService</code> into any service or controller constructor:
+          <code>constructor(private configService: ConfigService) {}</code>.
+          Then retrieve strongly-typed values safely:
+          <code>const port = this.configService.get&lt;number&gt;('PORT', 3000);</code>.
+        </div>
+      </div>
+
+      <!-- SLIDE 5: Data Models & Role Enum -->
+      <div class="slide" data-title="5. TypeORM Entities & Roles">
+        <div class="slide-header">
+          <h2>Data Models &amp; TypeORM Entities</h2>
+          <span class="slide-step-badge">Domain Layer</span>
+        </div>
+        <p>
+          In our architecture, base credentials (email, hashed password, system role) live on the <code>User</code>
+          entity,
+          while academic records live on the <code>Student</code> entity linked via a 1-to-1 relational mapping with
+          TypeORM.
+        </p>
+
+        <div class="grid-2">
+          <div>
+            <pre><span class="highlight-file">src/common/enums/role.enum.ts</span><code>export enum Role {
+  ADMIN = 'ADMIN',       // Registrar, System Administrators
+  TEACHER = 'TEACHER',   // Faculty &amp; Instructors
+  STUDENT = 'STUDENT',   // Enrolled Learners
+}</code></pre>
+
+            <pre><span class="highlight-file">src/users/entities/user.entity.ts</span><code>import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, DeleteDateColumn, OneToOne } from 'typeorm';
+import { Exclude } from 'class-transformer';
+import { Role } from '../../common/enums/role.enum';
+import { Student } from '../../students/entities/student.entity';
+
+@Entity('users')
+export class User {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column({ unique: true, length: 150 })
   email: string;
 
-  @IsString()
-  @MinLength(8, { message: 'Password must be at least 8 characters long' })
-  password: string;
+  @Column()
+  @Exclude() // Automatically stripped from JSON responses
+  passwordHash: string;
 
-  @IsString()
-  @IsNotEmpty({ message: 'First name is required' })
+  @Column({ type: 'enum', enum: Role, default: Role.STUDENT })
+  role: Role;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+
+  @DeleteDateColumn() // Enables soft-delete (preserves audit trail)
+  deletedAt?: Date;
+
+  @OneToOne(() => Student, (student) => student.user)
+  student?: Student;
+}</code></pre>
+          </div>
+
+          <div>
+            <pre><span class="highlight-file">src/students/entities/student.entity.ts</span><code>import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, DeleteDateColumn, OneToOne, JoinColumn } from 'typeorm';
+import { User } from '../../users/entities/user.entity';
+
+@Entity('students')
+export class Student {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column({ unique: true, length: 30 })
+  rollNumber: string; // e.g. "CS-2026-042"
+
+  @Column({ length: 60 })
   firstName: string;
 
-  @IsString()
-  @IsNotEmpty({ message: 'Last name is required' })
+  @Column({ length: 60 })
   lastName: string;
 
+  @Column({ length: 100 })
+  department: string;
+
+  @Column({ type: 'int' })
+  enrollmentYear: number;
+
+  @Column({ default: 'ACTIVE' })
+  status: 'ACTIVE' | 'GRADUATED' | 'SUSPENDED';
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+
+  @DeleteDateColumn()
+  deletedAt?: Date;
+
+  // 1-to-1 link with User authentication account
+  @OneToOne(() => User, (user) => user.student, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'userId' })
+  user: User;
+
+  @Column()
+  userId: string;
+}</code></pre>
+
+            <div class="callout callout-nest">
+              <strong>&#128161; TIP: Soft Delete Protection:</strong>
+              Using <code>@DeleteDateColumn()</code> allows calling <code>studentRepo.softDelete(id)</code>. Instead of
+              permanently destroying student history, TypeORM sets <code>deletedAt = NOW()</code> and automatically
+              filters out deleted rows from standard queries!
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 6: Database Setup with TypeORM + PostgreSQL -->
+      <div class="slide" data-title="6. Database & TypeORM Migrations">
+        <div class="slide-header">
+          <h2>Database Setup with TypeORM &amp; Migrations</h2>
+          <span class="slide-step-badge">Database Layer</span>
+        </div>
+        <p>
+          Connecting NestJS to PostgreSQL requires <code>@nestjs/typeorm</code>. For production safety, we configure
+          dynamic asynchronous module loading via <code>ConfigService</code> and manage database schema changes using
+          migrations.
+        </p>
+
+        <div class="grid-2">
+          <div>
+            <pre><span class="highlight-file">src/app.module.ts</span><code>import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+
+@Module({
+  imports: [
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        type: 'postgres',
+        host: config.get&lt;string&gt;('DB_HOST'),
+        port: config.get&lt;number&gt;('DB_PORT'),
+        username: config.get&lt;string&gt;('DB_USERNAME'),
+        password: config.get&lt;string&gt;('DB_PASSWORD'),
+        database: config.get&lt;string&gt;('DB_DATABASE'),
+        autoLoadEntities: true,      // Automatically loads registered entities
+        synchronize: false,          // &#9888;&#65039; CRITICAL: NEVER true in production!
+        logging: config.get('NODE_ENV') === 'development',
+      }),
+    }),
+  ],
+})
+export class AppModule {}</code></pre>
+
+            <div class="callout callout-warn">
+              <strong>&#9888;&#65039; CRITICAL PITFALL: synchronize: true:</strong>
+              Setting <code>synchronize: true</code> causes TypeORM to drop columns and alter tables dynamically on
+              server restart. If a column is renamed or removed in code, production customer data will be
+              <strong>permanently deleted</strong>!
+            </div>
+          </div>
+
+          <div>
+            <pre><span class="highlight-file">src/database/data-source.ts</span><code>import { DataSource } from 'typeorm';
+import * as dotenv from 'dotenv';
+dotenv.config();
+
+// Standalone DataSource instance for TypeORM CLI migration commands
+export const AppDataSource = new DataSource({
+  type: 'postgres',
+  host: process.env.DB_HOST,
+  port: parseInt(process.env.DB_PORT || '5432', 10),
+  username: process.env.DB_USERNAME,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_DATABASE,
+  entities: ['dist/**/*.entity.js'],
+  migrations: ['dist/database/migrations/*.js'],
+  synchronize: false,
+});</code></pre>
+
+            <div class="card" style="margin-top:.8rem;">
+              <h3 style="color:var(--cyan); font-size:1rem;">TypeORM CLI Migration Commands</h3>
+              <pre style="margin:0;"><code># 1. Generate migration after changing entity schema
+npm run typeorm -- -d ./dist/database/data-source.js migration:generate src/database/migrations/InitSchema
+
+# 2. Run pending migrations in production or CI/CD
+npm run typeorm -- -d ./dist/database/data-source.js migration:run
+
+# 3. Rollback the latest migration if a deployment fails
+npm run typeorm -- -d ./dist/database/data-source.js migration:revert</code></pre>
+            </div>
+
+            <div class="callout callout-info">
+              <strong>&#128161; TIP: CI/CD Migration Step:</strong>
+              Run <code>migration:run</code> as an automated pre-deployment task in your deployment pipeline before
+              spinning up the new app container instances.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 7: Step 1 — DTO & Validation Pipe -->
+      <div class="slide" data-title="7. Step 1: DTO Validation">
+        <div class="slide-header">
+          <h2>Step 1: DTO &amp; Global Validation Pipe</h2>
+          <span class="slide-step-badge">Registration Pipeline</span>
+        </div>
+        <p>
+          A <strong>DTO (Data Transfer Object)</strong> defines the exact network contract for incoming HTTP payloads.
+          Using <code>class-validator</code> and <code>class-transformer</code>, data is sanitized and validated before
+          hitting your controller.
+        </p>
+
+        <div class="grid-2">
+          <div>
+            <pre><span class="highlight-file">src/students/dto/create-student.dto.ts</span><code>import { IsEmail, IsNotEmpty, IsString, MinLength, Matches, IsInt, Min, Max } from 'class-validator';
+import { Transform } from 'class-transformer';
+import { ApiProperty } from '@nestjs/swagger';
+
+export class CreateStudentDto {
+  @ApiProperty({ example: 'alex.rivera@university.edu', description: 'Institutional email' })
+  @IsEmail({}, { message: 'Must be a valid email format' })
+  @Transform(({ value }) => value?.trim().toLowerCase()) // Normalize input
+  email: string;
+
+  @ApiProperty({ example: 'Pass123!Secure', description: 'Min 8 chars with upper, lower, &amp; number/symbol' })
   @IsString()
-  @IsNotEmpty({ message: 'Roll number cannot be empty' })
+  @MinLength(8, { message: 'Password must be at least 8 characters' })
+  @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
+    message: 'Password must contain uppercase, lowercase, and a number or symbol',
+  })
+  password: string;
+
+  @ApiProperty({ example: 'Alex', description: 'Legal first name' })
+  @IsString()
+  @IsNotEmpty({ message: 'First name cannot be empty' })
+  @Transform(({ value }) => value?.trim())
+  firstName: string;
+
+  @ApiProperty({ example: 'Rivera', description: 'Legal last name' })
+  @IsString()
+  @IsNotEmpty({ message: 'Last name cannot be empty' })
+  @Transform(({ value }) => value?.trim())
+  lastName: string;
+
+  @ApiProperty({ example: 'CS-2026-042', description: 'Format: CS-YYYY-XXX' })
+  @IsString()
+  @Matches(/^CS-\d{4}-\d{3}$/, { message: 'Roll number must follow format CS-YYYY-XXX' })
   rollNumber: string;
 
+  @ApiProperty({ example: 'Computer Science' })
   @IsString()
   @IsNotEmpty()
   department: string;
 
-  @IsNumber()
+  @ApiProperty({ example: 2026, minimum: 2020, maximum: 2035 })
+  @IsInt()
   @Min(2020)
-  @Max(2030)
+  @Max(2035)
   enrollmentYear: number;
 }</code></pre>
+          </div>
 
-      <div class="card" style="margin-top:1rem;">
-        <h3 style="color:var(--cyan);">Enable Global Auto-Validation in <code>main.ts</code></h3>
-        <pre style="margin:0;"><span class="highlight-file">src/main.ts</span><code>import { ValidationPipe } from '@nestjs/common';
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+          <div>
+            <pre><span class="highlight-file">src/students/dto/update-student.dto.ts</span><code>import { PartialType, OmitType } from '@nestjs/swagger';
+import { CreateStudentDto } from './create-student.dto';
 
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+// PartialType makes all fields optional for PATCH requests
+// OmitType prevents client from modifying the password via student update
+export class UpdateStudentDto extends PartialType(
+  OmitType(CreateStudentDto, ['password'] as const),
+) {}</code></pre>
 
-  // Automatically strips unallowed properties &amp; transforms types
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,              // Strips unexpected fields injected by attackers
-      forbidNonWhitelisted: true,  // Throws 400 Bad Request on unknown fields
-      transform: true,             // Automatically converts string query/body to DTO types
-    }),
-  );
+            <pre><span class="highlight-file">src/main.ts (ValidationPipe Setup)</span><code>import { ValidationPipe } from '@nestjs/common';
 
-  await app.listen(3000);
-}
-bootstrap();</code></pre>
+app.useGlobalPipes(
+  new ValidationPipe({
+    whitelist: true,              // Strips unexpected fields injected by attackers
+    forbidNonWhitelisted: true,  // Throws 400 Bad Request on unknown fields
+    transform: true,             // Automatically converts string params to types
+    transformOptions: { enableImplicitConversion: true },
+  }),
+);</code></pre>
+
+            <div class="callout callout-warn">
+              <strong>&#9888;&#65039; CRITICAL PITFALL: Mass-Assignment Attack:</strong>
+              Without <code>whitelist: true</code>, a malicious caller could POST <code>{ "role": "ADMIN" }</code> or
+              <code>{ "isSuperUser": true }</code> in the request body. If passed directly to the database, their
+              privileges would be silently escalated!
+            </div>
+
+            <div class="callout callout-info">
+              <strong>&#128161; TIP: PartialType Inheritance:</strong>
+              <code>PartialType</code> from <code>@nestjs/swagger</code> inherits both validation rules and Swagger
+              schemas, automatically flagging all fields as optional without duplicating code.
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
 
-    <!-- SLIDE 6: Step 2 — Controller -->
-    <div class="slide" data-title="6. Step 2: Controller Endpoint">
-      <div class="slide-header">
-        <h2>Step 2: The Controller Endpoint</h2>
-        <span class="slide-step-badge">Registration Pipeline</span>
-      </div>
-      <p>
-        The controller defines the HTTP route, accepts the validated DTO, and delegates business logic execution to the service.
-      </p>
+      <!-- SLIDE 8: Step 2 — Controller Endpoint -->
+      <div class="slide" data-title="8. Step 2: REST Controllers">
+        <div class="slide-header">
+          <h2>Step 2: Full CRUD REST Controller</h2>
+          <span class="slide-step-badge">Registration Pipeline</span>
+        </div>
+        <p>
+          The controller defines HTTP route verbs, route security guards, Swagger documentation, and delegates execution
+          to <code>StudentsService</code>. It stays thin with zero embedded business logic.
+        </p>
 
-      <pre><span class="highlight-file">src/students/students.controller.ts</span><code>import { Controller, Post, Body, HttpCode, HttpStatus, UseGuards } from '@nestjs/common';
+        <pre><span class="highlight-file">src/students/students.controller.ts</span><code>import { Controller, Post, Get, Patch, Delete, Body, Param, Query, HttpCode, HttpStatus, UseGuards, ParseUUIDPipe } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam } from '@nestjs/swagger';
 import { StudentsService } from './students.service';
 import { CreateStudentDto } from './dto/create-student.dto';
-import { Roles } from '../auth/decorators/roles.decorator';
-import { RolesGuard } from '../auth/guards/roles.guard';
+import { UpdateStudentDto } from './dto/update-student.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../common/enums/role.enum';
 
+@ApiTags('Students')
+@ApiBearerAuth('JWT-auth')
+@UseGuards(JwtAuthGuard, RolesGuard) // Protects all routes in this controller
 @Controller('students')
 export class StudentsController {
-  // Dependency Injection: NestJS automatically supplies the StudentsService singleton instance
   constructor(private readonly studentsService: StudentsService) {}
 
   @Post('register')
-  @HttpCode(HttpStatus.CREATED) // Returns HTTP 201
-  @UseGuards(JwtAuthGuard, RolesGuard) // Protects route: requires valid JWT &amp; Role check
-  @Roles(Role.ADMIN)                   // Only ADMIN role is authorized to register students
+  @HttpCode(HttpStatus.CREATED)
+  @Roles(Role.ADMIN) // Only ADMIN role can register student profiles
+  @ApiOperation({ summary: 'Register a new student and create auth user account' })
+  @ApiResponse({ status: 201, description: 'Student registered successfully' })
+  @ApiResponse({ status: 400, description: 'Validation failed' })
+  @ApiResponse({ status: 409, description: 'Email or Roll number conflict' })
   async register(@Body() createStudentDto: CreateStudentDto) {
     return this.studentsService.registerStudent(createStudentDto);
   }
+
+  @Get()
+  @Roles(Role.ADMIN, Role.TEACHER)
+  @ApiOperation({ summary: 'List all enrolled students with pagination' })
+  async findAll(@Query('page') page = 1, @Query('limit') limit = 10) {
+    return this.studentsService.findAll(+page, +limit);
+  }
+
+  @Get(':id')
+  @Roles(Role.ADMIN, Role.TEACHER, Role.STUDENT)
+  @ApiOperation({ summary: 'Get single student profile by UUID' })
+  async findOne(@Param('id', ParseUUIDPipe) id: string) {
+    return this.studentsService.findOne(id);
+  }
+
+  @Patch(':id')
+  @Roles(Role.ADMIN)
+  @ApiOperation({ summary: 'Update student profile details' })
+  async update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() updateStudentDto: UpdateStudentDto,
+  ) {
+    return this.studentsService.update(id, updateStudentDto);
+  }
+
+  @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @Roles(Role.ADMIN)
+  @ApiOperation({ summary: 'Soft-delete a student by UUID' })
+  async remove(@Param('id', ParseUUIDPipe) id: string) {
+    return this.studentsService.remove(id);
+  }
 }</code></pre>
 
-      <div class="callout callout-info">
-        <strong>Clean Architecture Rule:</strong> Keep controllers thin! A controller should only handle HTTP routing, decorators, status codes, and delegate heavy lifting to the service.
-      </div>
-    </div>
+        <div class="grid-2" style="margin-top:1rem;">
+          <div class="callout callout-warn" style="margin:0;">
+            <strong>&#9888;&#65039; PITFALL: Forgetting ParseUUIDPipe:</strong>
+            Without <code>ParseUUIDPipe</code>, sending an invalid string like <code>GET /students/abc-123</code> passes
+            the string to Postgres, crashing with a database driver error (500 Internal Server Error) instead of a
+            graceful 400 Bad Request.
+          </div>
 
-    <!-- SLIDE 7: Step 3 — Service Business Logic & Hashing -->
-    <div class="slide" data-title="7. Step 3: Service & Bcrypt">
-      <div class="slide-header">
-        <h2>Step 3: Service Business Logic &amp; Hashing</h2>
-        <span class="slide-step-badge">Registration Pipeline</span>
+          <div class="callout callout-info" style="margin:0;">
+            <strong>&#128161; TIP: HTTP 204 No Content on DELETE:</strong>
+            Use <code>@HttpCode(HttpStatus.NO_CONTENT)</code> for DELETE endpoints that do not return a body. This
+            matches official REST semantics.
+          </div>
+        </div>
       </div>
-      <p>
-        The service handles data validation rules (checking existing email or roll number duplicates), hashes the password with bcrypt, and stores the user and student profile.
-      </p>
 
-      <pre><span class="highlight-file">src/students/students.service.ts</span><code>import { Injectable, ConflictException } from '@nestjs/common';
-import { CreateStudentDto } from './dto/create-student.dto';
-import { Role } from '../common/enums/role.enum';
+      <!-- SLIDE 9: Step 3 — Service Business Logic & Bcrypt -->
+      <div class="slide" data-title="9. Step 3: Service & Bcrypt">
+        <div class="slide-header">
+          <h2>Step 3: Service Business Logic &amp; ACID Transactions</h2>
+          <span class="slide-step-badge">Registration Pipeline</span>
+        </div>
+        <p>
+          The service layer contains domain logic, checks for duplicate accounts, hashes passwords with
+          <strong>bcrypt</strong>,
+          and executes atomic database writes across the <code>User</code> and <code>Student</code> tables using a
+          TypeORM transaction.
+        </p>
+
+        <pre><span class="highlight-file">src/students/students.service.ts</span><code>import { Injectable, ConflictException, NotFoundException, Logger } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository, DataSource } from 'typeorm';
+import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
+import { Student } from './entities/student.entity';
+import { User } from '../users/entities/user.entity';
+import { Role } from '../common/enums/role.enum';
+import { CreateStudentDto } from './dto/create-student.dto';
+import { UpdateStudentDto } from './dto/update-student.dto';
 
 @Injectable()
 export class StudentsService {
-  // Simulated database repository (or TypeORM/Prisma client)
-  private usersTable: any[] = [];
-  private studentsTable: any[] = [];
+  private readonly logger = new Logger(StudentsService.name);
+
+  constructor(
+    @InjectRepository(Student)
+    private readonly studentRepository: Repository&lt;Student&gt;,
+    @InjectRepository(User)
+    private readonly userRepository: Repository&lt;User&gt;,
+    private readonly dataSource: DataSource,
+    private readonly configService: ConfigService,
+  ) {}
 
   async registerStudent(dto: CreateStudentDto) {
-    // 1. Check if email already registered
-    const existingUser = this.usersTable.find((u) => u.email === dto.email);
-    if (existingUser) {
-      throw new ConflictException(`Email '${dto.email}' is already in use.`);
+    this.logger.log(`Initiating registration for student email: ${dto.email}`);
+
+    // ACID Transaction ensures atomic creation: both succeed or both rollback
+    return await this.dataSource.transaction(async (manager) => {
+      // 1. Conflict Check: Email
+      const emailExists = await manager.findOne(User, { where: { email: dto.email } });
+      if (emailExists) {
+        throw new ConflictException(`Email '${dto.email}' is already registered in the system.`);
+      }
+
+      // 2. Conflict Check: Roll Number
+      const rollExists = await manager.findOne(Student, { where: { rollNumber: dto.rollNumber } });
+      if (rollExists) {
+        throw new ConflictException(`Roll number '${dto.rollNumber}' is already allocated.`);
+      }
+
+      // 3. Password Hashing with Bcrypt
+      const saltRounds = this.configService.get&lt;number&gt;('BCRYPT_SALT_ROUNDS', 10);
+      const passwordHash = await bcrypt.hash(dto.password, saltRounds);
+
+      // 4. Create User Authentication Record
+      const user = manager.create(User, {
+        email: dto.email,
+        passwordHash,
+        role: Role.STUDENT,
+      });
+      const savedUser = await manager.save(User, user);
+
+      // 5. Create Linked Student Profile
+      const student = manager.create(Student, {
+        userId: savedUser.id,
+        rollNumber: dto.rollNumber,
+        firstName: dto.firstName,
+        lastName: dto.lastName,
+        department: dto.department,
+        enrollmentYear: dto.enrollmentYear,
+        status: 'ACTIVE',
+      });
+      const savedStudent = await manager.save(Student, student);
+
+      this.logger.log(`Student registered successfully with ID: ${savedStudent.id}`);
+      return {
+        message: 'Student registered successfully',
+        student: savedStudent,
+        user: { id: savedUser.id, email: savedUser.email, role: savedUser.role },
+      };
+    });
+  }
+
+  async findAll(page = 1, limit = 10) {
+    const [items, total] = await this.studentRepository.findAndCount({
+      relations: ['user'],
+      skip: (page - 1) * limit,
+      take: limit,
+      order: { createdAt: 'DESC' },
+    });
+    return { data: items, meta: { total, page, limit, totalPages: Math.ceil(total / limit) } };
+  }
+
+  async findOne(id: string) {
+    const student = await this.studentRepository.findOne({ where: { id }, relations: ['user'] });
+    if (!student) throw new NotFoundException(`Student with ID '${id}' not found`);
+    return student;
+  }
+
+  async update(id: string, dto: UpdateStudentDto) {
+    const student = await this.findOne(id);
+    Object.assign(student, dto);
+    return await this.studentRepository.save(student);
+  }
+
+  async remove(id: string) {
+    await this.findOne(id);
+    await this.studentRepository.softDelete(id);
+  }
+}</code></pre>
+
+        <div class="grid-2" style="margin-top:1rem;">
+          <div class="callout callout-info" style="margin:0;">
+            <strong>&#128161; TIP: Transactions Prevent Partial Writes:</strong>
+            Without <code>dataSource.transaction()</code>, if user creation succeeds but student creation fails due to a
+            network glitch, you end up with a ghost user in the database who cannot log in. Transactions guarantee
+            complete rollback!
+          </div>
+          <div class="callout callout-warn" style="margin:0;">
+            <strong>&#9888;&#65039; PITFALL: Salt Rounds:</strong>
+            Salt rounds &lt; 10 can be cracked in seconds on modern GPUs. Salt rounds &gt; 14 will freeze Node.js CPU
+            workers for hundreds of milliseconds per request. <strong>10 to 12</strong> is the industry standard.
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 10: Auth Module: Login Endpoint & JWT Issuance -->
+      <div class="slide" data-title="10. Auth Module & JWT">
+        <div class="slide-header">
+          <h2>Auth Module: Login Endpoint &amp; JWT Issuance</h2>
+          <span class="slide-step-badge">Authentication</span>
+        </div>
+        <p>
+          The <code>AuthModule</code> handles user authentication. When a user submits credentials via
+          <code>POST /auth/login</code>,
+          we verify their password with <code>bcrypt.compare()</code> and issue a cryptographically signed <strong>JWT
+            token</strong>.
+        </p>
+
+        <div class="grid-2">
+          <div>
+            <pre><span class="highlight-file">src/auth/dto/login.dto.ts</span><code>import { IsEmail, IsString, MinLength } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+
+export class LoginDto {
+  @ApiProperty({ example: 'dean.smith@university.edu' })
+  @IsEmail()
+  email: string;
+
+  @ApiProperty({ example: 'AdminPass123!' })
+  @IsString()
+  @MinLength(8)
+  password: string;
+}</code></pre>
+
+            <pre><span class="highlight-file">src/auth/interfaces/jwt-payload.interface.ts</span><code>import { Role } from '../../common/enums/role.enum';
+
+export interface JwtPayload {
+  sub: string;     // User UUID
+  email: string;
+  role: Role;      // 'ADMIN' | 'TEACHER' | 'STUDENT'
+}</code></pre>
+
+            <pre><span class="highlight-file">src/auth/auth.controller.ts</span><code>import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { AuthService } from './auth.service';
+import { LoginDto } from './dto/login.dto';
+import { Public } from '../common/decorators/public.decorator';
+
+@ApiTags('Authentication')
+@Controller('auth')
+export class AuthController {
+  constructor(private readonly authService: AuthService) {}
+
+  @Public() // Bypasses global JWT Guard!
+  @Post('login')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Authenticate user credentials and receive JWT' })
+  @ApiResponse({ status: 200, description: 'JWT Token returned' })
+  @ApiResponse({ status: 401, description: 'Invalid email or password' })
+  async login(@Body() loginDto: LoginDto) {
+    return this.authService.login(loginDto);
+  }
+}</code></pre>
+          </div>
+
+          <div>
+            <pre><span class="highlight-file">src/auth/auth.service.ts</span><code>import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import * as bcrypt from 'bcrypt';
+import { User } from '../users/entities/user.entity';
+import { LoginDto } from './dto/login.dto';
+import { JwtPayload } from './interfaces/jwt-payload.interface';
+
+@Injectable()
+export class AuthService {
+  constructor(
+    @InjectRepository(User)
+    private readonly userRepository: Repository&lt;User&gt;,
+    private readonly jwtService: JwtService,
+  ) {}
+
+  async validateUser(email: string, pass: string): Promise&lt;User&gt; {
+    const user = await this.userRepository.findOne({ where: { email } });
+    if (!user) {
+      throw new UnauthorizedException('Invalid credentials provided.');
     }
 
-    // 2. Check if roll number already assigned
-    const existingRoll = this.studentsTable.find((s) => s.rollNumber === dto.rollNumber);
-    if (existingRoll) {
-      throw new ConflictException(`Roll number '${dto.rollNumber}' already exists.`);
+    const isMatch = await bcrypt.compare(pass, user.passwordHash);
+    if (!isMatch) {
+      throw new UnauthorizedException('Invalid credentials provided.');
     }
 
-    // 3. Hash password with bcrypt (10 rounds of salt)
-    const saltRounds = 10;
-    const passwordHash = await bcrypt.hash(dto.password, saltRounds);
+    return user;
+  }
 
-    // 4. Create base user record with STUDENT role
-    const newUser = {
-      id: `usr_${Date.now()}`,
-      email: dto.email,
-      passwordHash,
-      role: Role.STUDENT,
-      createdAt: new Date(),
+  async login(loginDto: LoginDto) {
+    const user = await this.validateUser(loginDto.email, loginDto.password);
+
+    const payload: JwtPayload = {
+      sub: user.id,
+      email: user.email,
+      role: user.role,
     };
-    this.usersTable.push(newUser);
 
-    // 5. Create student profile linked to the user
-    const newStudent = {
-      id: `std_${Date.now()}`,
-      userId: newUser.id,
-      firstName: dto.firstName,
-      lastName: dto.lastName,
-      rollNumber: dto.rollNumber,
-      department: dto.department,
-      enrollmentYear: dto.enrollmentYear,
-      status: 'ACTIVE',
-    };
-    this.studentsTable.push(newStudent);
-
-    // 6. Return sanitized response WITHOUT password hash
     return {
-      message: 'Student registered successfully',
-      student: newStudent,
-      user: { id: newUser.id, email: newUser.email, role: newUser.role },
+      accessToken: this.jwtService.sign(payload),
+      tokenType: 'Bearer',
+      expiresIn: '1h',
+      user: { id: user.id, email: user.email, role: user.role },
     };
   }
 }</code></pre>
-    </div>
 
-    <!-- SLIDE 8: Step 4 — Roles Decorator & Guard -->
-    <div class="slide" data-title="8. Step 4: RBAC & RolesGuard">
-      <div class="slide-header">
-        <h2>Step 4: Role-Based Access Control (RBAC)</h2>
-        <span class="slide-step-badge">Registration Pipeline</span>
+            <div class="callout callout-warn">
+              <strong>&#9888;&#65039; PITFALL: Never Expose JWT Secrets:</strong>
+              Never commit <code>JWT_SECRET</code> to git or pass sensitive personal data in the JWT payload. The
+              payload is Base64 encoded and visible to anyone inspecting the token!
+            </div>
+          </div>
+        </div>
       </div>
-      <p>
-        To prevent unauthorized registrations, we enforce Role-Based Access Control using a custom <code>@Roles()</code> decorator and a <code>RolesGuard</code>.
-      </p>
 
-      <div class="grid-2">
-        <div>
-          <pre><span class="highlight-file">src/auth/decorators/roles.decorator.ts</span><code>import { SetMetadata } from '@nestjs/common';
+      <!-- SLIDE 11: JWT Strategy & Passport Setup -->
+      <div class="slide" data-title="11. JWT Strategy & Global Guard">
+        <div class="slide-header">
+          <h2>JWT Strategy &amp; Global Guard Setup</h2>
+          <span class="slide-step-badge">Security Architecture</span>
+        </div>
+        <p>
+          By using <code>@nestjs/passport</code> and <code>passport-jwt</code>, incoming requests bearing an
+          <code>Authorization: Bearer &lt;token&gt;</code> header are automatically parsed, verified against our secret,
+          and the decoded payload is bound to <code>req.user</code>.
+        </p>
+
+        <div class="grid-2">
+          <div>
+            <pre><span class="highlight-file">src/auth/strategies/jwt.strategy.ts</span><code>import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { PassportStrategy } from '@nestjs/passport';
+import { ExtractJwt, Strategy } from 'passport-jwt';
+import { ConfigService } from '@nestjs/config';
+import { JwtPayload } from '../interfaces/jwt-payload.interface';
+
+@Injectable()
+export class JwtStrategy extends PassportStrategy(Strategy) {
+  constructor(configService: ConfigService) {
+    super({
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      ignoreExpiration: false, // Automatically rejects expired tokens
+      secretOrKey: configService.get&lt;string&gt;('JWT_SECRET'),
+    });
+  }
+
+  // Whatever is returned here is attached to request.user
+  async validate(payload: JwtPayload) {
+    if (!payload.sub || !payload.role) {
+      throw new UnauthorizedException('Malformed token payload');
+    }
+    return {
+      id: payload.sub,
+      email: payload.email,
+      role: payload.role,
+    };
+  }
+}</code></pre>
+          </div>
+
+          <div>
+            <pre><span class="highlight-file">src/common/decorators/public.decorator.ts</span><code>import { SetMetadata } from '@nestjs/common';
+
+export const IS_PUBLIC_KEY = 'isPublic';
+// Routes annotated with @Public() bypass the global JwtAuthGuard
+export const Public = () => SetMetadata(IS_PUBLIC_KEY, true);</code></pre>
+
+            <pre><span class="highlight-file">src/auth/guards/jwt-auth.guard.ts</span><code>import { Injectable, ExecutionContext } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { Reflector } from '@nestjs/core';
+import { IS_PUBLIC_KEY } from '../../common/decorators/public.decorator';
+
+@Injectable()
+export class JwtAuthGuard extends AuthGuard('jwt') {
+  constructor(private reflector: Reflector) {
+    super();
+  }
+
+  canActivate(context: ExecutionContext) {
+    const isPublic = this.reflector.getAllAndOverride&lt;boolean&gt;(IS_PUBLIC_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+
+    if (isPublic) return true; // Public route, let request proceed
+    return super.canActivate(context); // Run Passport JWT verification
+  }
+}</code></pre>
+
+            <div class="callout callout-info">
+              <strong>&#128161; TIP: Secure by Default Pattern:</strong>
+              Register <code>JwtAuthGuard</code> globally in <code>AppModule</code> providers with
+              <code>APP_GUARD</code>. Every single endpoint in your system is private by default, and developers must
+              explicitly annotate open routes with <code>@Public()</code>.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 12: Step 4 — RBAC Roles Guard -->
+      <div class="slide" data-title="12. Step 4: RBAC RolesGuard">
+        <div class="slide-header">
+          <h2>Step 4: Role-Based Access Control (RBAC) Guard</h2>
+          <span class="slide-step-badge">Authorization</span>
+        </div>
+        <p>
+          After the <code>JwtAuthGuard</code> verifies identity and attaches <code>req.user</code>, the
+          <code>RolesGuard</code>
+          compares the user's role against permissions declared with the <code>@Roles()</code> decorator.
+        </p>
+
+        <div class="grid-2">
+          <div>
+            <pre><span class="highlight-file">src/auth/decorators/roles.decorator.ts</span><code>import { SetMetadata } from '@nestjs/common';
 import { Role } from '../../common/enums/role.enum';
 
 export const ROLES_KEY = 'roles';
-// Custom decorator attaching metadata to route handlers
+// Attaches allowed roles metadata to route handler or controller class
 export const Roles = (...roles: Role[]) => SetMetadata(ROLES_KEY, roles);</code></pre>
-        </div>
 
-        <div>
-          <pre><span class="highlight-file">src/auth/guards/roles.guard.ts</span><code>import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common';
+            <pre><span class="highlight-file">src/auth/guards/roles.guard.ts</span><code>import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { ROLES_KEY } from '../decorators/roles.decorator';
+import { IS_PUBLIC_KEY } from '../../common/decorators/public.decorator';
 import { Role } from '../../common/enums/role.enum';
 
 @Injectable()
@@ -950,634 +1716,1452 @@ export class RolesGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
+    // 1. Bypass role check if route is public
+    const isPublic = this.reflector.getAllAndOverride&lt;boolean&gt;(IS_PUBLIC_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+    if (isPublic) return true;
+
+    // 2. Extract allowed roles metadata
     const requiredRoles = this.reflector.getAllAndOverride&lt;Role[]&gt;(ROLES_KEY, [
       context.getHandler(),
       context.getClass(),
     ]);
+    if (!requiredRoles || requiredRoles.length === 0) return true;
 
-    if (!requiredRoles) return true; // No roles needed for this route
-
+    // 3. Inspect authenticated user role from req.user
     const { user } = context.switchToHttp().getRequest();
-    if (!user || !requiredRoles.includes(user.role)) {
-      throw new ForbiddenException('Forbidden: Insufficient role permissions.');
+    if (!user || !user.role) {
+      throw new ForbiddenException('Access denied: Unauthenticated user identity.');
+    }
+
+    const hasRole = requiredRoles.includes(user.role);
+    if (!hasRole) {
+      throw new ForbiddenException(
+        `Access denied: requires one of [${requiredRoles.join(', ')}]. Current role: '${user.role}'.`
+      );
     }
 
     return true; // Authorized!
   }
 }</code></pre>
+          </div>
+
+          <div>
+            <div class="card">
+              <h3 style="color:#fff;">Global Guard Ordering in <code>AppModule</code></h3>
+              <p style="font-size:.87rem; color:var(--muted); line-height:1.6;">
+                NestJS executes guards in the exact order declared in <code>providers</code>:
+              </p>
+              <pre style="margin:0;"><code>providers: [
+  // 1st: Verifies JWT and populates req.user
+  {
+    provide: APP_GUARD,
+    useClass: JwtAuthGuard,
+  },
+  // 2nd: Reads req.user and verifies user.role
+  {
+    provide: APP_GUARD,
+    useClass: RolesGuard,
+  },
+]</code></pre>
+            </div>
+
+            <div class="callout callout-warn" style="margin-top:1rem;">
+              <strong>&#9888;&#65039; CRITICAL PITFALL: Guard Execution Order:</strong>
+              If <code>RolesGuard</code> runs before <code>JwtAuthGuard</code>, <code>req.user</code> is still
+              <code>undefined</code>! The guard will immediately throw 403 Forbidden even if a valid Bearer token was
+              supplied!
+            </div>
+
+            <div class="callout callout-info" style="margin-top:.8rem;">
+              <strong>&#128161; TIP: Class-Level Permissions:</strong>
+              Decorate an entire controller with <code>@Roles(Role.ADMIN)</code>. Every endpoint inside inherits
+              ADMIN-only authorization without repeating the decorator!
+            </div>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- SLIDE 9: Step 5 — Exception Filters & Responses -->
-    <div class="slide" data-title="9. Step 5: Global Exception Filters">
-      <div class="slide-header">
-        <h2>Step 5: Global Exception Filter &amp; Standard Responses</h2>
-        <span class="slide-step-badge">Registration Pipeline</span>
-      </div>
-      <p>
-        Catch unexpected crashes, database constraints, and validation errors in a single centralized filter, formatting errors into a consistent JSON envelope.
-      </p>
+      <!-- SLIDE 13: Step 5 — Global Exception Filter & Logging -->
+      <div class="slide" data-title="13. Step 5: Centralized Filters">
+        <div class="slide-header">
+          <h2>Step 5: Centralized Exception Filter &amp; Request IDs</h2>
+          <span class="slide-step-badge">Resilience &amp; Observability</span>
+        </div>
+        <p>
+          Catch unexpected crashes, database constraints, and validation errors in a single centralized filter.
+          It assigns a unique <strong>Correlation ID</strong> for distributed tracing and ensures consistent JSON
+          responses.
+        </p>
 
-      <pre><span class="highlight-file">src/common/filters/http-exception.filter.ts</span><code>import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus } from '@nestjs/common';
+        <pre><span class="highlight-file">src/common/filters/all-exceptions.filter.ts</span><code>import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus, Logger } from '@nestjs/common';
 import { Request, Response } from 'express';
+import { randomUUID } from 'crypto';
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
+  private readonly logger = new Logger(AllExceptionsFilter.name);
+
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse&lt;Response&gt;();
     const request = ctx.getRequest&lt;Request&gt;();
 
+    // 1. Determine HTTP status code
     const status =
       exception instanceof HttpException
         ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
 
-    const message =
-      exception instanceof HttpException
-        ? exception.getResponse()
-        : 'Internal Server Error';
+    // 2. Extract message or response object
+    let message: string | object = 'Internal server error occurred';
+    if (exception instanceof HttpException) {
+      const res = exception.getResponse();
+      message = typeof res === 'object' && (res as any).message ? (res as any).message : res;
+    } else if (exception instanceof Error) {
+      message = exception.message;
+    }
 
+    // 3. Generate or preserve Request Correlation ID
+    const correlationId = (request.headers['x-correlation-id'] as string) || randomUUID();
+    response.setHeader('x-correlation-id', correlationId);
+
+    // 4. Log error internally with stack trace
+    const logPayload = `[${correlationId}] ${request.method} ${request.url} - Status: ${status}`;
+    if (status &gt;= 500) {
+      this.logger.error(logPayload, exception instanceof Error ? exception.stack : '');
+    } else {
+      this.logger.warn(logPayload);
+    }
+
+    // 5. Send uniform sanitized JSON envelope to client
     response.status(status).json({
       success: false,
       statusCode: status,
+      correlationId,
       timestamp: new Date().toISOString(),
       path: request.url,
-      error: message,
+      method: request.method,
+      error: typeof message === 'string' ? message : (message as any).error || 'Error',
+      details: Array.isArray(message) ? message : undefined,
     });
   }
 }</code></pre>
 
-      <div class="card" style="margin-top:1rem;">
-        <h3 style="color:var(--ok);">Standard JSON Response Output</h3>
-        <div class="grid-2">
-          <div>
-            <p style="font-size:.82rem; color:var(--ok); font-weight:bold; margin-bottom:4px;">201 Created (Success):</p>
-            <pre style="margin:0;"><code>{
-  "success": true,
-  "message": "Student registered successfully",
-  "student": {
-    "id": "std_1730452391",
-    "firstName": "Alex",
-    "lastName": "Rivera",
-    "rollNumber": "CS-2026-001",
-    "department": "Computer Science"
-  }
-}</code></pre>
+        <div class="grid-2" style="margin-top:1rem;">
+          <div class="callout callout-warn" style="margin:0;">
+            <strong>&#9888;&#65039; PITFALL: Leaking Raw SQL in Responses:</strong>
+            Never return raw TypeORM <code>QueryFailedError</code> objects to clients in production! They reveal table
+            names, column constraints, and SQL syntax to prospective attackers.
           </div>
-          <div>
-            <p style="font-size:.82rem; color:var(--err); font-weight:bold; margin-bottom:4px;">400 Bad Request (Validation):</p>
-            <pre style="margin:0;"><code>{
-  "success": false,
-  "statusCode": 400,
-  "timestamp": "2026-11-01T15:10:00.000Z",
-  "path": "/students/register",
-  "error": [
-    "Must be a valid educational or personal email",
-    "Password must be at least 8 characters long"
-  ]
-}</code></pre>
+          <div class="callout callout-info" style="margin:0;">
+            <strong>&#128161; TIP: Correlation IDs in Distributed Tracing:</strong>
+            Passing <code>x-correlation-id</code> allows your support team and frontend developers to quote the exact ID
+            from an error modal and find the exact backend log line in seconds!
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- SLIDE 10: Step 6 — Auth & JWT Token Issuance -->
-    <div class="slide" data-title="10. JWT Authentication Flow">
-      <div class="slide-header">
-        <h2>Step 6: Authentication &amp; JWT Verification</h2>
-        <span class="slide-step-badge">Security</span>
-      </div>
-      <p>
-        How does the <code>RolesGuard</code> know who is calling the endpoint? The client sends a signed JWT in the <code>Authorization: Bearer &lt;token&gt;</code> header.
-      </p>
+      <!-- SLIDE 14: Logging with NestJS Logger & Winston -->
+      <div class="slide" data-title="14. Winston Structured Logging">
+        <div class="slide-header">
+          <h2>Structured Production Logging with Winston</h2>
+          <span class="slide-step-badge">Observability</span>
+        </div>
+        <p>
+          In production, raw <code>console.log()</code> statements are unacceptable. We integrate
+          <strong>Winston</strong> with NestJS to output structured JSON logs, daily rotating log files, and standard
+          log levels.
+        </p>
 
-      <pre><span class="highlight-file">src/auth/auth.service.ts</span><code>import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcrypt';
+        <div class="grid-2">
+          <div>
+            <pre><span class="highlight-file">src/logger/winston.config.ts</span><code>import * as winston from 'winston';
+import 'winston-daily-rotate-file';
+
+export const winstonConfig = {
+  transports: [
+    // Console Output with color coding for local dev
+    new winston.transports.Console({
+      format: winston.format.combine(
+        winston.format.timestamp(),
+        winston.format.colorize(),
+        winston.format.printf(({ timestamp, level, message, context, trace }) => {
+          return `[Nest] ${timestamp} ${level} [${context || 'App'}] ${message} ${trace || ''}`;
+        }),
+      ),
+    }),
+    // Rotating Daily File for ALL logs
+    new winston.transports.DailyRotateFile({
+      dirname: 'logs',
+      filename: 'application-%DATE%.log',
+      datePattern: 'YYYY-MM-DD',
+      maxSize: '20m',
+      maxFiles: '14d',
+      format: winston.format.combine(winston.format.timestamp(), winston.format.json()),
+    }),
+    // Rotating Daily File for ERRORS only
+    new winston.transports.DailyRotateFile({
+      level: 'error',
+      dirname: 'logs',
+      filename: 'error-%DATE%.log',
+      datePattern: 'YYYY-MM-DD',
+      maxSize: '20m',
+      maxFiles: '30d',
+      format: winston.format.combine(winston.format.timestamp(), winston.format.json()),
+    }),
+  ],
+};</code></pre>
+          </div>
+
+          <div>
+            <pre><span class="highlight-file">src/main.ts (Attach Winston)</span><code>import { WinstonModule } from 'nest-winston';
+import { winstonConfig } from './logger/winston.config';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule, {
+    logger: WinstonModule.createLogger(winstonConfig),
+  });
+  // ...
+}</code></pre>
+
+            <pre><span class="highlight-file">Usage in any Service</span><code>import { Injectable, Logger } from '@nestjs/common';
 
 @Injectable()
-export class AuthService {
-  constructor(private jwtService: JwtService) {}
+export class StudentsService {
+  // Always instantiate with class name context!
+  private readonly logger = new Logger(StudentsService.name);
 
-  async login(user: any) {
-    // Payload embedded inside the JWT signature
-    const payload = {
-      sub: user.id,
-      email: user.email,
-      role: user.role, // 'ADMIN' | 'TEACHER' | 'STUDENT'
-    };
-
-    return {
-      accessToken: this.jwtService.sign(payload, { expiresIn: '8h' }),
-      user: { id: user.id, email: user.email, role: user.role },
-    };
+  someMethod() {
+    this.logger.log('Info: Processing student record...');
+    this.logger.warn('Warning: Near enrollment capacity.');
+    this.logger.error('Critical failure during payout', trace);
   }
 }</code></pre>
 
-      <div class="card" style="margin-top:1rem;">
-        <h3 style="color:var(--cyan);">JWT Passport Strategy (<code>jwt.strategy.ts</code>)</h3>
-        <p style="font-size:.88rem; color:var(--muted); margin-bottom:.5rem;">
-          Decodes and verifies the token on incoming requests and automatically attaches the payload to <code>request.user</code>:
+            <div class="callout callout-warn">
+              <strong>&#9888;&#65039; PITFALL: Missing Logger Context:</strong>
+              Calling <code>new Logger()</code> without passing the class name context prints logs without indicating
+              where they originated, making debugging across 50+ services painful.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 15: Rate Limiting & Security Hardening -->
+      <div class="slide" data-title="15. Security & Rate Limiting">
+        <div class="slide-header">
+          <h2>Rate Limiting &amp; HTTP Security Hardening</h2>
+          <span class="slide-step-badge">Security Hardening</span>
+        </div>
+        <p>
+          Protect your API against brute-force password cracking, Denial of Service (DoS) attacks,
+          and common HTTP header vulnerabilities using <code>@nestjs/throttler</code> and <strong>Helmet</strong>.
         </p>
-        <pre style="margin:0;"><code>// Returns user payload to request.user
-async validate(payload: { sub: string; email: string; role: Role }) {
-  return { id: payload.sub, email: payload.email, role: payload.role };
+
+        <div class="grid-2">
+          <div>
+            <pre><span class="highlight-file">src/app.module.ts</span><code>import { Module } from '@nestjs/common';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+
+@Module({
+  imports: [
+    ThrottlerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => [
+        {
+          ttl: config.get&lt;number&gt;('THROTTLE_TTL', 60000), // 60 seconds
+          limit: config.get&lt;number&gt;('THROTTLE_LIMIT', 100), // 100 req per min
+        },
+      ],
+    }),
+  ],
+  providers: [
+    // Applies throttler guard globally across all routes
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
+})
+export class AppModule {}</code></pre>
+          </div>
+
+          <div>
+            <pre><span class="highlight-file">Strict Limit on Sensitive Routes</span><code>import { Controller, Post } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
+
+@Controller('auth')
+export class AuthController {
+  // Override: Allow at most 5 login attempts per minute!
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
+  @Post('login')
+  async login() {
+    // ...
+  }
 }</code></pre>
+
+            <pre><span class="highlight-file">src/main.ts (Helmet &amp; CORS)</span><code>import helmet from 'helmet';
+
+// 1. Secure HTTP headers against clickjacking, XSS, sniffing
+app.use(helmet());
+
+// 2. Strict Cross-Origin Resource Sharing (CORS)
+app.enableCors({
+  origin: ['https://sms-portal.university.edu'],
+  methods: ['GET', 'POST', 'PATCH', 'DELETE'],
+  credentials: true,
+});</code></pre>
+
+            <div class="callout callout-warn">
+              <strong>&#9888;&#65039; CRITICAL PITFALL: Unthrottled Auth:</strong>
+              Omitting rate limits on <code>/auth/login</code> allows attackers to launch automated dictionary attacks
+              testing thousands of password combinations per minute.
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
 
-    <!-- SLIDE 11: Swagger OpenAPI Documentation -->
-    <div class="slide" data-title="11. Swagger OpenAPI Docs">
-      <div class="slide-header">
-        <h2>Step 7: Swagger / OpenAPI Auto-Documentation</h2>
-        <span class="slide-step-badge">Documentation</span>
-      </div>
-      <p>
-        NestJS provides first-class OpenAPI documentation. Decorate your DTOs and controllers to generate an interactive API testing interface at <code>/api/docs</code>.
-      </p>
+      <!-- SLIDE 16: Step 7 — Swagger / OpenAPI Docs -->
+      <div class="slide" data-title="16. Swagger OpenAPI Docs">
+        <div class="slide-header">
+          <h2>Step 7: Interactive Swagger OpenAPI Documentation</h2>
+          <span class="slide-step-badge">Developer Experience</span>
+        </div>
+        <p>
+          NestJS provides first-class OpenAPI auto-documentation. Decorate your DTOs and Controllers
+          to render an interactive Swagger UI at <code>/api/docs</code>.
+        </p>
 
-      <pre><span class="highlight-file">src/main.ts</span><code>import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+        <div class="grid-2">
+          <div>
+            <pre><span class="highlight-file">src/main.ts (Swagger Setup)</span><code>import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { ConfigService } from '@nestjs/config';
 
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+export function setupSwagger(app: INestApplication) {
+  const configService = app.get(ConfigService);
+
+  // 💡 Security: Disable Swagger in Production if desired
+  if (configService.get('NODE_ENV') === 'production') {
+    return;
+  }
 
   const config = new DocumentBuilder()
-    .setTitle('Student Management API')
-    .setDescription('Complete SMS REST API with RBAC roles and registration')
-    .setVersion('1.0')
-    .addBearerAuth() // Allows passing JWT token in Swagger UI
+    .setTitle('Student Management System (SMS) API')
+    .setDescription('Enterprise Student Administration REST API with JWT Auth and RBAC')
+    .setVersion('1.0.0')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'Authorization',
+        description: 'Input your JWT Bearer token',
+        in: 'header',
+      },
+      'JWT-auth', // Identifier matching @ApiBearerAuth('JWT-auth')
+    )
+    .addTag('Authentication', 'Login &amp; Token management')
+    .addTag('Students', 'Student registration, roster queries, and profiles')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api/docs', app, document);
+  SwaggerModule.setup('api/docs', app, document, {
+    swaggerOptions: { persistAuthorization: true },
+  });
+}</code></pre>
+          </div>
 
-  await app.listen(3000);
+          <div>
+            <div class="card">
+              <h3 style="color:var(--cyan);">DTO &amp; Controller Annotations</h3>
+              <pre style="margin:0;"><code>@ApiTags('Students')
+@ApiBearerAuth('JWT-auth')
+@Controller('students')
+export class StudentsController {
+  @ApiOperation({ summary: 'Register a student' })
+  @ApiResponse({ status: 201, description: 'Created' })
+  @ApiResponse({ status: 400, description: 'Bad Request' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
+  @ApiResponse({ status: 409, description: 'Conflict' })
+  @Post('register')
+  register() { ... }
+}</code></pre>
+            </div>
+
+            <div class="callout callout-info" style="margin-top:1rem;">
+              <strong>&#128161; TIP: Try-It-Out in Browser:</strong>
+              Visiting <code>http://localhost:3000/api/docs</code> allows frontend engineers, QA testers, and external
+              partners to authorize with a JWT and invoke live endpoints with JSON payloads directly inside their web
+              browser.
+            </div>
+
+            <div class="callout callout-warn" style="margin-top:.8rem;">
+              <strong>&#9888;&#65039; PITFALL: Public Docs in Production:</strong>
+              Exposing Swagger documentation publicly in production gives attackers a blueprint of every endpoint and
+              validation parameter. Protect it behind VPN or disable via <code>NODE_ENV === 'production'</code>.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 17: Interceptors: Response Transformation & Timing -->
+      <div class="slide" data-title="17. Interceptors & Serialization">
+        <div class="slide-header">
+          <h2>Interceptors: Transformation &amp; Serialization</h2>
+          <span class="slide-step-badge">Pipeline Transformations</span>
+        </div>
+        <p>
+          Interceptors execute both <strong>before</strong> and <strong>after</strong> your route handler.
+          We use them to measure execution performance, standardize responses into a consistent JSON envelope,
+          and strip sensitive entity columns using <code>ClassSerializerInterceptor</code>.
+        </p>
+
+        <div class="grid-2">
+          <div>
+            <pre><span class="highlight-file">src/common/interceptors/transform.interceptor.ts</span><code>import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nestjs/common';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+
+export interface ResponseEnvelope&lt;T&gt; {
+  success: boolean;
+  statusCode: number;
+  timestamp: string;
+  data: T;
+}
+
+@Injectable()
+export class TransformInterceptor&lt;T&gt; implements NestInterceptor&lt;T, ResponseEnvelope&lt;T&gt;&gt; {
+  intercept(context: ExecutionContext, next: CallHandler): Observable&lt;ResponseEnvelope&lt;T&gt;&gt; {
+    const statusCode = context.switchToHttp().getResponse().statusCode;
+
+    return next.handle().pipe(
+      map((data) => ({
+        success: true,
+        statusCode,
+        timestamp: new Date().toISOString(),
+        data,
+      })),
+    );
+  }
 }</code></pre>
 
-      <div class="callout callout-info">
-        <strong>Instant Swagger UI:</strong> Visiting <code>http://localhost:3000/api/docs</code> allows professors, frontend engineers, and mobile developers to test the student registration endpoint with real payloads directly in the browser!
-      </div>
-    </div>
+            <pre><span class="highlight-file">src/common/interceptors/logging.interceptor.ts</span><code>import { Injectable, NestInterceptor, ExecutionContext, CallHandler, Logger } from '@nestjs/common';
+import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
 
-    <!-- SLIDE 12: Interactive Simulator -->
-    <div class="slide" data-title="12. Interactive API Simulator">
-      <div class="slide-header">
-        <h2>Interactive Student Registration Simulator</h2>
-        <span class="slide-step-badge">Live Testbench</span>
-      </div>
-      <p style="font-size:.9rem; color:var(--muted); margin-bottom:1rem;">
-        Test the complete NestJS pipeline live! Switch roles, modify form values, and trigger a simulated request to inspect Guards, Validation Pipes, and Service responses.
-      </p>
+@Injectable()
+export class LoggingInterceptor implements NestInterceptor {
+  private readonly logger = new Logger('HTTP');
 
-      <div class="sim-box">
-        <div class="sim-inputs">
-          <div class="sim-group">
-            <label>Acting User Role (JWT):</label>
-            <select id="sim-role">
-              <option value="ADMIN">ADMIN (Registrar / Dean) - Authorized</option>
-              <option value="TEACHER">TEACHER - Unauthorized</option>
-              <option value="STUDENT">STUDENT - Unauthorized</option>
-              <option value="ANONYMOUS">ANONYMOUS (No Token) - Unauthorized</option>
-            </select>
-          </div>
-          <div class="sim-group">
-            <label>First Name:</label>
-            <input type="text" id="sim-fname" value="Alex">
-          </div>
-          <div class="sim-group">
-            <label>Last Name:</label>
-            <input type="text" id="sim-lname" value="Rivera">
-          </div>
-          <div class="sim-group">
-            <label>Email Address:</label>
-            <input type="text" id="sim-email" value="alex.rivera@university.edu">
-          </div>
-          <div class="sim-group">
-            <label>Password (min 8 chars):</label>
-            <input type="text" id="sim-pass" value="Secret123!">
-          </div>
-          <div class="sim-group">
-            <label>Roll Number:</label>
-            <input type="text" id="sim-roll" value="CS-2026-042">
-          </div>
-          <div class="sim-group">
-            <label>Department:</label>
-            <select id="sim-dept">
-              <option value="Computer Science">Computer Science</option>
-              <option value="Electrical Engineering">Electrical Engineering</option>
-              <option value="Data Science">Data Science</option>
-            </select>
-          </div>
-          <div class="sim-group">
-            <label>Enrollment Year:</label>
-            <input type="number" id="sim-year" value="2026">
-          </div>
-        </div>
+  intercept(context: ExecutionContext, next: CallHandler): Observable&lt;any&gt; {
+    const req = context.switchToHttp().getRequest();
+    const { method, url } = req;
+    const now = Date.now();
 
-        <div style="display:flex; gap:.65rem; margin-bottom:1rem;">
-          <button class="btn btn-accent" onclick="runSimulatedRegister()">
-            &#9654; POST /students/register
-          </button>
-          <button class="btn" onclick="injectInvalidEmail()">
-            Test Invalid Email (400)
-          </button>
-          <button class="btn" onclick="injectShortPassword()">
-            Test Short Password (400)
-          </button>
-          <button class="btn" onclick="injectDuplicateEmail()">
-            Test Duplicate Email (409)
-          </button>
-        </div>
+    return next.handle().pipe(
+      tap(() => {
+        const elapsed = Date.now() - now;
+        this.logger.log(`${method} ${url} completed in ${elapsed}ms`);
+      }),
+    );
+  }
+}</code></pre>
+          </div>
 
-        <div class="sim-log-terminal" id="sim-terminal">
-          <span style="color:var(--muted);">// Ready. Select role, adjust inputs, and click 'POST /students/register'...</span>
-        </div>
-      </div>
-    </div>
+          <div>
+            <pre><span class="highlight-file">src/main.ts (Register Interceptors)</span><code>import { Reflector } from '@nestjs/core';
+import { ClassSerializerInterceptor } from '@nestjs/common';
+import { TransformInterceptor } from './common/interceptors/transform.interceptor';
+import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 
-    <!-- SLIDE 13: Summary & Best Practices -->
-    <div class="slide" data-title="13. Cheatsheet & Best Practices">
-      <div class="slide-header">
-        <h2>Summary &amp; Production Best Practices</h2>
-        <span class="slide-step-badge">Cheatsheet</span>
-      </div>
+// 1. Strips @Exclude() properties (e.g. passwordHash)
+app.useGlobalInterceptors(
+  new ClassSerializerInterceptor(app.get(Reflector)),
+  new TransformInterceptor(),
+  new LoggingInterceptor(),
+);</code></pre>
 
-      <div class="grid-2">
-        <div class="card">
-          <h3 style="color:var(--ok);">&#10004; The Do's of NestJS APIs</h3>
-          <ul style="font-size:.87rem; color:var(--muted); padding-left:1.2rem; line-height:1.7;">
-            <li><strong>Always validate with DTOs:</strong> Use <code>class-validator</code> and enable <code>whitelist: true</code> to stop parameter pollution.</li>
-            <li><strong>Inject Services:</strong> Keep business calculations in <code>@Injectable()</code> classes.</li>
-            <li><strong>Secure by Default:</strong> Bind <code>JwtAuthGuard</code> globally or per controller, opt-out with <code>@Public()</code> metadata.</li>
-            <li><strong>Hash early, sanitize late:</strong> Use <code>bcrypt.hash(password, 10)</code> and exclude hashes from responses.</li>
-            <li><strong>Centralize errors:</strong> Implement global exception filters for uniform API error structures.</li>
-          </ul>
-        </div>
+            <div class="card" style="margin-top:1rem;">
+              <h3 style="color:var(--ok);">Standard Client JSON Envelope</h3>
+              <pre style="margin:0;"><code>{
+  "success": true,
+  "statusCode": 201,
+  "timestamp": "2026-11-03T10:00:00.000Z",
+  "data": {
+    "id": "c1f7b029-...",
+    "rollNumber": "CS-2026-042",
+    "firstName": "Alex",
+    "lastName": "Rivera"
+  }
+}</code></pre>
+            </div>
 
-        <div class="card">
-          <h3 style="color:var(--err);">&#10008; Anti-Patterns to Avoid</h3>
-          <ul style="font-size:.87rem; color:var(--muted); padding-left:1.2rem; line-height:1.7;">
-            <li><strong>Fat Controllers:</strong> Writing raw database queries or loops directly in controller route handlers.</li>
-            <li><strong>Plain Text Passwords:</strong> Never store or log raw user passwords.</li>
-            <li><strong>Hardcoding Secrets:</strong> Always use <code>@nestjs/config</code> (<code>ConfigService</code>) for environment variables.</li>
-            <li><strong>Direct Component Coupling:</strong> Avoid direct class instantiation (<code>new Service()</code>); use dependency injection.</li>
-          </ul>
+            <div class="callout callout-warn">
+              <strong>&#9888;&#65039; CRITICAL PITFALL: Leaking Passwords:</strong>
+              Without <code>ClassSerializerInterceptor</code> registered globally, <code>@Exclude()</code> on entities
+              is ignored, resulting in <code>passwordHash</code> being sent directly over the wire in HTTP responses!
+            </div>
+          </div>
         </div>
       </div>
 
-      <div class="callout callout-nest" style="margin-top:1.5rem;">
-        <strong>Full Learning Path Complete!</strong>
-        You can explore the companion brush-up guides:
-        <a href="javascript-brush-up.html" style="color:var(--cyan); font-weight:600;">JavaScript Guide</a> |
-        <a href="typescript-brush-up.html" style="color:var(--cyan); font-weight:600;">TypeScript Guide</a> |
-        <a href="nextjs-brush-up.html" style="color:var(--cyan); font-weight:600;">Next.js Fullstack Guide</a>
-      </div>
-    </div>
+      <!-- SLIDE 18: Unit Testing with Jest -->
+      <div class="slide" data-title="18. Unit Testing with Jest">
+        <div class="slide-header">
+          <h2>Unit Testing with Jest &amp; Boundary Mocks</h2>
+          <span class="slide-step-badge">Quality Assurance</span>
+        </div>
+        <p>
+          Because NestJS relies on Dependency Injection, unit testing services in isolation is clean and
+          straightforward.
+          We mock the TypeORM repositories and <code>DataSource</code> using Jest mock functions.
+        </p>
 
-  </div>
+        <pre><span class="highlight-file">src/students/students.service.spec.ts</span><code>import { Test, TestingModule } from '@nestjs/testing';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
+import { ConfigService } from '@nestjs/config';
+import { ConflictException, NotFoundException } from '@nestjs/common';
+import { StudentsService } from './students.service';
+import { Student } from './entities/student.entity';
+import { User } from '../users/entities/user.entity';
 
-  <!-- SLIDER FOOTER BAR -->
-  <footer class="slider-footer">
-    <div class="controls-left">
-      <button class="btn" id="btn-prev" onclick="prevSlide()">
-        &larr; Previous
-      </button>
-      <button class="btn btn-accent" id="btn-next" onclick="nextSlide()">
-        Next &rarr;
-      </button>
-    </div>
+describe('StudentsService', () => {
+  let service: StudentsService;
+  let mockStudentRepo: any;
+  let mockUserRepo: any;
+  let mockDataSource: any;
 
-    <div class="slide-dots" id="dots-container"></div>
-
-    <div class="controls-right">
-      <span class="slide-num" id="slide-indicator">Slide 1 of 13</span>
-      <button class="btn" onclick="toggleFullscreen()" title="Toggle Fullscreen">
-        &#x26F6;
-      </button>
-    </div>
-  </footer>
-</div>
-
-<!-- ========================================== -->
-<!-- CONTINUOUS READER MODE (Alternative View)  -->
-<!-- ========================================== -->
-<div id="scroll-mode">
-  <div style="margin-bottom:2rem; border-bottom:1px solid var(--border); padding-bottom:1rem;">
-    <h1 style="color:#fff; margin-top:0;">NestJS API Architecture &amp; Student Registration Guide</h1>
-    <p style="color:var(--muted);">Continuous reading mode of the 13 tutorial slides.</p>
-    <button class="btn btn-accent" onclick="toggleViewMode()">
-      &larr; Return to Slide Deck Presentation
-    </button>
-  </div>
-  <div id="scroll-content"></div>
-</div>
-
-<script>
-  // SLIDES DATA & LOGIC
-  const slides = Array.from(document.querySelectorAll('.slide'));
-  const totalSlides = slides.length;
-  let currentSlide = 0;
-  let isReaderMode = false;
-
-  const dotsContainer = document.getElementById('dots-container');
-  const slideIndicator = document.getElementById('slide-indicator');
-  const progressBar = document.getElementById('progress-bar');
-  const tocList = document.getElementById('toc-list');
-  const scrollContent = document.getElementById('scroll-content');
-
-  // Initialize Dots, Drawer TOC, and Reader Mode Copy
-  slides.forEach((slide, idx) => {
-    // 1. Footer Dot
-    const dot = document.createElement('div');
-    dot.className = `dot ${idx === 0 ? 'active' : ''}`;
-    dot.title = slide.getAttribute('data-title') || `Slide ${idx + 1}`;
-    dot.onclick = () => goToSlide(idx);
-    dotsContainer.appendChild(dot);
-
-    // 2. Drawer TOC Item
-    const tocItem = document.createElement('div');
-    tocItem.className = `toc-item ${idx === 0 ? 'active' : ''}`;
-    tocItem.textContent = slide.getAttribute('data-title') || `Slide ${idx + 1}`;
-    tocItem.onclick = () => {
-      goToSlide(idx);
-      toggleDrawer(false);
+  beforeEach(async () => {
+    mockStudentRepo = {
+      findOne: jest.fn(),
+      findAndCount: jest.fn(),
+      save: jest.fn(),
+      softDelete: jest.fn(),
     };
-    tocList.appendChild(tocItem);
+    mockUserRepo = {
+      findOne: jest.fn(),
+      save: jest.fn(),
+    };
+    mockDataSource = {
+      transaction: jest.fn().mockImplementation(async (cb) => {
+        return cb({
+          findOne: jest.fn().mockResolvedValue(null), // No conflicts by default
+          create: jest.fn((entity, data) => ({ id: 'mock-uuid', ...data })),
+          save: jest.fn((entity, data) => Promise.resolve(data)),
+        });
+      }),
+    };
 
-    // 3. Populate Continuous Reader Section
-    const docSec = document.createElement('div');
-    docSec.className = 'doc-section';
-    docSec.id = `doc-sec-${idx}`;
-    docSec.innerHTML = slide.innerHTML;
-    scrollContent.appendChild(docSec);
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        StudentsService,
+        { provide: getRepositoryToken(Student), useValue: mockStudentRepo },
+        { provide: getRepositoryToken(User), useValue: mockUserRepo },
+        { provide: DataSource, useValue: mockDataSource },
+        {
+          provide: ConfigService,
+          useValue: { get: jest.fn().mockReturnValue(10) },
+        },
+      ],
+    }).compile();
+
+    service = module.get&lt;StudentsService&gt;(StudentsService);
   });
 
-  function updateSlideUI() {
-    slides.forEach((s, i) => {
-      s.classList.toggle('active', i === currentSlide);
+  it('should be defined', () => {
+    expect(service).toBeDefined();
+  });
+
+  it('should register a new student when email and roll number are unique', async () => {
+    const dto = {
+      email: 'new.student@university.edu',
+      password: 'ValidPassword123!',
+      firstName: 'Jane',
+      lastName: 'Doe',
+      rollNumber: 'CS-2026-099',
+      department: 'Computer Science',
+      enrollmentYear: 2026,
+    };
+
+    const result = await service.registerStudent(dto);
+    expect(result.message).toBe('Student registered successfully');
+    expect(result.student.rollNumber).toBe('CS-2026-099');
+  });
+
+  it('should throw ConflictException if email is already taken', async () => {
+    mockDataSource.transaction.mockImplementationOnce(async (cb: any) => {
+      return cb({
+        findOne: jest.fn().mockResolvedValueOnce({ id: 'existing-id' }), // Simulates email conflict
+      });
     });
 
-    const dots = document.querySelectorAll('.dot');
-    dots.forEach((d, i) => d.classList.toggle('active', i === currentSlide));
+    await expect(
+      service.registerStudent({ email: 'taken@university.edu' } as any),
+    ).rejects.toThrow(ConflictException);
+  });
+});</code></pre>
 
-    const tocItems = document.querySelectorAll('.toc-item');
-    tocItems.forEach((t, i) => t.classList.toggle('active', i === currentSlide));
+        <div class="grid-2" style="margin-top:1rem;">
+          <div class="callout callout-info" style="margin:0;">
+            <strong>&#128161; TIP: Mock at Boundaries:</strong>
+            Mock at the repository and DataSource level rather than mocking private internals. This tests true business
+            logic behavior while running blazingly fast in-memory without a live DB.
+          </div>
+          <div class="callout callout-warn" style="margin:0;">
+            <strong>&#9888;&#65039; PITFALL: Testing Implementation Details:</strong>
+            Don't assert how many times an internal helper function was called; assert inputs, outputs, exceptions, and
+            boundary contracts.
+          </div>
+        </div>
+      </div>
 
-    slideIndicator.textContent = `Slide ${currentSlide + 1} of ${totalSlides}`;
-    const pct = ((currentSlide + 1) / totalSlides) * 100;
-    progressBar.style.width = `${pct}%`;
+      <!-- SLIDE 19: E2E Testing with Supertest -->
+      <div class="slide" data-title="19. E2E Testing with Supertest">
+        <div class="slide-header">
+          <h2>End-to-End (E2E) Testing with Supertest</h2>
+          <span class="slide-step-badge">Integration Testing</span>
+        </div>
+        <p>
+          End-to-end tests exercise the entire application pipeline: Middleware, Guards, Pipes, Interceptors,
+          and Controller routing against real HTTP requests using <code>supertest</code>.
+        </p>
 
-    // Disable/Enable buttons
-    document.getElementById('btn-prev').disabled = currentSlide === 0;
-    document.getElementById('btn-next').disabled = currentSlide === totalSlides - 1;
-  }
+        <pre><span class="highlight-file">test/students.e2e-spec.ts</span><code>import { Test, TestingModule } from '@nestjs/testing';
+import { INestApplication, ValidationPipe } from '@nestjs/common';
+import * as request from 'supertest';
+import { AppModule } from '../src/app.module';
+import { JwtService } from '@nestjs/jwt';
+import { Role } from '../src/common/enums/role.enum';
 
-  function goToSlide(index) {
-    if (index >= 0 && index < totalSlides) {
-      currentSlide = index;
-      updateSlideUI();
-    }
-  }
+describe('StudentsController (e2e)', () => {
+  let app: INestApplication;
+  let adminToken: string;
+  let studentToken: string;
 
-  function nextSlide() {
-    if (currentSlide < totalSlides - 1) {
-      goToSlide(currentSlide + 1);
-    }
-  }
+  beforeAll(async () => {
+    const moduleFixture: TestingModule = await Test.createTestingModule({
+      imports: [AppModule],
+    }).compile();
 
-  function prevSlide() {
-    if (currentSlide > 0) {
-      goToSlide(currentSlide - 1);
-    }
-  }
+    app = moduleFixture.createNestApplication();
+    app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }));
+    await app.init();
 
-  // KEYBOARD NAVIGATION
-  window.addEventListener('keydown', (e) => {
-    if (isReaderMode) return;
-    if (e.key === 'ArrowRight' || e.key === ' ') {
-      if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'SELECT') {
-        e.preventDefault();
-        nextSlide();
-      }
-    } else if (e.key === 'ArrowLeft') {
-      if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'SELECT') {
-        e.preventDefault();
-        prevSlide();
-      }
-    } else if (e.key === 'Escape') {
-      toggleDrawer(false);
-    }
+    const jwtService = app.get&lt;JwtService&gt;(JwtService);
+    // Mint test tokens with respective roles
+    adminToken = jwtService.sign({ sub: 'admin-uuid', email: 'admin@uni.edu', role: Role.ADMIN });
+    studentToken = jwtService.sign({ sub: 'student-uuid', email: 'student@uni.edu', role: Role.STUDENT });
   });
 
-  // DRAWER TOGGLE
-  function toggleDrawer(force) {
-    const drawer = document.getElementById('toc-drawer');
-    const overlay = document.getElementById('drawer-overlay');
-    const isOpen = force !== undefined ? force : !drawer.classList.contains('open');
-    drawer.classList.toggle('open', isOpen);
-    overlay.classList.toggle('open', isOpen);
-  }
+  afterAll(async () => {
+    await app.close();
+  });
 
-  // VIEW MODE TOGGLE (SLIDES vs DOCUMENT)
-  function toggleViewMode() {
-    isReaderMode = !isReaderMode;
-    const sliderMode = document.getElementById('slider-mode');
-    const scrollMode = document.getElementById('scroll-mode');
-    const btn = document.getElementById('btn-toggle-view');
+  it('POST /students/register &rarr; 401 Unauthorized without JWT', () => {
+    return request(app.getHttpServer())
+      .post('/students/register')
+      .send({ firstName: 'Alex' })
+      .expect(401);
+  });
 
-    if (isReaderMode) {
-      sliderMode.style.display = 'none';
-      scrollMode.style.display = 'block';
-      btn.innerHTML = '&#128187; Slide Deck View';
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    } else {
-      sliderMode.style.display = 'flex';
-      scrollMode.style.display = 'none';
-      btn.innerHTML = '&#128196; Reader View';
-      updateSlideUI();
-    }
-  }
+  it('POST /students/register &rarr; 403 Forbidden with STUDENT role JWT', () => {
+    return request(app.getHttpServer())
+      .post('/students/register')
+      .set('Authorization', `Bearer ${studentToken}`)
+      .send({ firstName: 'Alex' })
+      .expect(403);
+  });
 
-  // FULLSCREEN TOGGLE
-  function toggleFullscreen() {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch(() => {});
-    } else {
-      document.exitFullscreen().catch(() => {});
-    }
-  }
+  it('POST /students/register &rarr; 400 Bad Request with malformed payload', () => {
+    return request(app.getHttpServer())
+      .post('/students/register')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({ email: 'not-an-email', password: '123' }) // Invalid format &amp; short password
+      .expect(400);
+  });
 
-  // ==========================================
-  // INTERACTIVE API SIMULATOR ENGINE
-  // ==========================================
-  const mockExistingEmails = ['existing.student@university.edu'];
-  const mockExistingRolls = ['CS-2026-001'];
-
-  function runSimulatedRegister() {
-    const role = document.getElementById('sim-role').value;
-    const fname = document.getElementById('sim-fname').value.trim();
-    const lname = document.getElementById('sim-lname').value.trim();
-    const email = document.getElementById('sim-email').value.trim();
-    const pass = document.getElementById('sim-pass').value;
-    const roll = document.getElementById('sim-roll').value.trim();
-    const dept = document.getElementById('sim-dept').value;
-    const year = parseInt(document.getElementById('sim-year').value, 10);
-
-    const term = document.getElementById('sim-terminal');
-    term.innerHTML = '';
-
-    const log = (msg, color = '#e2e8f0') => {
-      const line = document.createElement('div');
-      line.style.color = color;
-      line.style.padding = '2px 0';
-      line.innerHTML = msg;
-      term.appendChild(line);
-      term.scrollTop = term.scrollHeight;
+  it('POST /students/register &rarr; 201 Created with valid payload and ADMIN JWT', () => {
+    const validPayload = {
+      email: `test.${Date.now()}@university.edu`,
+      password: 'StrongPassword123!',
+      firstName: 'Sarah',
+      lastName: 'Connor',
+      rollNumber: `CS-2026-${Math.floor(100 + Math.random() * 900)}`,
+      department: 'Computer Science',
+      enrollmentYear: 2026,
     };
 
-    log(`[HTTP Request] POST /students/register`, '#38bdf8');
-    log(`&bull; Headers: Authorization: Bearer &lt;JWT role="${role}"&gt;`, '#94a3b8');
+    return request(app.getHttpServer())
+      .post('/students/register')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send(validPayload)
+      .expect(201)
+      .expect((res) => {
+        expect(res.body.student).toHaveProperty('id');
+        expect(res.body.user).not.toHaveProperty('passwordHash');
+      });
+  });
+});</code></pre>
 
-    // Step 1: JWT Authentication Guard Check
-    if (role === 'ANONYMOUS') {
-      setTimeout(() => {
-        log(`&cross; [JwtAuthGuard] Missing Bearer Token!`, '#ef4444');
-        log(`HTTP/1.1 401 Unauthorized`, '#ef4444');
-        log(JSON.stringify({
-          statusCode: 401,
-          message: 'Unauthorized: Bearer token is missing or invalid',
-        }, null, 2), '#f87171');
-      }, 200);
-      return;
-    }
+        <div class="grid-2" style="margin-top:1rem;">
+          <div class="callout callout-info" style="margin:0;">
+            <strong>&#128161; TIP: Dedicated Test Containers / SQLite:</strong>
+            Run E2E tests against an ephemeral PostgreSQL Docker container or in-memory SQLite database to keep tests
+            fast, fully repeatable, and isolated from your development records.
+          </div>
+          <div class="callout callout-warn" style="margin:0;">
+            <strong>&#9888;&#65039; PITFALL: State Leakage:</strong>
+            Always clean up test records or run tests in an isolated transaction to prevent duplicate key errors between
+            test runs.
+          </div>
+        </div>
+      </div>
 
-    // Step 2: RolesGuard (RBAC) Check
-    if (role !== 'ADMIN') {
-      setTimeout(() => {
-        log(`&check; [JwtAuthGuard] Token verified for role: ${role}`, '#10b981');
-        log(`&cross; [RolesGuard] Route requires @Roles(Role.ADMIN). User has '${role}'`, '#ef4444');
-        log(`HTTP/1.1 403 Forbidden`, '#ef4444');
-        log(JSON.stringify({
-          statusCode: 403,
-          error: 'Forbidden',
-          message: 'Forbidden: Insufficient role permissions.',
-        }, null, 2), '#f87171');
-      }, 250);
-      return;
-    }
+      <!-- SLIDE 20: Production Deployment Checklist & Docker -->
+      <div class="slide" data-title="20. Docker Multi-Stage Build">
+        <div class="slide-header">
+          <h2>Production Deployment &amp; Multi-Stage Docker</h2>
+          <span class="slide-step-badge">DevOps &amp; Containerization</span>
+        </div>
+        <p>
+          A production Docker container must be minimal, secure, and fast to pull. We use a
+          <strong>multi-stage build</strong> that discards TypeScript sources and devDependencies, running under a
+          non-root user.
+        </p>
 
-    log(`&check; [JwtAuthGuard] Token verified. Role: ${role}`, '#10b981');
-    log(`&check; [RolesGuard] Role check passed (User is ADMIN)`, '#10b981');
+        <div class="grid-2">
+          <div>
+            <pre><span class="highlight-file">Dockerfile</span><code># ==========================================
+# STAGE 1: Build Application
+# ==========================================
+FROM node:20-alpine AS builder
+WORKDIR /app
 
-    // Step 3: ValidationPipe (DTO Check)
-    const validationErrors = [];
-    if (!email.includes('@') || !email.includes('.')) {
-      validationErrors.push('Must be a valid educational or personal email');
-    }
-    if (pass.length < 8) {
-      validationErrors.push('Password must be at least 8 characters long');
-    }
-    if (!fname) validationErrors.push('First name is required');
-    if (!lname) validationErrors.push('Last name is required');
-    if (!roll) validationErrors.push('Roll number cannot be empty');
-    if (isNaN(year) || year < 2020 || year > 2030) {
-      validationErrors.push('enrollmentYear must be between 2020 and 2030');
-    }
+# Install build dependencies
+COPY package*.json ./
+RUN npm ci
 
-    if (validationErrors.length > 0) {
-      setTimeout(() => {
-        log(`&cross; [ValidationPipe] DTO schema check failed!`, '#ef4444');
-        log(`HTTP/1.1 400 Bad Request`, '#ef4444');
-        log(JSON.stringify({
-          statusCode: 400,
-          error: 'Bad Request',
-          message: validationErrors,
-        }, null, 2), '#f87171');
-      }, 350);
-      return;
-    }
+# Copy sources and compile TypeScript to dist/
+COPY . .
+RUN npm run build
 
-    log(`&check; [ValidationPipe] DTO valid and sanitized.`, '#10b981');
+# Prune devDependencies to keep image small
+RUN npm prune --omit=dev
 
-    // Step 4: Controller delegates to StudentsService
-    setTimeout(() => {
-      log(`&bull; [StudentsController] Invoking studentsService.registerStudent()...`, '#94a3b8');
+# ==========================================
+# STAGE 2: Lightweight Production Runner
+# ==========================================
+FROM node:20-alpine AS runner
+WORKDIR /app
+ENV NODE_ENV=production
 
-      // Duplicate email check
-      if (mockExistingEmails.includes(email)) {
-        log(`&cross; [StudentsService] Email conflict found!`, '#ef4444');
-        log(`HTTP/1.1 409 Conflict`, '#ef4444');
-        log(JSON.stringify({
-          statusCode: 409,
-          error: 'Conflict',
-          message: `Email '${email}' is already in use.`,
-        }, null, 2), '#f87171');
-        return;
-      }
+# Security: Never run containers as root!
+USER node
 
-      // Duplicate roll number check
-      if (mockExistingRolls.includes(roll)) {
-        log(`&cross; [StudentsService] Roll number duplicate!`, '#ef4444');
-        log(`HTTP/1.1 409 Conflict`, '#ef4444');
-        log(JSON.stringify({
-          statusCode: 409,
-          error: 'Conflict',
-          message: `Roll number '${roll}' already exists.`,
-        }, null, 2), '#f87171');
-        return;
-      }
+# Copy compiled artifacts and production dependencies
+COPY --chown=node:node --from=builder /app/package*.json ./
+COPY --chown=node:node --from=builder /app/node_modules ./node_modules
+COPY --chown=node:node --from=builder /app/dist ./dist
 
-      // Step 5: Password Hashing with Bcrypt & DB Insertion
-      log(`&check; [Bcrypt] Password hashed with 10 salt rounds ($2b$10$eY...).`, '#10b981');
-      log(`&check; [Database] User &amp; Student records created atomically.`, '#10b981');
+# Application Port
+EXPOSE 3000
 
-      // Success Response
-      log(`HTTP/1.1 201 Created`, '#10b981');
-      const resPayload = {
-        success: true,
-        message: 'Student registered successfully',
-        student: {
-          id: `std_${Date.now()}`,
-          firstName: fname,
-          lastName: lname,
-          rollNumber: roll,
-          department: dept,
-          enrollmentYear: year,
-          status: 'ACTIVE',
-        },
-        user: {
-          id: `usr_${Date.now()}`,
-          email: email,
-          role: 'STUDENT',
-        },
+# Start production server
+CMD ["node", "dist/main.js"]</code></pre>
+          </div>
+
+          <div>
+            <pre><span class="highlight-file">.dockerignore</span><code>node_modules
+dist
+.git
+.env
+.env.*
+*.log
+coverage
+test
+README.md</code></pre>
+
+            <div class="card" style="margin-top:1rem;">
+              <h3 style="color:var(--ok); font-size:1rem;">&#10004; Production Hardening Checklist</h3>
+              <ul style="font-size:.85rem; color:var(--muted); padding-left:1.2rem; line-height:1.7;">
+                <li><strong>Non-Root User:</strong> Explicitly invoke <code>USER node</code>.</li>
+                <li><strong>Image Size:</strong> Drops image size from 1.2GB down to &lt;140MB.</li>
+                <li><strong>Health Checks:</strong> Expose <code>GET /health</code> with <code>@nestjs/terminus</code>.
+                </li>
+                <li><strong>Process Management:</strong> NestJS handles SIGTERM gracefully for Kubernetes.</li>
+                <li><strong>Secrets:</strong> Mount via AWS Secrets Manager or Kubernetes Secrets.</li>
+              </ul>
+            </div>
+
+            <div class="callout callout-warn">
+              <strong>&#9888;&#65039; CRITICAL PITFALL: Root Execution:</strong>
+              Running containers as <code>root</code> gives anyone exploiting a remote code execution vulnerability root
+              privileges over the host container runtime.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 21: Full main.ts Production Configuration -->
+      <div class="slide" data-title="21. Master main.ts Configuration">
+        <div class="slide-header">
+          <h2>Master Production Bootstrap: main.ts</h2>
+          <span class="slide-step-badge">Architecture Synthesis</span>
+        </div>
+        <p>
+          The complete <code>src/main.ts</code> file synthesizing all security layers: Helmet, CORS, Global Validation
+          Pipe,
+          Exception Filters, Serialization Interceptors, Winston Logger, and conditional Swagger documentation.
+        </p>
+
+        <pre><span class="highlight-file">src/main.ts</span><code>import { NestFactory, Reflector } from '@nestjs/core';
+import { ValidationPipe, ClassSerializerInterceptor, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import helmet from 'helmet';
+import { AppModule } from './app.module';
+import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
+import { TransformInterceptor } from './common/interceptors/transform.interceptor';
+import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
+
+async function bootstrap() {
+  const logger = new Logger('Bootstrap');
+  const app = await NestFactory.create(AppModule);
+
+  const configService = app.get(ConfigService);
+  const port = configService.get&lt;number&gt;('PORT', 3000);
+  const nodeEnv = configService.get&lt;string&gt;('NODE_ENV', 'development');
+
+  // 1. Enable Graceful Shutdown hooks for container orchestrators (K8s/Docker)
+  app.enableShutdownHooks();
+
+  // 2. HTTP Security Headers with Helmet
+  app.use(helmet());
+
+  // 3. Strict Cross-Origin Resource Sharing (CORS)
+  app.enableCors({
+    origin: nodeEnv === 'production' ? ['https://sms-portal.university.edu'] : true,
+    methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+    credentials: true,
+  });
+
+  // 4. Global API Prefix
+  app.setGlobalPrefix('api/v1');
+
+  // 5. Global Validation Pipe
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,              // Strips unexpected fields injected by callers
+      forbidNonWhitelisted: true,  // Rejects requests with unexpected fields
+      transform: true,             // Coerces primitives automatically
+      transformOptions: { enableImplicitConversion: true },
+    }),
+  );
+
+  // 6. Global Interceptors (Serialization &amp; Envelope)
+  app.useGlobalInterceptors(
+    new ClassSerializerInterceptor(app.get(Reflector)),
+    new TransformInterceptor(),
+    new LoggingInterceptor(),
+  );
+
+  // 7. Global Centralized Exception Filter
+  app.useGlobalFilters(new AllExceptionsFilter());
+
+  // 8. OpenAPI Swagger Documentation (Active in dev/test, disabled in prod)
+  if (nodeEnv !== 'production') {
+    const swaggerConfig = new DocumentBuilder()
+      .setTitle('Student Management API')
+      .setDescription('Enterprise Student Administration REST API with JWT Auth and RBAC')
+      .setVersion('1.0.0')
+      .addBearerAuth({ type: 'http', scheme: 'bearer', bearerFormat: 'JWT' }, 'JWT-auth')
+      .build();
+    const document = SwaggerModule.createDocument(app, swaggerConfig);
+    SwaggerModule.setup('api/docs', app, document);
+    logger.log(`Swagger documentation running at: http://localhost:${port}/api/docs`);
+  }
+
+  // 9. Bind server to 0.0.0.0 to accept container traffic
+  await app.listen(port, '0.0.0.0');
+  logger.log(`Application successfully listening on port ${port} [Env: ${nodeEnv}]`);
+}
+bootstrap();</code></pre>
+
+        <div class="callout callout-info" style="margin-top:1rem;">
+          <strong>&#128161; TIP: Listen on 0.0.0.0 in Docker:</strong>
+          Always pass <code>'0.0.0.0'</code> as the host parameter in <code>app.listen(port, '0.0.0.0')</code>. Binding
+          to default <code>localhost</code> (127.0.0.1) prevents Docker and Kubernetes ingress controllers from reaching
+          the container!
+        </div>
+      </div>
+
+      <!-- SLIDE 22: Interactive API Simulator -->
+      <div class="slide" data-title="22. Interactive API Simulator">
+        <div class="slide-header">
+          <h2>Interactive Student Registration Simulator</h2>
+          <span class="slide-step-badge">Live Interactive Testbench</span>
+        </div>
+        <p style="font-size:.9rem; color:var(--muted); margin-bottom:1rem;">
+          Test the complete NestJS pipeline live! Switch roles, modify form values, and trigger simulated requests
+          to observe the exact execution flow through <strong>JwtAuthGuard</strong>, <strong>RolesGuard</strong>,
+          <strong>ValidationPipe</strong>, and <strong>StudentsService</strong>.
+        </p>
+
+        <div class="sim-box">
+          <div class="sim-inputs">
+            <div class="sim-group">
+              <label>Acting User Role (JWT):</label>
+              <select id="sim-role">
+                <option value="ADMIN">ADMIN (Registrar / Dean) - Authorized</option>
+                <option value="TEACHER">TEACHER - Unauthorized (403)</option>
+                <option value="STUDENT">STUDENT - Unauthorized (403)</option>
+                <option value="ANONYMOUS">ANONYMOUS (No Token) - Unauthorized (401)</option>
+              </select>
+            </div>
+            <div class="sim-group">
+              <label>First Name:</label>
+              <input type="text" id="sim-fname" value="Alex">
+            </div>
+            <div class="sim-group">
+              <label>Last Name:</label>
+              <input type="text" id="sim-lname" value="Rivera">
+            </div>
+            <div class="sim-group">
+              <label>Email Address:</label>
+              <input type="text" id="sim-email" value="alex.rivera@university.edu">
+            </div>
+            <div class="sim-group">
+              <label>Password (min 8 chars):</label>
+              <input type="text" id="sim-pass" value="Secret123!">
+            </div>
+            <div class="sim-group">
+              <label>Roll Number (CS-YYYY-XXX):</label>
+              <input type="text" id="sim-roll" value="CS-2026-042">
+            </div>
+            <div class="sim-group">
+              <label>Department:</label>
+              <select id="sim-dept">
+                <option value="Computer Science">Computer Science</option>
+                <option value="Electrical Engineering">Electrical Engineering</option>
+                <option value="Data Science">Data Science</option>
+              </select>
+            </div>
+            <div class="sim-group">
+              <label>Enrollment Year:</label>
+              <input type="number" id="sim-year" value="2026">
+            </div>
+          </div>
+
+          <div style="display:flex; flex-wrap:wrap; gap:.65rem; margin-bottom:1rem;">
+            <button class="btn btn-accent" onclick="runSimulatedRegister()">
+              &#9654; POST /api/v1/students/register
+            </button>
+            <button class="btn" onclick="injectInvalidEmail()">
+              Test Invalid Email (400)
+            </button>
+            <button class="btn" onclick="injectShortPassword()">
+              Test Short Password (400)
+            </button>
+            <button class="btn" onclick="injectDuplicateEmail()">
+              Test Duplicate Email (409)
+            </button>
+          </div>
+
+          <div class="sim-log-terminal" id="sim-terminal">
+            <span style="color:var(--muted);">// Ready. Select role, adjust inputs, and click 'POST
+              /api/v1/students/register'...</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 23: Code Quality Pitfalls & Anti-Patterns Cheatsheet -->
+      <div class="slide" data-title="23. Pitfalls & Anti-Patterns">
+        <div class="slide-header">
+          <h2>Code Quality Pitfalls &amp; Anti-Patterns Cheatsheet</h2>
+          <span class="slide-step-badge">Production Cheatsheet</span>
+        </div>
+        <p style="margin-bottom:1rem;">
+          A high-impact comparative reference contrasting battle-tested NestJS patterns against common beginner
+          mistakes.
+        </p>
+
+        <div class="grid-2">
+          <div class="card" style="border-left:4px solid var(--ok);">
+            <h3 style="color:var(--ok);">&#10004; The Do's (Production Best Practices)</h3>
+            <ul style="font-size:.85rem; color:var(--text); padding-left:1.2rem; line-height:1.75; margin:0;">
+              <li><strong>Thin Controllers:</strong> Controllers only handle HTTP verbs, status codes, and call
+                services.</li>
+              <li><strong>Bcrypt Hashing:</strong> Always hash passwords using 10-12 salt rounds before persisting to
+                database.</li>
+              <li><strong>ConfigService + Joi:</strong> Validate all environment variables on startup so the app fails
+                fast if keys are missing.</li>
+              <li><strong>Structured Logger:</strong> Use <code>new Logger(ClassName.name)</code> or Winston for
+                searchable, categorized logs.</li>
+              <li><strong>Database Migrations:</strong> Use versioned TypeORM migrations with
+                <code>synchronize: false</code>.
+              </li>
+              <li><strong>Throttler Guard:</strong> Apply rate limits (5 req/min on login) to prevent brute-force
+                attacks.</li>
+              <li><strong>ClassSerializerInterceptor:</strong> Automatically strip <code>@Exclude()</code> fields to
+                protect password hashes.</li>
+              <li><strong>Boundary Unit &amp; E2E Tests:</strong> Test business logic with Jest mocks and endpoints with
+                Supertest.</li>
+              <li><strong>API Versioning:</strong> Always version endpoints using
+                <code>app.setGlobalPrefix('api/v1')</code>.
+              </li>
+              <li><strong>Strict DTOs:</strong> Use <code>whitelist: true</code> and
+                <code>forbidNonWhitelisted: true</code> to stop mass-assignment.
+              </li>
+            </ul>
+          </div>
+
+          <div class="card" style="border-left:4px solid var(--err);">
+            <h3 style="color:var(--err);">&#10008; The Don'ts (Dangerous Anti-Patterns)</h3>
+            <ul style="font-size:.85rem; color:var(--text); padding-left:1.2rem; line-height:1.75; margin:0;">
+              <li><strong>Fat Controllers:</strong> Writing raw SQL, password hashing, or loops directly in controller
+                methods.</li>
+              <li><strong>Plaintext Passwords:</strong> Persisting raw passwords or using weak md5/sha1 hashing
+                algorithms.</li>
+              <li><strong>Hardcoded Secrets:</strong> Inlining database passwords or JWT secrets directly into
+                TypeScript files.</li>
+              <li><strong>console.log():</strong> Scattering console prints without timestamps, log levels, or
+                correlation IDs.</li>
+              <li><strong>synchronize: true in Prod:</strong> Auto-syncing schemas drops columns and permanently deletes
+                production data.</li>
+              <li><strong>No Rate Limiting:</strong> Leaving endpoints open to automated brute-force password stuffing.
+              </li>
+              <li><strong>Raw Entity Returns:</strong> Forgetting serializer interceptors, allowing password hashes to
+                leak in JSON.</li>
+              <li><strong>Zero Tests:</strong> Deploying without automated unit and E2E regression tests.</li>
+              <li><strong>Unversioned APIs:</strong> Breaking existing mobile and web clients when endpoint signatures
+                change.</li>
+              <li><strong>Loose Any Payloads:</strong> Typing bodies as <code>any</code>, enabling parameter tampering
+                and script injection.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 24: Summary & Learning Path -->
+      <div class="slide" data-title="24. Summary & Learning Path">
+        <div class="slide-header">
+          <h2>Summary &amp; Advanced Learning Roadmap</h2>
+          <span class="slide-step-badge">Course Graduation</span>
+        </div>
+        <p style="font-size:1.05rem; color:#e2e8f0; margin-bottom:1rem;">
+          Congratulations! You have mastered the complete architectural pipeline to build, test, and deploy
+          enterprise-grade NestJS REST APIs with production-grade security and reliability.
+        </p>
+
+        <div class="grid-3">
+          <div class="card">
+            <h3 style="color:var(--accent-light);">&#127942; What You Mastered</h3>
+            <ul style="font-size:.85rem; color:var(--muted); padding-left:1.2rem; line-height:1.6;">
+              <li>NestJS Lifecycle &amp; Dependency Injection</li>
+              <li>TypeORM Entities, Relations &amp; Migrations</li>
+              <li>DTO Validation &amp; Mass-Assignment Defense</li>
+              <li>JWT Auth &amp; Role-Based Access Control (RBAC)</li>
+              <li>Centralized Filters &amp; Correlation IDs</li>
+              <li>Interceptors &amp; Performance Logging</li>
+              <li>Jest Unit &amp; Supertest E2E Testing</li>
+              <li>Multi-Stage Docker &amp; Cloud Deployment</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <h3 style="color:var(--cyan);">&#128640; Next Architectural Horizons</h3>
+            <ul style="font-size:.85rem; color:var(--muted); padding-left:1.2rem; line-height:1.6;">
+              <li><strong>Microservices:</strong> Decouple domains via RabbitMQ, Kafka, or NATS message brokers.</li>
+              <li><strong>GraphQL Federation:</strong> Combine multiple NestJS subgraphs with Apollo Federation.</li>
+              <li><strong>Caching with Redis:</strong> Accelerate read queries using
+                <code>cache-manager-redis-store</code>.
+              </li>
+              <li><strong>WebSockets:</strong> Real-time student alerts and live class chats via Socket.io gateways.
+              </li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <h3 style="color:var(--ok);">&#128218; Companion Brush-Up Guides</h3>
+            <p style="font-size:.85rem; color:var(--muted); line-height:1.6;">
+              Solidify your fullstack knowledge with our other interactive guides:
+            </p>
+            <div style="display:flex; flex-direction:column; gap:.5rem; margin-top:.6rem;">
+              <a href="typescript-brush-up.html" class="btn" style="text-decoration:none; justify-content:center;">
+                &#128200; TypeScript Brush-Up Guide
+              </a>
+              <a href="nextjs-brush-up.html" class="btn" style="text-decoration:none; justify-content:center;">
+                &#9889; Next.js 14+ Fullstack Guide
+              </a>
+              <a href="javascript-brush-up.html" class="btn" style="text-decoration:none; justify-content:center;">
+                &#128187; Modern JavaScript (ES6+) Guide
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="callout callout-nest" style="margin-top:1.5rem;">
+          <strong>&#127881; You're Ready to Ship:</strong>
+          Clone the patterns from this guide, hook up your PostgreSQL database, and build your next production API with
+          confidence!
+        </div>
+      </div>
+
+    </div>
+
+    <!-- SLIDER FOOTER BAR -->
+    <footer class="slider-footer">
+      <div class="controls-left">
+        <button class="btn" id="btn-prev" onclick="prevSlide()">
+          &larr; Previous
+        </button>
+        <button class="btn btn-accent" id="btn-next" onclick="nextSlide()">
+          Next &rarr;
+        </button>
+      </div>
+
+      <div class="slide-dots" id="dots-container"></div>
+
+      <div class="controls-right">
+        <span class="slide-num" id="slide-indicator">Slide 1 of 24</span>
+        <button class="btn" onclick="toggleFullscreen()" title="Toggle Fullscreen">
+          &#x26F6;
+        </button>
+      </div>
+    </footer>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- CONTINUOUS READER MODE (Alternative View)  -->
+  <!-- ========================================== -->
+  <div id="scroll-mode">
+    <div style="margin-bottom:2rem; border-bottom:1px solid var(--border); padding-bottom:1rem;">
+      <h1 style="color:#fff; margin-top:0;">NestJS API Architecture &amp; Student Registration Guide</h1>
+      <p style="color:var(--muted);">Continuous reading mode of all 24 masterclass tutorial slides.</p>
+      <button class="btn btn-accent" onclick="toggleViewMode()">
+        &larr; Return to Slide Deck Presentation
+      </button>
+    </div>
+    <div id="scroll-content"></div>
+  </div>
+
+  <script>
+    // SLIDES DATA & LOGIC
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    const totalSlides = slides.length;
+    let currentSlide = 0;
+    let isReaderMode = false;
+
+    const dotsContainer = document.getElementById('dots-container');
+    const slideIndicator = document.getElementById('slide-indicator');
+    const progressBar = document.getElementById('progress-bar');
+    const tocList = document.getElementById('toc-list');
+    const scrollContent = document.getElementById('scroll-content');
+
+    // Initialize Dots, Drawer TOC, and Reader Mode Copy
+    slides.forEach((slide, idx) => {
+      // 1. Footer Dot
+      const dot = document.createElement('div');
+      dot.className = `dot ${idx === 0 ? 'active' : ''}`;
+      dot.title = slide.getAttribute('data-title') || `Slide ${idx + 1}`;
+      dot.onclick = () => goToSlide(idx);
+      dotsContainer.appendChild(dot);
+
+      // 2. Drawer TOC Item
+      const tocItem = document.createElement('div');
+      tocItem.className = `toc-item ${idx === 0 ? 'active' : ''}`;
+      tocItem.textContent = slide.getAttribute('data-title') || `Slide ${idx + 1}`;
+      tocItem.onclick = () => {
+        goToSlide(idx);
+        toggleDrawer(false);
       };
-      log(JSON.stringify(resPayload, null, 2), '#34d399');
+      tocList.appendChild(tocItem);
 
-      // Track registered items
-      mockExistingEmails.push(email);
-      mockExistingRolls.push(roll);
-    }, 450);
-  }
+      // 3. Populate Continuous Reader Section
+      const docSec = document.createElement('div');
+      docSec.className = 'doc-section';
+      docSec.id = `doc-sec-${idx}`;
+      docSec.innerHTML = slide.innerHTML;
+      scrollContent.appendChild(docSec);
+    });
 
-  function injectInvalidEmail() {
-    document.getElementById('sim-email').value = 'not-an-email';
-    runSimulatedRegister();
-  }
+    function updateSlideUI() {
+      slides.forEach((s, i) => {
+        s.classList.toggle('active', i === currentSlide);
+      });
 
-  function injectShortPassword() {
-    document.getElementById('sim-pass').value = '123';
-    runSimulatedRegister();
-  }
+      const dots = document.querySelectorAll('.dot');
+      dots.forEach((d, i) => d.classList.toggle('active', i === currentSlide));
 
-  function injectDuplicateEmail() {
-    document.getElementById('sim-email').value = 'existing.student@university.edu';
-    runSimulatedRegister();
-  }
+      const tocItems = document.querySelectorAll('.toc-item');
+      tocItems.forEach((t, i) => t.classList.toggle('active', i === currentSlide));
 
-  // Initialize UI
-  updateSlideUI();
-</script>
+      slideIndicator.textContent = `Slide ${currentSlide + 1} of ${totalSlides}`;
+      const pct = ((currentSlide + 1) / totalSlides) * 100;
+      progressBar.style.width = `${pct}%`;
+
+      // Disable/Enable buttons
+      document.getElementById('btn-prev').disabled = currentSlide === 0;
+      document.getElementById('btn-next').disabled = currentSlide === totalSlides - 1;
+    }
+
+    function goToSlide(index) {
+      if (index >= 0 && index < totalSlides) {
+        currentSlide = index;
+        updateSlideUI();
+      }
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides - 1) {
+        goToSlide(currentSlide + 1);
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 0) {
+        goToSlide(currentSlide - 1);
+      }
+    }
+
+    // KEYBOARD NAVIGATION
+    window.addEventListener('keydown', (e) => {
+      if (isReaderMode) return;
+      if (e.key === 'ArrowRight' || e.key === ' ') {
+        if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'SELECT') {
+          e.preventDefault();
+          nextSlide();
+        }
+      } else if (e.key === 'ArrowLeft') {
+        if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'SELECT') {
+          e.preventDefault();
+          prevSlide();
+        }
+      } else if (e.key === 'Escape') {
+        toggleDrawer(false);
+      }
+    });
+
+    // DRAWER TOGGLE
+    function toggleDrawer(force) {
+      const drawer = document.getElementById('toc-drawer');
+      const overlay = document.getElementById('drawer-overlay');
+      const isOpen = force !== undefined ? force : !drawer.classList.contains('open');
+      drawer.classList.toggle('open', isOpen);
+      overlay.classList.toggle('open', isOpen);
+    }
+
+    // VIEW MODE TOGGLE (SLIDES vs DOCUMENT)
+    function toggleViewMode() {
+      isReaderMode = !isReaderMode;
+      const sliderMode = document.getElementById('slider-mode');
+      const scrollMode = document.getElementById('scroll-mode');
+      const btn = document.getElementById('btn-toggle-view');
+
+      if (isReaderMode) {
+        sliderMode.style.display = 'none';
+        scrollMode.style.display = 'block';
+        btn.innerHTML = '&#128187; Slide Deck View';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        sliderMode.style.display = 'flex';
+        scrollMode.style.display = 'none';
+        btn.innerHTML = '&#128196; Reader View';
+        updateSlideUI();
+      }
+    }
+
+    // FULLSCREEN TOGGLE
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => { });
+      } else {
+        document.exitFullscreen().catch(() => { });
+      }
+    }
+
+    // ==========================================
+    // INTERACTIVE API SIMULATOR ENGINE (Slide 22)
+    // ==========================================
+    const mockExistingEmails = ['existing.student@university.edu'];
+    const mockExistingRolls = ['CS-2026-001'];
+
+    function runSimulatedRegister() {
+      const role = document.getElementById('sim-role').value;
+      const fname = document.getElementById('sim-fname').value.trim();
+      const lname = document.getElementById('sim-lname').value.trim();
+      const email = document.getElementById('sim-email').value.trim();
+      const pass = document.getElementById('sim-pass').value;
+      const roll = document.getElementById('sim-roll').value.trim();
+      const dept = document.getElementById('sim-dept').value;
+      const year = parseInt(document.getElementById('sim-year').value, 10);
+
+      const term = document.getElementById('sim-terminal');
+      term.innerHTML = '';
+
+      const log = (msg, color = '#e2e8f0') => {
+        const line = document.createElement('div');
+        line.style.color = color;
+        line.style.padding = '2px 0';
+        line.innerHTML = msg;
+        term.appendChild(line);
+        term.scrollTop = term.scrollHeight;
+      };
+
+      log(`[HTTP Request] POST /api/v1/students/register`, '#38bdf8');
+      log(`&bull; Headers: Authorization: Bearer &lt;JWT role="${role}"&gt;`, '#94a3b8');
+
+      // Step 1: JWT Authentication Guard Check
+      if (role === 'ANONYMOUS') {
+        setTimeout(() => {
+          log(`&cross; [JwtAuthGuard] Missing Bearer Token!`, '#ef4444');
+          log(`HTTP/1.1 401 Unauthorized`, '#ef4444');
+          log(JSON.stringify({
+            statusCode: 401,
+            message: 'Unauthorized: Bearer token is missing or invalid',
+          }, null, 2), '#f87171');
+        }, 200);
+        return;
+      }
+
+      // Step 2: RolesGuard (RBAC) Check
+      if (role !== 'ADMIN') {
+        setTimeout(() => {
+          log(`&check; [JwtAuthGuard] Token verified for role: ${role}`, '#10b981');
+          log(`&cross; [RolesGuard] Route requires @Roles(Role.ADMIN). User has '${role}'`, '#ef4444');
+          log(`HTTP/1.1 403 Forbidden`, '#ef4444');
+          log(JSON.stringify({
+            statusCode: 403,
+            error: 'Forbidden',
+            message: 'Forbidden: Insufficient role permissions.',
+          }, null, 2), '#f87171');
+        }, 250);
+        return;
+      }
+
+      log(`&check; [JwtAuthGuard] Token verified. Role: ${role}`, '#10b981');
+      log(`&check; [RolesGuard] Role check passed (User is ADMIN)`, '#10b981');
+
+      // Step 3: ValidationPipe (DTO Check)
+      const validationErrors = [];
+      if (!email.includes('@') || !email.includes('.')) {
+        validationErrors.push('Must be a valid educational or personal email');
+      }
+      if (pass.length < 8) {
+        validationErrors.push('Password must be at least 8 characters long');
+      }
+      if (!fname) validationErrors.push('First name is required');
+      if (!lname) validationErrors.push('Last name is required');
+      if (!roll) validationErrors.push('Roll number cannot be empty');
+      if (isNaN(year) || year < 2020 || year > 2035) {
+        validationErrors.push('enrollmentYear must be between 2020 and 2035');
+      }
+
+      if (validationErrors.length > 0) {
+        setTimeout(() => {
+          log(`&cross; [ValidationPipe] DTO schema check failed!`, '#ef4444');
+          log(`HTTP/1.1 400 Bad Request`, '#ef4444');
+          log(JSON.stringify({
+            statusCode: 400,
+            error: 'Bad Request',
+            message: validationErrors,
+          }, null, 2), '#f87171');
+        }, 350);
+        return;
+      }
+
+      log(`&check; [ValidationPipe] DTO valid and sanitized.`, '#10b981');
+
+      // Step 4: Controller delegates to StudentsService
+      setTimeout(() => {
+        log(`&bull; [StudentsController] Invoking studentsService.registerStudent()...`, '#94a3b8');
+
+        // Duplicate email check
+        if (mockExistingEmails.includes(email)) {
+          log(`&cross; [StudentsService] Email conflict found!`, '#ef4444');
+          log(`HTTP/1.1 409 Conflict`, '#ef4444');
+          log(JSON.stringify({
+            statusCode: 409,
+            error: 'Conflict',
+            message: `Email '${email}' is already in use.`,
+          }, null, 2), '#f87171');
+          return;
+        }
+
+        // Duplicate roll number check
+        if (mockExistingRolls.includes(roll)) {
+          log(`&cross; [StudentsService] Roll number duplicate!`, '#ef4444');
+          log(`HTTP/1.1 409 Conflict`, '#ef4444');
+          log(JSON.stringify({
+            statusCode: 409,
+            error: 'Conflict',
+            message: `Roll number '${roll}' already exists.`,
+          }, null, 2), '#f87171');
+          return;
+        }
+
+        // Step 5: Password Hashing with Bcrypt & DB Insertion
+        log(`&check; [Bcrypt] Password hashed with 10 salt rounds ($2b$10$eY...).`, '#10b981');
+        log(`&check; [Database] User &amp; Student records created atomically inside transaction.`, '#10b981');
+
+        // Success Response
+        log(`HTTP/1.1 201 Created`, '#10b981');
+        const resPayload = {
+          success: true,
+          statusCode: 201,
+          timestamp: new Date().toISOString(),
+          data: {
+            message: 'Student registered successfully',
+            student: {
+              id: `std_${Date.now()}`,
+              rollNumber: roll,
+              firstName: fname,
+              lastName: lname,
+              department: dept,
+              enrollmentYear: year,
+              status: 'ACTIVE',
+            },
+            user: {
+              id: `usr_${Date.now()}`,
+              email: email,
+              role: 'STUDENT',
+            },
+          },
+        };
+        log(JSON.stringify(resPayload, null, 2), '#34d399');
+
+        // Track registered items
+        mockExistingEmails.push(email);
+        mockExistingRolls.push(roll);
+      }, 450);
+    }
+
+    function injectInvalidEmail() {
+      document.getElementById('sim-email').value = 'not-an-email';
+      runSimulatedRegister();
+    }
+
+    function injectShortPassword() {
+      document.getElementById('sim-pass').value = '123';
+      runSimulatedRegister();
+    }
+
+    function injectDuplicateEmail() {
+      document.getElementById('sim-email').value = 'existing.student@university.edu';
+      runSimulatedRegister();
+    }
+
+    // Initialize UI
+    updateSlideUI();
+  </script>
 </body>
+
 </html>
