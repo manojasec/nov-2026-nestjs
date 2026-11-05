@@ -13,7 +13,7 @@ import { Student } from './students/entities/student.entity.js';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
-        type: 'postgres',
+        type: 'postgres', //   type: 'mysql',
         host: "localhost",//config.get<string>('DB_HOST'),
         port: 5432, //config.get<number>('DB_PORT'),
         username: "postgres", //config.get<string>('DB_USERNAME'),

@@ -3,3 +3,6 @@ run below in command prompt
 
 npm install --save @nestjs/typeorm typeorm pg @nestjs/config
 
+for mysql use below 
+
+ npm install --save @nestjs/typeorm typeorm mysql2 @nestjs/config
