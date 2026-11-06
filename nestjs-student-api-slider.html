@@ -7,26 +7,26 @@
   <title>NestJS API Architecture &amp; Student Registration Masterclass</title>
   <style>
     :root {
-      --bg: #090d16;
-      --panel: #111827;
-      --panel-card: #162032;
-      --panel-hover: #1f2d45;
-      --text: #f1f5f9;
-      --muted: #94a3b8;
+      --bg: #f8fafc;
+      --panel: #ffffff;
+      --panel-card: #f1f5f9;
+      --panel-hover: #e2e8f0;
+      --text: #0f172a;
+      --muted: #475569;
       --accent: #e0234e;
       /* NestJS Signature Red/Crimson */
-      --accent-light: #ff4d6d;
-      --accent-glow: rgba(224, 35, 78, 0.25);
-      --cyan: #38bdf8;
-      --border: #243044;
-      --border-light: #334155;
-      --code-bg: #030712;
-      --ok: #10b981;
-      --err: #ef4444;
-      --warn: #f59e0b;
-      --admin-badge: #8b5cf6;
-      --teacher-badge: #3b82f6;
-      --student-badge: #10b981;
+      --accent-light: #be123c;
+      --accent-glow: rgba(224, 35, 78, 0.12);
+      --cyan: #0369a1;
+      --border: #e2e8f0;
+      --border-light: #cbd5e1;
+      --code-bg: #0f172a;
+      --ok: #059669;
+      --err: #dc2626;
+      --warn: #b45309;
+      --admin-badge: #7c3aed;
+      --teacher-badge: #2563eb;
+      --student-badge: #059669;
     }
 
     * {
@@ -49,9 +49,10 @@
       left: 0;
       right: 0;
       height: 56px;
-      background: rgba(17, 24, 39, 0.95);
+      background: rgba(255,255,255,0.97);
       backdrop-filter: blur(8px);
       border-bottom: 1px solid var(--border);
+      box-shadow: 0 1px 8px rgba(0,0,0,0.08);
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -65,7 +66,7 @@
       gap: .65rem;
       font-weight: 700;
       font-size: 1.05rem;
-      color: #fff;
+      color: #0f172a;
       text-decoration: none;
     }
 
@@ -79,7 +80,7 @@
       justify-content: center;
       font-size: .95rem;
       font-weight: 900;
-      color: #fff;
+      color: #0f172a;
       box-shadow: 0 0 12px var(--accent-glow);
     }
 
@@ -90,7 +91,7 @@
     }
 
     .btn {
-      background: #1e293b;
+      background: #f1f5f9;
       color: var(--text);
       border: 1px solid var(--border);
       padding: .35rem .8rem;
@@ -108,12 +109,12 @@
     .btn:hover {
       background: var(--panel-hover);
       border-color: var(--muted);
-      color: #fff;
+      color: var(--text);
     }
 
     .btn-accent {
       background: var(--accent);
-      color: #fff;
+      color: #0f172a;
       border-color: var(--accent-light);
     }
 
@@ -200,7 +201,7 @@
 
     .slide-header h2 {
       margin: 0;
-      color: #fff;
+      color: #0f172a;
       font-size: 1.6rem;
       display: flex;
       align-items: center;
@@ -229,9 +230,10 @@
     .slider-footer {
       position: sticky;
       bottom: 0;
-      background: rgba(17, 24, 39, 0.95);
+      background: rgba(255,255,255,0.97);
       backdrop-filter: blur(8px);
       border-top: 1px solid var(--border);
+      box-shadow: 0 -1px 8px rgba(0,0,0,0.06);
       padding: .75rem 1.5rem;
       display: flex;
       align-items: center;
@@ -297,12 +299,12 @@
     p code,
     li code,
     td code {
-      background: var(--code-bg);
+      background: #f1f5f9;
       padding: 2px 6px;
       border-radius: 4px;
-      color: #f472b6;
+      color: #be123c;
       font-size: .9em;
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      border: 1px solid #e2e8f0;
     }
 
     .highlight-file {
@@ -332,6 +334,10 @@
       gap: 1rem;
     }
 
+    @media (max-width: 1100px) {
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+
     @media (max-width: 900px) {
 
       .grid-2,
@@ -357,7 +363,7 @@
 
     .card h3 {
       margin-top: 0;
-      color: #fff;
+      color: #0f172a;
       font-size: 1.1rem;
       display: flex;
       align-items: center;
@@ -373,21 +379,21 @@
     }
 
     .callout-info {
-      background: rgba(56, 189, 248, 0.1);
+      background: rgba(3,105,161,0.07);
       border-left: 4px solid var(--cyan);
-      color: #e0f2fe;
+      color: #0c4a6e;
     }
 
     .callout-warn {
-      background: rgba(245, 158, 11, 0.1);
+      background: rgba(180,83,9,0.08);
       border-left: 4px solid var(--warn);
-      color: #fef3c7;
+      color: #78350f;
     }
 
     .callout-nest {
-      background: rgba(224, 35, 78, 0.1);
+      background: rgba(224,35,78,0.07);
       border-left: 4px solid var(--accent);
-      color: #ffe4e6;
+      color: #881337;
     }
 
     /* ROLES BADGES */
@@ -401,21 +407,21 @@
     }
 
     .role-admin {
-      background: rgba(139, 92, 246, 0.2);
-      color: #c4b5fd;
-      border: 1px solid #8b5cf6;
+      background: rgba(124,58,237,0.1);
+      color: #5b21b6;
+      border: 1px solid #7c3aed;
     }
 
     .role-teacher {
-      background: rgba(59, 130, 246, 0.2);
-      color: #93c5fd;
-      border: 1px solid #3b82f6;
+      background: rgba(37,99,235,0.1);
+      color: #1e40af;
+      border: 1px solid #2563eb;
     }
 
     .role-student {
-      background: rgba(16, 185, 129, 0.2);
-      color: #6ee7b7;
-      border: 1px solid #10b981;
+      background: rgba(5,150,105,0.1);
+      color: #065f46;
+      border: 1px solid #059669;
     }
 
     /* LIFECYCLE FLOW STEPS */
@@ -428,7 +434,7 @@
     }
 
     .flow-node {
-      background: var(--panel-card);
+      background: #f8fafc;
       border: 1px solid var(--border);
       padding: .6rem .9rem;
       border-radius: 8px;
@@ -441,7 +447,7 @@
     .flow-node.active-node {
       border-color: var(--accent);
       background: rgba(224, 35, 78, 0.15);
-      color: #fff;
+      color: #0f172a;
       box-shadow: 0 0 10px var(--accent-glow);
     }
 
@@ -453,7 +459,7 @@
 
     /* SIMULATOR CARD */
     .sim-box {
-      background: #030712;
+      background: #f8fafc;
       border: 1px solid var(--border);
       border-radius: 8px;
       padding: 1.25rem;
@@ -478,9 +484,9 @@
     .sim-group input,
     .sim-group select {
       width: 100%;
-      background: #111827;
+      background: #ffffff;
       border: 1px solid var(--border);
-      color: #fff;
+      color: #0f172a;
       padding: .45rem .65rem;
       border-radius: 6px;
       font-size: .86rem;
@@ -493,7 +499,7 @@
     }
 
     .sim-log-terminal {
-      background: #020617;
+      background: #0f172a;
       border: 1px solid var(--border);
       border-radius: 6px;
       padding: .85rem;
@@ -527,8 +533,9 @@
       left: -340px;
       width: 320px;
       bottom: 0;
-      background: var(--panel);
+      background: #ffffff;
       border-right: 1px solid var(--border);
+      box-shadow: 4px 0 20px rgba(0,0,0,0.08);
       z-index: 1050;
       transition: left .25s ease;
       padding: 1.25rem 1rem;
@@ -573,6 +580,50 @@
     .drawer-overlay.open {
       display: block;
     }
+  
+  /* Code-stacked grids: always full-width */
+  .grid-2.code-stack {
+    display: block;
+  }
+  .grid-2.code-stack > div,
+  .grid-2.code-stack > pre {
+    margin-bottom: 1rem;
+  }
+
+  /* ── Dark Mode ─────────────────────────── */
+  body.dark-mode {
+    --bg: #090d16; --panel: #111827; --panel-card: #162032;
+    --panel-hover: #1f2d45; --text: #f1f5f9; --muted: #94a3b8;
+    --accent: #e0234e; --accent-light: #ff4d6d;
+    --accent-glow: rgba(224,35,78,0.25); --cyan: #38bdf8;
+    --border: #243044; --border-light: #334155; --code-bg: #030712;
+    --ok: #10b981; --err: #ef4444; --warn: #f59e0b;
+  }
+  body.dark-mode .btn { background:#1e293b; color:#f1f5f9; border-color:#243044; }
+  body.dark-mode .btn:hover { background:#1f2d45; color:#fff; }
+  body.dark-mode header.top-bar,
+  body.dark-mode footer.slider-footer { background:rgba(17,24,39,0.95); box-shadow:none; }
+  body.dark-mode .brand { color:#fff !important; }
+  body.dark-mode .card h3,
+  body.dark-mode .slide-header h2 { color:#fff !important; }
+  body.dark-mode h3 { color:#fff !important; }
+  body.dark-mode h2 { color:#fff !important; }
+  body.dark-mode p { color:var(--text); }
+  body.dark-mode .callout-info { background:rgba(56,189,248,0.1); color:#e0f2fe; }
+  body.dark-mode .callout-warn { background:rgba(245,158,11,0.1); color:#fef3c7; }
+  body.dark-mode .callout-nest { background:rgba(224,35,78,0.1); color:#ffe4e6; }
+  body.dark-mode p code, body.dark-mode li code, body.dark-mode td code {
+    background:#030712; color:#f472b6; border-color:rgba(255,255,255,0.08);
+  }
+  body.dark-mode .role-admin { background:rgba(139,92,246,0.2); color:#c4b5fd; border-color:#8b5cf6; }
+  body.dark-mode .role-teacher { background:rgba(59,130,246,0.2); color:#93c5fd; border-color:#3b82f6; }
+  body.dark-mode .role-student { background:rgba(16,185,129,0.2); color:#6ee7b7; border-color:#10b981; }
+  body.dark-mode .sim-box { background:#030712 !important; }
+  body.dark-mode .sim-group input, body.dark-mode .sim-group select { background:#111827; color:#fff; border-color:#243044; }
+  body.dark-mode .toc-drawer { background:#111827; box-shadow:10px 0 30px rgba(0,0,0,0.6); }
+  body.dark-mode .flow-node { background:var(--panel-card); }
+  body.dark-mode .dot { background:#334155; }
+
   </style>
 </head>
 
@@ -589,6 +640,7 @@
       <button class="btn" id="btn-toc" onclick="toggleDrawer()">
         &#9776; Contents
       </button>
+      <button class="btn" id="btn-theme" onclick="toggleTheme()" title="Switch to Dark Mode" style="font-size:1.1rem;padding:.28rem .55rem;">&#9790;</button>
       <button class="btn" id="btn-toggle-view" onclick="toggleViewMode()">
         &#128196; Reader View
       </button>
@@ -629,7 +681,7 @@
           </h2>
           <span class="slide-step-badge">Case Study: Student Management API</span>
         </div>
-        <p style="font-size:1.05rem; color:#e2e8f0; margin-bottom:1rem;">
+        <p style="font-size:1.05rem; color:#1e293b; margin-bottom:1rem;">
           Welcome to this complete, cookbook-style masterclass on architecting, implementing, and securing a
           battle-tested
           <strong>Student Management System (SMS) REST API</strong> using <strong>NestJS</strong>,
@@ -671,7 +723,7 @@
         </div>
 
         <div class="card" style="margin-top:1.2rem;">
-          <h3 style="color:#fff;">&#128506;&#65039; Complete 24-Step Learning Roadmap</h3>
+          <h3 style="color:#0f172a;">&#128506;&#65039; Complete 24-Step Learning Roadmap</h3>
           <div class="flow-row" style="flex-wrap:wrap; gap:.5rem;">
             <span class="flow-node">1. Roadmap</span>
             <span class="flow-arrow">&rarr;</span>
@@ -812,25 +864,53 @@
           standardized boilerplate in seconds.
         </p>
 
-        <pre><span class="highlight-file">terminal</span><code># 1. Install the official NestJS CLI globally
+        <div class="callout callout-nest" style="margin-bottom:.8rem;">
+          <strong>&#128218; Cookbook Style:</strong> We install in <strong>3 phases</strong> so you understand <em>why</em> each dependency exists before adding the next layer.
+        </div>
+
+        <div class="grid-2 code-stack" style="margin-bottom:.8rem;">
+          <div>
+            <p style="font-size:.84rem;font-weight:700;color:var(--accent-light);margin:.2rem 0 .3rem;">&#128230; Phase 1 &mdash; Scaffold &amp; Validation</p>
+            <pre style="margin:0;"><span class="highlight-file">terminal</span><code># Step 1: Install NestJS CLI globally (one-time setup)
 npm install -g @nestjs/cli
 
-# 2. Scaffold the Student Management project (select npm)
-nest new student-management-api --package-manager npm
+# Step 2: Create the project — choose 'npm' when prompted for package manager
+nest new student-management-api
 cd student-management-api
 
-# 3. Generate feature domain resources with modules, controllers, and services
+# Step 3: Generate Student &amp; Auth feature modules
+# Each command creates: module + controller + service + dto/ + entities/
 nest g resource students --no-spec
 nest g resource auth --no-spec
 
-# 4. Install production dependencies: config, database, security, validation, and swagger
-npm install @nestjs/config joi @nestjs/typeorm typeorm pg @nestjs/passport passport passport-jwt @nestjs/jwt bcrypt class-validator class-transformer @nestjs/swagger @nestjs/throttler helmet
-npm install -D @types/bcrypt @types/passport-jwt @types/supertest</code></pre>
+# Step 4: Input validation &amp; body transformation (always needed)
+npm install class-validator class-transformer</code></pre>
 
-        <div class="grid-2" style="margin-top:1rem;">
-          <div class="card">
-            <h3 style="color:#fff;">Clean Modular Folder Structure</h3>
-            <pre style="margin:0;"><code>src/
+            <p style="font-size:.84rem;font-weight:700;color:var(--cyan);margin:.8rem 0 .3rem;">&#128204; Phase 2 &mdash; Database (TypeORM + PostgreSQL)</p>
+            <pre style="margin:0;"><span class="highlight-file">terminal</span><code># TypeORM ORM library + NestJS adapter + PostgreSQL pg driver
+npm install @nestjs/typeorm typeorm pg
+
+# .env config management + Joi for startup-time .env validation
+npm install @nestjs/config joi</code></pre>
+
+            <p style="font-size:.84rem;font-weight:700;color:var(--ok);margin:.8rem 0 .3rem;">&#128274; Phase 3 &mdash; Auth, Security &amp; API Docs</p>
+            <pre style="margin:0;"><span class="highlight-file">terminal</span><code># Authentication: JWT tokens + Passport.js strategy pattern
+npm install @nestjs/passport @nestjs/jwt passport passport-jwt bcrypt
+
+# Rate limiting (brute-force protection) + HTTP security headers
+npm install @nestjs/throttler helmet
+
+# Interactive Swagger / OpenAPI documentation UI
+npm install @nestjs/swagger
+
+# Dev-only TypeScript type definitions
+npm install -D @types/bcrypt @types/passport-jwt @types/supertest</code></pre>
+          </div>
+
+          <div>
+            <div class="card">
+              <h3 style="color:#0f172a;">Clean Modular Folder Structure</h3>
+              <pre style="margin:0;"><code>src/
 ├── main.ts                    # Application bootstrap &amp; global pipeline
 ├── app.module.ts              # Root module importing features &amp; database
 ├── config/
@@ -851,10 +931,9 @@ npm install -D @types/bcrypt @types/passport-jwt @types/supertest</code></pre>
     ├── students.service.ts
     ├── dto/                   # CreateStudentDto, UpdateStudentDto
     └── entities/              # Student TypeORM entity</code></pre>
-          </div>
+            </div>
 
-          <div>
-            <div class="callout callout-info">
+            <div class="callout callout-info" style="margin-top:.8rem;">
               <strong>&#128161; TIP: Node Version Pinning (.nvmrc):</strong>
               Add a <code>.nvmrc</code> file in your repository root with <code>20.18.0</code> (Active LTS). This
               guarantees identical Node.js runtime environments between your team's local machines and CI/CD production
@@ -895,7 +974,7 @@ npm install -D @types/bcrypt @types/passport-jwt @types/supertest</code></pre>
           startup and fail fast if anything is missing.
         </p>
 
-        <div class="grid-2">
+        <div class="grid-2 code-stack">
           <div>
             <pre><span class="highlight-file">.env.example</span><code># Application Port &amp; Environment
 PORT=3000
@@ -982,59 +1061,94 @@ export class AppModule {}</code></pre>
           TypeORM.
         </p>
 
-        <div class="grid-2">
-          <div>
-            <pre><span class="highlight-file">src/common/enums/role.enum.ts</span><code>export enum Role {
-  ADMIN = 'ADMIN',       // Registrar, System Administrators
+        <!-- Tab switcher for the 3 entity files -->
+        <div style="display:flex;gap:.5rem;margin-bottom:.8rem;flex-wrap:wrap;">
+          <button class="btn btn-accent" id="tab-role" onclick="showEntityTab('role')" style="font-size:.8rem;">&#9654; role.enum.ts</button>
+          <button class="btn" id="tab-user" onclick="showEntityTab('user')" style="font-size:.8rem;">&#9654; user.entity.ts</button>
+          <button class="btn" id="tab-student" onclick="showEntityTab('student')" style="font-size:.8rem;">&#9654; student.entity.ts</button>
+          <button class="btn" id="tab-er" onclick="showEntityTab('er')" style="font-size:.8rem;">&#9654; ER Diagram</button>
+        </div>
+
+        <!-- Tab: Role Enum -->
+        <div id="entity-tab-role">
+          <pre><span class="highlight-file">src/common/enums/role.enum.ts</span><code>export enum Role {
+  ADMIN   = 'ADMIN',     // System Administrators &amp; Registrars
   TEACHER = 'TEACHER',   // Faculty &amp; Instructors
   STUDENT = 'STUDENT',   // Enrolled Learners
-}</code></pre>
+}
 
-            <pre><span class="highlight-file">src/users/entities/user.entity.ts</span><code>import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, DeleteDateColumn, OneToOne } from 'typeorm';
+// &#128161; TIP: String enums are stored as readable text in PostgreSQL
+// (e.g. 'ADMIN') instead of integers (0, 1, 2).
+// Much easier to debug when you query the DB directly!</code></pre>
+          <div class="callout callout-info">
+            <strong>Why string enums over numeric?</strong> If you use <code>Role.ADMIN = 0</code>,
+            anyone looking at the database sees <code>0</code> and needs a lookup chart.
+            With <code>Role.ADMIN = 'ADMIN'</code> the data is self-documenting.
+          </div>
+        </div>
+
+        <!-- Tab: User Entity -->
+        <div id="entity-tab-user" style="display:none;">
+          <pre><span class="highlight-file">src/users/entities/user.entity.ts</span><code>import {
+  Entity, PrimaryGeneratedColumn, Column,
+  CreateDateColumn, UpdateDateColumn, DeleteDateColumn, OneToOne
+} from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { Role } from '../../common/enums/role.enum';
 import { Student } from '../../students/entities/student.entity';
 
-@Entity('users')
+@Entity('users')    // Maps this class to PostgreSQL table named 'users'
 export class User {
+
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id: string;             // Auto-generated UUID, e.g. "a1b2c3d4-e5f6-..."
 
   @Column({ unique: true, length: 150 })
-  email: string;
+  email: string;          // Must be unique across all users (enforced at DB level)
 
   @Column()
-  @Exclude() // Automatically stripped from JSON responses
-  passwordHash: string;
+  @Exclude()              // &#10004; Stripped from JSON responses by ClassSerializerInterceptor
+  passwordHash: string;   // NEVER stored as plain text!
 
   @Column({ type: 'enum', enum: Role, default: Role.STUDENT })
   role: Role;
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt: Date;        // Automatically set by TypeORM on INSERT
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updatedAt: Date;        // Automatically updated by TypeORM on every UPDATE
 
-  @DeleteDateColumn() // Enables soft-delete (preserves audit trail)
-  deletedAt?: Date;
+  @DeleteDateColumn()     // Enables soft-delete: sets deletedAt instead of deleting row
+  deletedAt?: Date;       // NULL = active record,  date value = soft-deleted
 
-  @OneToOne(() => Student, (student) => student.user)
-  student?: Student;
+  @OneToOne(() =&gt; Student, (student) =&gt; student.user)
+  student?: Student;      // Lazy-loaded 1-to-1 relationship
 }</code></pre>
+          <div class="callout callout-warn">
+            <strong>&#9888;&#65039; PITFALL: Forgetting @Exclude() on passwordHash</strong> — Without
+            <code>ClassSerializerInterceptor</code> + <code>@Exclude()</code>, the bcrypt hash
+            is returned in <em>every single API response</em>. This is a critical security leak.
+            We set it up globally in <code>main.ts</code> (covered in Slide 17).
           </div>
+        </div>
 
-          <div>
-            <pre><span class="highlight-file">src/students/entities/student.entity.ts</span><code>import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, DeleteDateColumn, OneToOne, JoinColumn } from 'typeorm';
+        <!-- Tab: Student Entity -->
+        <div id="entity-tab-student" style="display:none;">
+          <pre><span class="highlight-file">src/students/entities/student.entity.ts</span><code>import {
+  Entity, PrimaryGeneratedColumn, Column,
+  CreateDateColumn, UpdateDateColumn, DeleteDateColumn, OneToOne, JoinColumn
+} from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 
-@Entity('students')
+@Entity('students')   // Maps to PostgreSQL table named 'students'
 export class Student {
+
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column({ unique: true, length: 30 })
-  rollNumber: string; // e.g. "CS-2026-042"
+  rollNumber: string;      // e.g. "CS-2026-042" — must be globally unique
 
   @Column({ length: 60 })
   firstName: string;
@@ -1043,42 +1157,67 @@ export class Student {
   lastName: string;
 
   @Column({ length: 100 })
-  department: string;
+  department: string;      // e.g. "Computer Science"
 
   @Column({ type: 'int' })
-  enrollmentYear: number;
+  enrollmentYear: number;  // 2024, 2025, 2026 ...
 
   @Column({ default: 'ACTIVE' })
   status: 'ACTIVE' | 'GRADUATED' | 'SUSPENDED';
 
-  @CreateDateColumn()
-  createdAt: Date;
+  @CreateDateColumn() createdAt: Date;
+  @UpdateDateColumn() updatedAt: Date;
+  @DeleteDateColumn() deletedAt?: Date;  // Soft-delete column
 
-  @UpdateDateColumn()
-  updatedAt: Date;
-
-  @DeleteDateColumn()
-  deletedAt?: Date;
-
-  // 1-to-1 link with User authentication account
-  @OneToOne(() => User, (user) => user.student, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'userId' })
+  // @JoinColumn on THIS side means the 'students' table holds the FK column
+  @OneToOne(() =&gt; User, (user) =&gt; user.student, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'userId' })   // &lt;-- Creates the actual FK column in DB
   user: User;
 
   @Column()
-  userId: string;
+  userId: string;    // Stored directly for fast WHERE userId = $1 queries
 }</code></pre>
+          <div class="callout callout-nest">
+            <strong>&#128161; TIP: Why store userId as a Column AND OneToOne?</strong>
+            Keeping <code>userId</code> as an explicit <code>@Column()</code> lets you filter
+            by user without loading the full <code>User</code> entity via a JOIN.
+            It trades a tiny bit of redundancy for significantly faster lookups.
+          </div>
+        </div>
 
-            <div class="callout callout-nest">
-              <strong>&#128161; TIP: Soft Delete Protection:</strong>
-              Using <code>@DeleteDateColumn()</code> allows calling <code>studentRepo.softDelete(id)</code>. Instead of
-              permanently destroying student history, TypeORM sets <code>deletedAt = NOW()</code> and automatically
-              filters out deleted rows from standard queries!
+        <!-- Tab: ER Diagram -->
+        <div id="entity-tab-er" style="display:none;">
+          <div class="card">
+            <h3 style="color:var(--cyan);">&#128447; Entity Relationship Diagram</h3>
+            <pre style="font-size:.82rem;"><code>  ┌──────────────────────────────┐       ┌──────────────────────────────┐
+  │       users (table)          │       │     students (table)         │
+  ├──────────────────────────────┤       ├──────────────────────────────┤
+  │ id           UUID   PK       │◄──┐   │ id           UUID  PK        │
+  │ email        VARCHAR(150) UQ │   │   │ userId       UUID  FK ───────┘
+  │ passwordHash VARCHAR         │   └───│ rollNumber   VARCHAR(30) UQ  │
+  │ role         ENUM            │       │ firstName    VARCHAR(60)      │
+  │ createdAt    TIMESTAMP       │       │ lastName     VARCHAR(60)      │
+  │ updatedAt    TIMESTAMP       │       │ department   VARCHAR(100)     │
+  │ deletedAt    TIMESTAMP NULL  │       │ enrollmentYear INT            │
+  └──────────────────────────────┘       │ status       VARCHAR          │
+                                         │ createdAt    TIMESTAMP        │
+         1 User : 1 Student              │ deletedAt    TIMESTAMP NULL   │
+         (CASCADE on delete)             └──────────────────────────────┘</code></pre>
+            <div class="callout callout-info" style="margin-top:.5rem;">
+              <strong>&#128161; Key Design Decisions:</strong>
+              <ul style="margin:.4rem 0;padding-left:1.3rem;font-size:.88rem;">
+                <li><strong>Split tables:</strong> Auth (User) is separated from academic profile (Student). A teacher account needs no Student record — same schema, different role.</li>
+                <li><strong>Soft delete on both:</strong> Student history and login records are preserved for auditing — never permanently deleted.</li>
+                <li><strong>CASCADE:</strong> Removing a User automatically soft-deletes their linked Student row.</li>
+              </ul>
             </div>
           </div>
         </div>
+
+
       </div>
 
+      <!-- SLIDE 6
       <!-- SLIDE 6: Database Setup with TypeORM + PostgreSQL -->
       <div class="slide" data-title="6. Database & TypeORM Migrations">
         <div class="slide-header">
@@ -1086,14 +1225,49 @@ export class Student {
           <span class="slide-step-badge">Database Layer</span>
         </div>
         <p>
-          Connecting NestJS to PostgreSQL requires <code>@nestjs/typeorm</code>. For production safety, we configure
-          dynamic asynchronous module loading via <code>ConfigService</code> and manage database schema changes using
-          migrations.
+          We start with a <strong>hardcoded connection</strong> so you can confirm it works, then immediately upgrade to <code>.env</code> + <code>ConfigService</code> for production.
         </p>
 
-        <div class="grid-2">
+        <div class="callout callout-warn" style="margin-bottom:.8rem;">
+          <strong>&#9312; Step A: Start with Hardcoded Config (Dev Only — confirm connection first!)</strong><br>
+          Before using environment variables, verify that TypeORM can connect at all.
+          Hardcode values temporarily, see it work, then refactor in Step B.
+        </div>
+
+        <pre><span class="highlight-file">src/app.module.ts &mdash; Step A: Hardcoded (get it connecting first!)</span><code>import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { User } from './users/entities/user.entity';
+import { Student } from './students/entities/student.entity';
+
+@Module({
+  imports: [
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: 'localhost',              // &#10060; Hardcoded — dev only!
+      port: 5432,                     // &#10060; Hardcoded — dev only!
+      username: 'postgres',           // &#10060; Hardcoded — dev only!
+      password: 'yourpassword',       // &#10060; Hardcoded — dev only!
+      database: 'sms_university_db',  // Create this DB in pgAdmin first
+      entities: [User, Student],      // List every entity here
+      synchronize: true,              // &#9888; Auto-creates tables in dev; NEVER in prod!
+      logging: true,                  // Shows SQL queries in terminal (helpful!)
+    }),
+  ],
+})
+export class AppModule {}
+
+// &#128073; Once this works (server starts, tables created), move to Step B below!</code></pre>
+
+        <div class="callout callout-info" style="margin:.8rem 0;">
+          <strong>&#9313; Step B: Refactor to .env (Production-Ready)</strong><br>
+          Now move all hardcoded values to <code>.env</code> and load them via <code>ConfigService</code>.
+          This separates code from configuration — same code runs in dev, staging, and production
+          with different database credentials.
+        </div>
+
+        <div class="grid-2 code-stack">
           <div>
-            <pre><span class="highlight-file">src/app.module.ts</span><code>import { Module } from '@nestjs/common';
+            <pre><span class="highlight-file">src/app.module.ts &mdash; Step B: .env via ConfigService</span><code>import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
@@ -1177,7 +1351,7 @@ npm run typeorm -- -d ./dist/database/data-source.js migration:revert</code></pr
           hitting your controller.
         </p>
 
-        <div class="grid-2">
+        <div class="grid-2 code-stack">
           <div>
             <pre><span class="highlight-file">src/students/dto/create-student.dto.ts</span><code>import { IsEmail, IsNotEmpty, IsString, MinLength, Matches, IsInt, Min, Max } from 'class-validator';
 import { Transform } from 'class-transformer';
@@ -1495,7 +1669,7 @@ export class StudentsService {
             token</strong>.
         </p>
 
-        <div class="grid-2">
+        <div class="grid-2 code-stack">
           <div>
             <pre><span class="highlight-file">src/auth/dto/login.dto.ts</span><code>import { IsEmail, IsString, MinLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
@@ -1613,7 +1787,7 @@ export class AuthService {
           and the decoded payload is bound to <code>req.user</code>.
         </p>
 
-        <div class="grid-2">
+        <div class="grid-2 code-stack">
           <div>
             <pre><span class="highlight-file">src/auth/strategies/jwt.strategy.ts</span><code>import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
@@ -1696,7 +1870,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
           compares the user's role against permissions declared with the <code>@Roles()</code> decorator.
         </p>
 
-        <div class="grid-2">
+        <div class="grid-2 code-stack">
           <div>
             <pre><span class="highlight-file">src/auth/decorators/roles.decorator.ts</span><code>import { SetMetadata } from '@nestjs/common';
 import { Role } from '../../common/enums/role.enum';
@@ -1750,7 +1924,7 @@ export class RolesGuard implements CanActivate {
 
           <div>
             <div class="card">
-              <h3 style="color:#fff;">Global Guard Ordering in <code>AppModule</code></h3>
+              <h3 style="color:#0f172a;">Global Guard Ordering in <code>AppModule</code></h3>
               <p style="font-size:.87rem; color:var(--muted); line-height:1.6;">
                 NestJS executes guards in the exact order declared in <code>providers</code>:
               </p>
@@ -1876,7 +2050,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
           log levels.
         </p>
 
-        <div class="grid-2">
+        <div class="grid-2 code-stack">
           <div>
             <pre><span class="highlight-file">src/logger/winston.config.ts</span><code>import * as winston from 'winston';
 import 'winston-daily-rotate-file';
@@ -1961,7 +2135,7 @@ export class StudentsService {
           and common HTTP header vulnerabilities using <code>@nestjs/throttler</code> and <strong>Helmet</strong>.
         </p>
 
-        <div class="grid-2">
+        <div class="grid-2 code-stack">
           <div>
             <pre><span class="highlight-file">src/app.module.ts</span><code>import { Module } from '@nestjs/common';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
@@ -2038,7 +2212,7 @@ app.enableCors({
           to render an interactive Swagger UI at <code>/api/docs</code>.
         </p>
 
-        <div class="grid-2">
+        <div class="grid-2 code-stack">
           <div>
             <pre><span class="highlight-file">src/main.ts (Swagger Setup)</span><code>import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
@@ -2123,7 +2297,7 @@ export class StudentsController {
           and strip sensitive entity columns using <code>ClassSerializerInterceptor</code>.
         </p>
 
-        <div class="grid-2">
+        <div class="grid-2 code-stack">
           <div>
             <pre><span class="highlight-file">src/common/interceptors/transform.interceptor.ts</span><code>import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nestjs/common';
 import { Observable } from 'rxjs';
@@ -2437,7 +2611,7 @@ describe('StudentsController (e2e)', () => {
           non-root user.
         </p>
 
-        <div class="grid-2">
+        <div class="grid-2 code-stack">
           <div>
             <pre><span class="highlight-file">Dockerfile</span><code># ==========================================
 # STAGE 1: Build Application
@@ -2756,7 +2930,7 @@ bootstrap();</code></pre>
           <h2>Summary &amp; Advanced Learning Roadmap</h2>
           <span class="slide-step-badge">Course Graduation</span>
         </div>
-        <p style="font-size:1.05rem; color:#e2e8f0; margin-bottom:1rem;">
+        <p style="font-size:1.05rem; color:#1e293b; margin-bottom:1rem;">
           Congratulations! You have mastered the complete architectural pipeline to build, test, and deploy
           enterprise-grade NestJS REST APIs with production-grade security and reliability.
         </p>
@@ -2844,7 +3018,7 @@ bootstrap();</code></pre>
   <!-- ========================================== -->
   <div id="scroll-mode">
     <div style="margin-bottom:2rem; border-bottom:1px solid var(--border); padding-bottom:1rem;">
-      <h1 style="color:#fff; margin-top:0;">NestJS API Architecture &amp; Student Registration Guide</h1>
+      <h1 style="color:#0f172a; margin-top:0;">NestJS API Architecture &amp; Student Registration Guide</h1>
       <p style="color:var(--muted);">Continuous reading mode of all 24 masterclass tutorial slides.</p>
       <button class="btn btn-accent" onclick="toggleViewMode()">
         &larr; Return to Slide Deck Presentation
@@ -3160,8 +3334,41 @@ bootstrap();</code></pre>
     }
 
     // Initialize UI
-    updateSlideUI();
-  </script>
+  
+  // ENTITY TAB SWITCHER (Slide 5)
+  function showEntityTab(tab) {
+    ['role', 'user', 'student', 'er'].forEach(function(t) {
+      var el = document.getElementById('entity-tab-' + t);
+      var btn = document.getElementById('tab-' + t);
+      if (el) el.style.display = (t === tab) ? '' : 'none';
+      if (btn) btn.className = (t === tab) ? 'btn btn-accent' : 'btn';
+    });
+  }
+
+  updateSlideUI();
+  
+  // THEME TOGGLE
+  function toggleTheme() {
+    const isDark = document.body.classList.toggle('dark-mode');
+    const btn = document.getElementById('btn-theme');
+    if (btn) {
+      btn.textContent = isDark ? String.fromCodePoint(0x2600) : String.fromCodePoint(0x263E);
+      btn.title = isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode';
+    }
+    try { localStorage.setItem('nestjs_theme', isDark ? 'dark' : 'light'); } catch(e) {}
+  }
+  // Restore on load
+  (function() {
+    try {
+      if (localStorage.getItem('nestjs_theme') === 'dark') {
+        document.body.classList.add('dark-mode');
+        var btn = document.getElementById('btn-theme');
+        if (btn) { btn.textContent = String.fromCodePoint(0x2600); btn.title = 'Switch to Light Mode'; }
+      }
+    } catch(e) {}
+  })();
+
+</script>
 </body>
 
 </html>

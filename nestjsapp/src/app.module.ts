@@ -12,6 +12,7 @@ import { Student } from './students/entities/student.entity.js';
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
+      
       useFactory: (config: ConfigService) => ({
         type: 'postgres', //   type: 'mysql',
         host: "localhost",//config.get<string>('DB_HOST'),
